@@ -1,0 +1,23 @@
+{
+    "name": "lucinda/framework",
+    "type": "library",
+    "description": "MVC Exceptions framework for PHP",
+    "keywords": ["mvc","errors"],
+    "homepage": "http://www.lucinda-framework.com",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lucian Popescu",
+            "email": "lucian.gabriel.popescu@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "lucinda/errors": "~1.0",
+        "lucinda/logging": "~1.0"
+    },
+    "require-dev": {
+        "lucinda/errors": "~1.0",
+        "lucinda/logging": "~1.0"
+    }
+}

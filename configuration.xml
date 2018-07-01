@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+
+<xml>
+	<application>
+		<default_content_type>text/html</default_content_type>
+		<paths>
+			<controllers>application/controllers</controllers>
+			<views>application/views</views>
+			<reporters>application/reporters</reporters>
+			<renderers>application/renderers</renderers>
+		</paths>
+		<display_errors>
+			<ENVIRONMENT>1</ENVIRONMENT>
+		</display_errors>
+	</application>
+	<reporters>
+		<ENVIRONMENT>
+			<reporter class="..."/>
+		</ENVIRONMENT>
+	</reporters>
+	<exceptions controller="..." http_status="...">
+		<exception class="..." controller="..." view="..." http_status="..." is_reportable="..."/>
+	</exceptions>
+	<renderers>
+		<renderer content_type="text/html" class="HTMLRenderer" charset="UTF-8"/>
+		<renderer content_type="application/json" class="JsonRenderer" charset="UTF-8"/>
+	</renderers>
+</xml>
