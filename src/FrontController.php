@@ -6,9 +6,6 @@ require_once("PHPException.php");
 
 class FrontController implements ErrorHandler
 {
-    const DEFAULT_HTTP_STATUS = 500;
-    const DEFAULT_REPORTING_STATUS = LOG_ERR;
-    
     private $contentType;
     private $documentDescriptor;
     private $developmentEnvironment;
