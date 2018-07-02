@@ -2,11 +2,11 @@
 namespace Lucinda\Framework\STDERR;
 
 /**
- * Defines blueprint for error display
+ * Defines blueprint for output following a routed exception.
  */
 interface ErrorRenderer {
 	/**
-	 * Renders error to screen.
+	 * Renders view to screen.
 	 * 
 	 * @param View $view
 	 */

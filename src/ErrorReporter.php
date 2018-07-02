@@ -2,14 +2,14 @@
 namespace Lucinda\Framework\STDERR;
 
 /**
- * Defines blueprint for error reporting 
+ * Defines blueprint for reporting a routed exception
  */
 interface ErrorReporter {
 	/**
 	 * Reports error to a storage medium.
 	 * 
 	 * @param \Exception|\Throwable $exception
-     * @param integer $severity
+     * @param ErrorType $type One of possible error types
 	 */
-	function report($exception, $severity);
+	function report($exception, $type);
 }

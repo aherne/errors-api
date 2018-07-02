@@ -1,6 +1,9 @@
 <?php
 namespace Lucinda\Framework\STDERR;
 
+/**
+ * Detects MVC Errors API settings from XML
+ */
 class Application
 {
     private $simpleXMLElement;

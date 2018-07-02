@@ -3,13 +3,30 @@ namespace Lucinda\Framework\STDERR;
 
 require_once("ErrorRenderer.php");
 
+/**
+ * Locates error renderer on disk based on XML, then instances it with its XML tag
+ */
 class ErrorRendererFinder {
     private $renderer;
-    
+
+    /**
+     * ErrorRendererFinder constructor.
+     *
+     * @param Application $application
+     * @param string $contentType
+     * @throws Exception
+     */
     public function __construct(Application $application, $contentType) {
         $this->setRenderer($application, $contentType);
     }
-    
+
+    /**
+     * Locates renderer on dis, then instances it with its XML tag and saves result
+     *
+     * @param Application $application
+     * @param string $contentType
+     * @throws Exception
+     */
     private function setRenderer($application, $contentType) {
         $tmp = (array) $application->getXML()->renderers;
         if(empty($tmp["renderer"])) return;
@@ -29,7 +46,12 @@ class ErrorRendererFinder {
             $this->renderer = $object;
         }
     }
-    
+
+    /**
+     * Gets found error renderer.
+     *
+     * @return ErrorRenderer
+     */
     public function getRenderer() {
         return $this->renderer;
     }

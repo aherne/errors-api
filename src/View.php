@@ -3,32 +3,35 @@ namespace Lucinda\Framework\STDERR;
 
 class View
 {
-    private $characterEncoding;
     private $httpStatus;
     private $stream;
-    private $view;
+    private $file;
     private $headers=array();
     
-    public function __construct(Route $route){
+    public function __construct(Application $application, Route $route){
         $this->headers["Content-Type"] = $route->getContentType();
         $this->httpStatus = $route->getHttpStatus();
-        $this->view = $route->getView();
+        $this->file = $application->getViewsPath()."/".$route->getView().".php";
     }
     
     /**
+     * Gets file that contains response body.
+     *
      * @return mixed
      */
-    public function getView()
+    public function getFile()
     {
-        return $this->view;
+        return $this->file;
     }
 
     /**
+     * Sets file that contains response body.
+     *
      * @param mixed $view
      */
-    public function setView($view)
+    public function setFile($file)
     {
-        $this->view = $view;
+        $this->file = $file;
     }
     
     /**
@@ -36,7 +39,7 @@ class View
      */
     public function getContentType()
     {
-        return $this->contentType;
+        return $this->headers["Content-Type"];
     }
 
     /**

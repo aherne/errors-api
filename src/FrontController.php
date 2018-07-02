@@ -47,24 +47,26 @@ class FrontController implements ErrorHandler
 
             // compiles a view object from content type and http status
             require_once("View.php");
-            $view = new View($route);
+            $view = new View($application, $route);
 
             // passes View object to Controller
             if($route->getController()) {
                 require_once("ControllerFinder.php");
-                $cf = new ControllerFinder($application, $reporters, $route, $view);
+                $cf = new ControllerFinder($application, $route, $view, $reporters);
                 $controller = $cf->getController();
-                $reporters = $controller->getReporters();
+                $reporters = $controller->run($exception);
             }
 
             // report
-            foreach($reporters as $reporter) {
-                $reporter->report($exception, $route->getSeverity());
+            if($route->getErrorType()!=ErrorType::NONE) {
+                foreach($reporters as $reporter) {
+                    $reporter->report($exception, $route->getErrorType());
+                }
             }
 
             // render
             require_once("ErrorRendererFinder.php");
-            $erf = new ErrorRendererFinder($application, $route->get);
+            $erf = new ErrorRendererFinder($application, $view->getContentType());
             $renderer = $erf->getRenderer();
             $renderer->render($view);
         } catch(Exception $internalError) {

@@ -1,15 +1,21 @@
 <?php
 namespace Lucinda\Framework\STDERR;
 
+/**
+ * Encapsulates a route that matches a thrown exception
+ */
 class Route
 {
     private $controller;
     private $view;
     private $httpStatus;
-    private $severity;
+    private $errorType;
     private $contentType;
+
     /**
-     * @return mixed
+     * Gets controller class name that handles exception thrown.
+     *
+     * @return string
      */
     public function getController()
     {
@@ -17,7 +23,9 @@ class Route
     }
 
     /**
-     * @return mixed
+     * Gets file that holds what is displayed when error response is rendered.
+     *
+     * @return string
      */
     public function getView()
     {
@@ -25,7 +33,9 @@ class Route
     }
 
     /**
-     * @return mixed
+     * Gets HTTP status associated to exception thrown.
+     *
+     * @return integer
      */
     public function getHttpStatus()
     {
@@ -33,15 +43,19 @@ class Route
     }
 
     /**
-     * @return mixed
+     * Gets error type associated to exception thrown.
+     * 
+     * @return ErrorType
      */
-    public function getSeverity()
+    public function getErrorType()
     {
-        return $this->severity;
+        return $this->errorType;
     }
 
     /**
-     * @return mixed
+     * Gets content type associated to exception thrown.
+     *
+     * @return string
      */
     public function getContentType()
     {
@@ -49,6 +63,8 @@ class Route
     }
 
     /**
+     * Sets controller class name that handles exception thrown.
+     *
      * @param mixed $controller
      */
     public function setController($controller)
@@ -57,6 +73,8 @@ class Route
     }
 
     /**
+     * Sets file that holds what is displayed when error response is rendered.
+     *
      * @param mixed $view
      */
     public function setView($view)
@@ -65,7 +83,9 @@ class Route
     }
 
     /**
-     * @param mixed $httpStatus
+     * Sets HTTP status associated to exception thrown.
+     *
+     * @param integer $httpStatus
      */
     public function setHttpStatus($httpStatus)
     {
@@ -73,15 +93,19 @@ class Route
     }
 
     /**
-     * @param mixed $severity
+     * Sets error type associated to exception thrown.
+     *
+     * @param integer $errorType
      */
-    public function setSeverity($severity)
+    public function setErrorType($errorType)
     {
-        $this->severity = $severity;
+        $this->errorType = $errorType;
     }
 
     /**
-     * @param mixed $contentType
+     * Sets content type associated to exception thrown.
+     *
+     * @param string $contentType
      */
     public function setContentType($contentType)
     {

@@ -3,10 +3,20 @@ namespace Lucinda\Framework\STDERR;
 
 require_once("ErrorReporter.php");
 
+/**
+ * Locates error reporters on disk based on XML and development environment, then instances them based on their matching XML tag.
+ */
 class ErrorReportersFinder
 {
     private $reporters;
-    
+
+    /**
+     * ErrorReportersFinder constructor.
+     *
+     * @param Application $application
+     * @param string $developmentEnvironment
+     * @throws Exception
+     */
     public function __construct(Application $application, $developmentEnvironment) {
         $this->setReporters($application, $developmentEnvironment);
     }

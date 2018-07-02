@@ -1,18 +1,20 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: aherne
- * Date: 02.07.2018
- * Time: 09:32
- */
-
 namespace Lucinda\Framework\STDERR;
 
-
+/**
+ * Encapsulates an abstract controller that feeds on exceptions, able to set exception-specific rendering/reporting policies
+ */
 abstract class Controller
 {
     protected $application, $route, $view, $reporters;
 
+    /**
+     * Controller constructor.
+     * @param Application $application
+     * @param Route $route
+     * @param View $view
+     * @param ErrorReporter[] $reporters
+     */
     public function __construct(Application $application, Route $route, View $view, $reporters) {
         $this->application = $application;
         $this->route = $route;
@@ -20,7 +22,11 @@ abstract class Controller
         $this->reporters = $reporters;
     }
 
-    public function getReporters() {
-        return $this->reporters;
-    }
+    /**
+     * Executes controller logic, which interfaces received exception with models (eg: reporters) and view
+     *
+     * @param Exception|Error $exception Exception routed.
+     * @return ErrorReporter[] List of reporters to send exception to.
+     */
+    abstract public function run($exception);
 }
