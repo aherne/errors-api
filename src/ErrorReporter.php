@@ -9,6 +9,7 @@ interface ErrorReporter {
 	 * Reports error to a storage medium.
 	 * 
 	 * @param \Exception|\Throwable $exception
+     * @param integer $severity
 	 */
-	function report($exception);
+	function report($exception, $severity);
 }

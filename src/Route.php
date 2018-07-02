@@ -6,7 +6,7 @@ class Route
     private $controller;
     private $view;
     private $httpStatus;
-    private $reportingStatus;
+    private $severity;
     private $contentType;
     /**
      * @return mixed
@@ -35,9 +35,9 @@ class Route
     /**
      * @return mixed
      */
-    public function getReportingStatus()
+    public function getSeverity()
     {
-        return $this->reportingStatus;
+        return $this->severity;
     }
 
     /**
@@ -73,11 +73,11 @@ class Route
     }
 
     /**
-     * @param mixed $reportingStatus
+     * @param mixed $severity
      */
-    public function setReportingStatus($reportingStatus)
+    public function setSeverity($severity)
     {
-        $this->reportingStatus = $reportingStatus;
+        $this->severity = $severity;
     }
 
     /**

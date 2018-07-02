@@ -42,8 +42,8 @@ class RouteFinder {
         }
         
         // override non-existent reporting status with default
-        if(!$this->route->getReportingStatus()) {
-            $this->route->setReportingStatus(self::DEFAULT_REPORTING_STATUS);
+        if(!$this->route->getSeverity()) {
+            $this->route->setSeverity(self::DEFAULT_REPORTING_STATUS);
         }
     }
     
@@ -52,7 +52,7 @@ class RouteFinder {
         $route->setController((string) $info["controller"]);
         $route->setView((string) $info["view"]);
         $route->setHttpStatus((string) $info["http_status"]);
-        $route->setReportingStatus((string) $info["reporting_status"]);
+        $route->setSeverity((string) $info["reporting_status"]);
         $route->setContentType((string) $info["content_type"]);
         return $route;        
     }

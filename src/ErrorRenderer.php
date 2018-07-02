@@ -8,7 +8,7 @@ interface ErrorRenderer {
 	/**
 	 * Renders error to screen.
 	 * 
-	 * @param \Exception|\Throwable $exception
+	 * @param View $view
 	 */
-	function render($exception);
+	function render(View $view);
 }

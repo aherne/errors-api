@@ -20,7 +20,7 @@
 		</ENVIRONMENT>
 	</reporters>
 	<exceptions controller="..." http_status="...">
-		<exception class="..." controller="..." view="..." http_status="..." is_reportable="..."/>
+		<exception class="PathNotFoundException" controller="..." view="..." http_status="..." reporting_status="..."/>
 	</exceptions>
 	<renderers>
 		<renderer content_type="text/html" class="HTMLRenderer" charset="UTF-8"/>

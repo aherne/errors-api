@@ -29,6 +29,7 @@ class FrontController implements ErrorHandler
     }
     
     public function handle($exception) {
+        $application = null;
         try {
             // finds application settings based on XML and development environment
             require_once("Application.php");
@@ -43,12 +44,7 @@ class FrontController implements ErrorHandler
             require_once("RouteFinder.php");
             $rf = new RouteFinder($application, $exception, $this->contentType);
             $route = $rf->getRoute();
-            
-            // finds view renderer
-            require_once("ErrorRendererFinder.php");
-            $erf = new ErrorRendererFinder($application, $contentType);
-            $renderer = $erf->getRenderer();
-            
+
             // compiles a view object from content type and http status
             require_once("View.php");
             $view = new View($route);
@@ -56,25 +52,28 @@ class FrontController implements ErrorHandler
             // passes View object to Controller
             if($route->getController()) {
                 require_once("ControllerFinder.php");
-                $cf = new ControllerFinder($application, $reporters, $route, $renderer, $view);
+                $cf = new ControllerFinder($application, $reporters, $route, $view);
                 $controller = $cf->getController();
                 $reporters = $controller->getReporters();
-                $view = $controller->getView();
-                // TODO: should controller display view?
             }
-            // TODO: integrate $application->getDisplayErrors();
-            // TODO: integrate $route->getReportingStatus()
-            
+
             // report
             foreach($reporters as $reporter) {
-                $reporter->report($exception);
+                $reporter->report($exception, $route->getSeverity());
             }
-            
-            // render output
+
+            // render
+            require_once("ErrorRendererFinder.php");
+            $erf = new ErrorRendererFinder($application, $route->get);
+            $renderer = $erf->getRenderer();
             $renderer->render($view);
         } catch(Exception $internalError) {
-            
+            if($application && $application->getDisplayErrors()) {
+                var_dump($internalError);
+            }
         }
+
+        die(); // prevent further catch cycle
     }
 }
 

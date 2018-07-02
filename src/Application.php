@@ -9,15 +9,14 @@ class Application
     public function __construct($xmlPath, $developmentEnvironment) {
         if(!file_exists($xmlPath)) throw new Exception("XML configuration file not found!");
         $this->simpleXMLElement = simplexml_load_file($xmlPath);
-        
+
+        $this->setDisplayErrors($developmentEnvironment);
         $this->setDefaultContentType();
         $this->setControllersPath();
         $this->setViewsPath();
         $this->setReportersPath();
         $this->setRenderersPath();
         $this->setViewsPath();
-        $this->setDisplayErrors($developmentEnvironment);
-        $this->setReporters($developmentEnvironment);
     }
     
     /**
