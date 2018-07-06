@@ -1,23 +1,31 @@
 <?php
 namespace Lucinda\Framework\STDERR;
 
+/**
+ * Encapsulates error response that will be displayed back to caller
+ */
 class View
 {
     private $httpStatus;
-    private $stream;
-    private $file;
+    private $body;
     private $headers=array();
-    
+    private $file;
+
+    /**
+     * View constructor.
+     * @param Application $application Collects information about application
+     * @param Route $route Collects information about exception route
+     */
     public function __construct(Application $application, Route $route){
         $this->headers["Content-Type"] = $route->getContentType();
         $this->httpStatus = $route->getHttpStatus();
-        $this->file = $application->getViewsPath()."/".$route->getView().".php";
+        $this->file = $route->getView();
     }
     
     /**
-     * Gets file that contains response body.
+     * Gets relative path of file that contains response body.
      *
-     * @return mixed
+     * @return string
      */
     public function getFile()
     {
@@ -25,25 +33,9 @@ class View
     }
 
     /**
-     * Sets file that contains response body.
+     * Gets response HTTP status
      *
-     * @param mixed $view
-     */
-    public function setFile($file)
-    {
-        $this->file = $file;
-    }
-    
-    /**
-     * @return mixed
-     */
-    public function getContentType()
-    {
-        return $this->headers["Content-Type"];
-    }
-
-    /**
-     * @return mixed
+     * @return integer
      */
     public function getHttpStatus()
     {
@@ -51,15 +43,29 @@ class View
     }
 
     /**
-     * @return mixed
+     * Gets response body
+     *
+     * @return string
      */
-    public function getStream()
+    public function getBody()
     {
-        return $this->stream;
+        return $this->body;
     }
 
     /**
-     * @param mixed $httpStatus
+     * Gets response headers
+     *
+     * @return array[string:string]
+     */
+    public function getHeaders()
+    {
+        return $this->headers;
+    }
+
+    /**
+     * Sets response HTTP status
+     *
+     * @param integer $httpStatus
      */
     public function setHttpStatus($httpStatus)
     {
@@ -67,14 +73,18 @@ class View
     }
 
     /**
-     * @param mixed $stream
+     * Sets response body
+     *
+     * @param string $body
      */
-    public function setStream($stream)
+    public function setBody($body)
     {
-        $this->stream = $stream;
+        $this->body = $body;
     }
     
     /**
+     * Sets response header by name and value.
+     *
      * @param string $name
      * @param string $value
      */
@@ -82,13 +92,15 @@ class View
     {
         $this->headers[$name] = $value;
     }
-    
+
     /**
-     * @return array
+     * Sets relative path of file that contains response body.
+     *
+     * @param string $view
      */
-    public function getHeaders()
+    public function setFile($file)
     {
-        return $this->headers;
+        $this->file = $file;
     }
 }
 
