@@ -6,10 +6,9 @@ namespace Lucinda\Framework\STDERR;
  */
 interface ErrorReporter {
 	/**
-	 * Reports error to a storage medium.
+	 * Reports error info to a storage medium.
 	 * 
-	 * @param \Exception|\Throwable $exception
-     * @param ErrorType $type One of possible error types
+	 * @param Request $request
 	 */
-	function report($exception, $type);
+    function report($request);
 }

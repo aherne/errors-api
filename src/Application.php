@@ -1,13 +1,19 @@
 <?php
 namespace Lucinda\Framework\STDERR;
 
+require_once("ErrorReportersFinder.php");
+require_once("ErrorRenderersFinder.php");
+require_once("RoutesFinder.php");
+require_once("ReportersList.php");
+
 /**
  * Detects MVC Errors API settings from XML
  */
 class Application
 {
     private $simpleXMLElement;
-    private $controllersPath, $viewsPath, $reportersPath, $renderersPath, $defaultContentType, $displayErrors = false;
+    private $controllersPath, $viewsPath, $defaultContentType, $displayErrors = false;
+    private $reporters=array(), $renderers=array(), $routes=array();
     
     public function __construct($xmlPath, $developmentEnvironment) {
         if(!file_exists($xmlPath)) throw new Exception("XML configuration file not found!");
@@ -17,9 +23,9 @@ class Application
         $this->setDefaultContentType();
         $this->setControllersPath();
         $this->setViewsPath();
-        $this->setReportersPath();
-        $this->setRenderersPath();
-        $this->setViewsPath();
+        $this->setReporters($developmentEnvironment);
+        $this->setRenderers();
+        $this->setRoutes();
     }
     
     /**
@@ -71,38 +77,6 @@ class Application
     }
     
     /**
-     * Sets reporters folder. Maps to application.paths.reporters @ XML.
-     */
-    private function setReportersPath() {
-        $this->reportersPath = (string) $this->simpleXMLElement->application->paths->reporters;
-    }
-    
-    /**
-     * Gets path to reporters folder.
-     *
-     * @return string
-     */
-    public function getReportersPath() {
-        return $this->reportersPath;
-    }
-    
-    /**
-     * Sets renderers folder. Maps to application.paths.renderers @ XML.
-     */
-    private function setRenderersPath() {
-        $this->renderersPath = (string) $this->simpleXMLElement->application->paths->renderers;
-    }
-    
-    /**
-     * Gets path to renderers folder.
-     *
-     * @return string
-     */
-    public function getRenderersPath() {
-        return $this->renderersPath;
-    }
-    
-    /**
      * Sets whether or not error details should be displayed in rendered response. Maps to application.display_errors @ XML.
      * 
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
@@ -127,6 +101,39 @@ class Application
      */
     public function getXML() {
         return $this->simpleXMLElement;
+    }
+    
+    private function setReporters($developmentEnvironment) {
+        $erp = new ErrorReportersFinder(
+            $this->simpleXMLElement->reporters->{$developmentEnvironment},
+            (string) $this->simpleXMLElement->application->paths->reporters
+            );
+        $this->reporters = new ReportersList($erp->getReporters());
+    }
+    
+    public function getReporters() {
+        return $this->reporters;
+    }
+    
+    private function setRenderers() {
+        $erf = new ErrorRenderersFinder(
+            $this->simpleXMLElement->renderers,
+            (string) $this->simpleXMLElement->application->paths->renderers
+            );
+        $this->renderers = $erf->getRenderers();
+    }
+    
+    public function getRenderers() {
+        return $this->renderers;
+    }
+    
+    private function setRoutes() {
+        $rf = new RoutesFinder($this->simpleXMLElement->exceptions);
+        $this->routes = $rf->getRoutes();
+    }
+    
+    public function getRoutes() {
+        return $this->routes;
     }
 }
 

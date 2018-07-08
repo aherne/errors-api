@@ -11,6 +11,7 @@ class Route
     private $httpStatus;
     private $errorType;
     private $contentType;
+    private $exception;
 
     /**
      * Gets controller class name that handles exception thrown.
@@ -111,7 +112,5 @@ class Route
     {
         $this->contentType = $contentType;
     }
-
-
 }
 

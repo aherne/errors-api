@@ -6,27 +6,24 @@ namespace Lucinda\Framework\STDERR;
  */
 abstract class Controller
 {
-    protected $application, $route, $view, $reporters;
+    protected $application, $request, $response;
 
     /**
      * Controller constructor.
      * @param Application $application
-     * @param Route $route
-     * @param View $view
-     * @param ErrorReporter[] $reporters
+     * @param Request $request
+     * @param Response $response
      */
-    public function __construct(Application $application, Route $route, View $view, $reporters) {
+    public function __construct(Application $application, Request $request, Response $response) {
         $this->application = $application;
-        $this->route = $route;
-        $this->view = $view;
-        $this->reporters = $reporters;
+        $this->request = $request;
+        $this->response = $response;
     }
 
     /**
-     * Executes controller logic, which interfaces received exception with models (eg: reporters) and view
-     *
-     * @param Exception|Error $exception Exception routed.
-     * @return ErrorReporter[] List of reporters to send exception to.
+     * Executes controller logic, which interfaces received exception with models (eg: reporters) and response
+     * 
+     * @return ErrorReporter[]
      */
-    abstract public function run($exception);
+    abstract public function run();
 }

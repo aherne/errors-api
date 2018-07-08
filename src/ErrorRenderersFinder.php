@@ -6,29 +6,15 @@ require_once("ErrorRenderer.php");
 /**
  * Locates error renderer on disk based on XML, then instances it with its XML tag
  */
-class ErrorRendererFinder {
-    private $renderer;
+class ErrorRenderersFinder {
+    private $renderers = array();
 
-    /**
-     * ErrorRendererFinder constructor.
-     *
-     * @param Application $application
-     * @param string $contentType
-     * @throws Exception
-     */
-    public function __construct(Application $application, $contentType) {
-        $this->setRenderer($application, $contentType);
+    public function __construct(\SimpleXMLElement $xml, $renderersPath) {
+        $this->setRenderer($xml, $renderersPath);
     }
 
-    /**
-     * Locates renderer on dis, then instances it with its XML tag and saves result
-     *
-     * @param Application $application
-     * @param string $contentType
-     * @throws Exception
-     */
-    private function setRenderer($application, $contentType) {
-        $tmp = (array) $application->getXML()->renderers;
+    private function setRenderer(\SimpleXMLElement $xml, $renderersPath) {
+        $tmp = (array) $xml;
         if(empty($tmp["renderer"])) return;
         $tmp = $tmp["renderer"];
         if(!is_array($tmp)) $tmp = array($tmp);
@@ -36,23 +22,17 @@ class ErrorRendererFinder {
             $className = (string) $info['class'];
             $currentContentType = (string) $info["content_type"];
             if(!$currentContentType) throw new Exception("Renderer missing content type!");
-            if($currentContentType != $contentType) continue;
             $file = $application->getRenderersPath()."/".$className.".php";
             if(!file_exists($file)) throw new Exception("Renderer file not found: ".$file);
             require_once($file);
             if(!class_exists($className)) throw new Exception("Renderer class not found: ".$className);
             $object = new $className($info);
             if(!($object instanceof ErrorRenderer)) throw new Exception("Renderer must be instance of ErrorRenderer");
-            $this->renderer = $object;
+            $this->renderers[$currentContentType] = $object;
         }
     }
 
-    /**
-     * Gets found error renderer.
-     *
-     * @return ErrorRenderer
-     */
-    public function getRenderer() {
-        return $this->renderer;
+    public function getRenderers() {
+        return $this->renderers;
     }
 }

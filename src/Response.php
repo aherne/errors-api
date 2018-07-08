@@ -4,32 +4,35 @@ namespace Lucinda\Framework\STDERR;
 /**
  * Encapsulates error response that will be displayed back to caller
  */
-class View
+class Response
 {
     private $httpStatus;
     private $body;
     private $headers=array();
-    private $file;
+    private $view;
 
     /**
      * View constructor.
      * @param Application $application Collects information about application
-     * @param Route $route Collects information about exception route
+     * @param Request $request Collects information about exception route
      */
-    public function __construct(Application $application, Route $route){
-        $this->headers["Content-Type"] = $route->getContentType();
-        $this->httpStatus = $route->getHttpStatus();
-        $this->file = $route->getView();
+    public function __construct(Application $application, Request $request){
+        $routeInfo = $request->getRoute();
+        $this->headers["Content-Type"] = $request->getRoute()->getContentType();
+        $this->httpStatus = $request->getRoute()->getHttpStatus();
+        if($request->getRoute()->getView()) {
+            $this->view = ($application->getViewsPath()."/".$request->getRoute()->getView());
+        }
     }
     
     /**
-     * Gets relative path of file that contains response body.
+     * Gets relative path of view that contains response body.
      *
      * @return string
      */
-    public function getFile()
+    public function getView()
     {
-        return $this->file;
+        return $this->view;
     }
 
     /**
@@ -60,6 +63,17 @@ class View
     public function getHeaders()
     {
         return $this->headers;
+    }
+    
+    /**
+     * Gets value of response header by name
+     * 
+     * @param string $name
+     * @return NULL|string
+     */
+    public function getHeader($name)
+    {
+        return (isset($this->headers[$name])?$this->headers[$name]:null);
     }
 
     /**
@@ -94,13 +108,13 @@ class View
     }
 
     /**
-     * Sets relative path of file that contains response body.
+     * Sets relative path of view that contains response body.
      *
      * @param string $view
      */
-    public function setFile($file)
+    public function setView($view)
     {
-        $this->file = $file;
+        $this->view = $view;
     }
 }
 

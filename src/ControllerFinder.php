@@ -13,33 +13,32 @@ class ControllerFinder {
      * ControllerFinder constructor.
      *
      * @param Application $application
-     * @param Route $route
-     * @param View $view
-     * @param ErrorReporter[] $reporters
+     * @param Request $request
+     * @param Response $response
      * @throws Exception
      */
-    public function __construct(Application $application, Route $route, View $view, $reporters) {
-        $this->setController($application, $route, $view, $reporters);
+    public function __construct(Application $application, Request $request, Response $response) {
+        $this->setController($application, $request, $response, $reporters);
     }
 
     /**
      * Finds controller on disk and saves result
      *
      * @param Application $application
-     * @param Route $route
-     * @param View $view
+     * @param Request $request
+     * @param Response $response
      * @param ErrorReporter[] $reporters
      * @throws Exception
      */
-    private function setController(Application $application, Route $route, View $view, $reporters) {
-        $controllerPath = $application->getControllersPath()."/".$route->getController().".php";
+    private function setController(Application $application, Request $request, Response $response) {
+        $controllerPath = $application->getControllersPath()."/".$request->getRoute()->getController().".php";
         if(!file_exists($controllerPath)) throw new Exception("Controller file not found: ".$controllerPath);
         require_once($controllerPath);
 
-        $controllerClass = $route->getController();
+        $controllerClass = $request->getRoute()->getController();
         if(!class_exists($controllerClass)) throw new Exception("Controller class not found: ".$controllerClass);
 
-        $object = new $controllerClass($application, $route, $view, $reporters);
+        $object = new $controllerClass($application, $request, $response);
         if(!($object instanceof Controller)) throw new Exception("Class must be instance of Controller");
         $this->controller = $object;
     }

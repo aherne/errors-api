@@ -8,46 +8,33 @@ require_once("ErrorReporter.php");
  */
 class ErrorReportersFinder
 {
-    private $reporters;
+    private $reporters = array();
 
-    /**
-     * ErrorReportersFinder constructor.
-     *
-     * @param Application $application
-     * @param string $developmentEnvironment
-     * @throws Exception
-     */
-    public function __construct(Application $application, $developmentEnvironment) {
-        $this->setReporters($application, $developmentEnvironment);
+    public function __construct(\SimpleXMLElement $xml, $reportersPath) {
+        $this->setReporters($xml, $reportersPath);
     }
     
-    /**
-     * Detects error reporters from XML based on development environment
-     *
-     * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
-     * @throws Exception
-     */
-    private function setReporters(Application $application, $developmentEnvironment) {
-        $tmp = (array) $application->getXML()->reporters->{$developmentEnvironment};
+    private function setReporters(\SimpleXMLElement $xml, $reportersPath) {
+        $tmp = (array) $xml;
         if(empty($tmp["reporter"])) return;
         $tmp = $tmp["reporter"];
         if(!is_array($tmp)) $tmp = array($tmp);
         foreach($tmp as $info) {
             $className = (string) $info['class'];
-            $file = $application->getReportersPath()."/".$className.".php";
+            $file = $reportersPath."/".$className.".php";
             if(!file_exists($file)) throw new Exception("Reporter file not found: ".$file);
             require_once($file);
             if(!class_exists($className)) throw new Exception("Reporter class not found: ".$className);
             $object = new $className($info);
             if(!($object instanceof ErrorReporter)) throw new Exception("Reporter must be instance of ErrorReporter");
-            $this->reporters[] = $object;
+            $this->reporters[$className] = $object;
         }
     }
     
     /**
      * Gets list of error reporters found in XML for development environment.
      * 
-     * @return ErrorReporter[]
+     * @return ErrorReporter[string]
      */
     public function getReporters() {
         return $this->reporters;

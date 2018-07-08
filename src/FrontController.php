@@ -35,40 +35,38 @@ class FrontController implements ErrorHandler
             require_once("Application.php");
             $application = new Application($this->documentDescriptor, $this->developmentEnvironment);
             
-            // finds and instances reporters based on XML and development environment
-            require_once("ErrorReportersFinder.php");
-            $erp = new ErrorReportersFinder($application, $this->developmentEnvironment);
-            $reporters = $erp->getReporters();
-            
             // finds and instances routes based on XML and exception received
-            require_once("RouteFinder.php");
-            $rf = new RouteFinder($application, $exception, $this->contentType);
-            $route = $rf->getRoute();
+            require_once("Request.php");
+            $request = new Request($application, $exception, $this->contentType);
 
             // compiles a view object from content type and http status
-            require_once("View.php");
-            $view = new View($application, $route);
+            require_once("Response.php");
+            $response = new Response($application, $request);
 
-            // passes View object to Controller
+            // runs controller, able to alter reporters
             if($route->getController()) {
                 require_once("ControllerFinder.php");
-                $cf = new ControllerFinder($application, $route, $view, $reporters);
+                $cf = new ControllerFinder($application, $request, $response);
                 $controller = $cf->getController();
-                $reporters = $controller->run($exception);
+                $controller->run();
             }
 
-            // report
+            // reports error
             if($route->getErrorType()!=ErrorType::NONE) {
+                $reporters = $application->getReporters()->toArray();
                 foreach($reporters as $reporter) {
-                    $reporter->report($exception, $route->getErrorType());
+                    $reporter->report($request);
                 }
             }
 
-            // render
-            require_once("ErrorRendererFinder.php");
-            $erf = new ErrorRendererFinder($application, $view->getContentType());
-            $renderer = $erf->getRenderer();
-            $renderer->render($view);
+            // renders output
+            $renderers = $application->getRenderers();
+            foreach($renderers as $contentType=>$renderer) {
+                // content type must be an EXACT match (incl. charset)
+                if($contentType == $response->getHeader("Content-Type")) {
+                    $renderer->render($response);
+                }
+            }
         } catch(Exception $internalError) {
             if($application && $application->getDisplayErrors()) {
                 var_dump($internalError);
