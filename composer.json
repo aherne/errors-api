@@ -1,9 +1,9 @@
 {
-    "name": "lucinda/framework",
+    "name": "lucinda/errors-mvc",
     "type": "library",
-    "description": "MVC Exceptions framework for PHP",
+    "description": "MVC framework for STDERR flow in PHP applications",
     "keywords": ["mvc","errors"],
-    "homepage": "http://www.lucinda-framework.com",
+    "homepage": "",
     "license": "MIT",
     "authors": [
         {
@@ -11,13 +11,5 @@
             "email": "lucian.gabriel.popescu@gmail.com",
             "role": "Developer"
         }
-    ],
-    "require": {
-        "lucinda/errors": "~1.0",
-        "lucinda/logging": "~1.0"
-    },
-    "require-dev": {
-        "lucinda/errors": "~1.0",
-        "lucinda/logging": "~1.0"
-    }
+    ]
 }
