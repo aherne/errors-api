@@ -2,6 +2,7 @@
 namespace Lucinda\MVC\STDERR;
 
 require_once("ErrorRenderer.php");
+require_once("ClassFinder.php");
 
 /**
  * Locates error renderer on disk based on XML, then instances it with its XML tag
@@ -19,14 +20,13 @@ class ErrorRenderersFinder {
         $tmp = $tmp["renderer"];
         if(!is_array($tmp)) $tmp = array($tmp);
         foreach($tmp as $info) {
-            $className = (string) $info['class'];
             $currentContentType = (string) $info["content_type"];
             if(!$currentContentType) throw new Exception("Renderer missing content type!");
-            $file = $renderersPath."/".$className.".php";
-            if(!file_exists($file)) throw new Exception("Renderer file not found: ".$file);
-            require_once($file);
-            if(!class_exists($className)) throw new Exception("Renderer class not found: ".$className);
-            $object = new $className($info);
+
+            $classFinder = new ClassFinder($renderersPath, (string) $info['class']);
+            $rendererClass = $classFinder->getName();
+
+            $object = new $rendererClass($info);
             if(!($object instanceof ErrorRenderer)) throw new Exception("Renderer must be instance of ErrorRenderer");
             $this->renderers[$currentContentType] = $object;
         }

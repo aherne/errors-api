@@ -2,6 +2,7 @@
 namespace Lucinda\MVC\STDERR;
 
 require_once("Controller.php");
+require_once("ClassFinder.php");
 
 /**
  * Locates controller on disk based on XML, then instances it via received parameters
@@ -31,13 +32,8 @@ class ControllerFinder {
      * @throws Exception
      */
     private function setController(Application $application, Request $request, Response $response) {
-        $controllerPath = $application->getControllersPath()."/".$request->getRoute()->getController().".php";
-        if(!file_exists($controllerPath)) throw new Exception("Controller file not found: ".$controllerPath);
-        require_once($controllerPath);
-
-        $controllerClass = $request->getRoute()->getController();
-        if(!class_exists($controllerClass)) throw new Exception("Controller class not found: ".$controllerClass);
-
+        $classFinder = new ClassFinder($application->getControllersPath(), $request->getRoute()->getController());
+        $controllerClass = $classFinder->getName();
         $object = new $controllerClass($application, $request, $response);
         if(!($object instanceof Controller)) throw new Exception("Class must be instance of Controller");
         $this->controller = $object;

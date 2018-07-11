@@ -2,6 +2,7 @@
 namespace Lucinda\MVC\STDERR;
 
 require_once("ErrorReporter.php");
+require_once("ClassFinder.php");
 
 /**
  * Locates error reporters on disk based on XML and development environment, then instances them based on their matching XML tag.
@@ -20,14 +21,12 @@ class ErrorReportersFinder
         $tmp = $tmp["reporter"];
         if(!is_array($tmp)) $tmp = array($tmp);
         foreach($tmp as $info) {
-            $className = (string) $info['class'];
-            $file = $reportersPath."/".$className.".php";
-            if(!file_exists($file)) throw new Exception("Reporter file not found: ".$file);
-            require_once($file);
-            if(!class_exists($className)) throw new Exception("Reporter class not found: ".$className);
-            $object = new $className($info);
+            $classFinder = new ClassFinder($reportersPath, (string) $info['class']);
+            $reporterClass = $classFinder->getName();
+
+            $object = new $reporterClass($info);
             if(!($object instanceof ErrorReporter)) throw new Exception("Reporter must be instance of ErrorReporter");
-            $this->reporters[$className] = $object;
+            $this->reporters[$reporterClass] = $object;
         }
     }
     
