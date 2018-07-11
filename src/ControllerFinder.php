@@ -5,31 +5,31 @@ require_once("Controller.php");
 require_once("ClassFinder.php");
 
 /**
- * Locates controller on disk based on XML, then instances it via received parameters
+ * Locates MVC controller on disk based on controller path & route detected beforehand,
+ * then instances it from received parameters
  */
 class ControllerFinder {
     private $controller;
 
     /**
-     * ControllerFinder constructor.
+     * Starts detection process.
      *
-     * @param Application $application
-     * @param Request $request
-     * @param Response $response
-     * @throws Exception
+     * @param Application $application Encapsulates application settings detected from xml and development environment.
+     * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
+     * @param Response $response Encapsulates response to send back to caller.
+     * @throws Exception If detection fails due to file/class not found.
      */
     public function __construct(Application $application, Request $request, Response $response) {
         $this->setController($application, $request, $response);
     }
 
     /**
-     * Finds controller on disk and saves result
+     * Finds controller on disk, instances it with received parameters and saves result
      *
-     * @param Application $application
-     * @param Request $request
-     * @param Response $response
-     * @param ErrorReporter[] $reporters
-     * @throws Exception
+     * @param Application $application Encapsulates application settings detected from xml and development environment.
+     * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
+     * @param Response $response Encapsulates response to send back to caller.
+     * @throws Exception If detection fails due to file/class not found.
      */
     private function setController(Application $application, Request $request, Response $response) {
         $classFinder = new ClassFinder($application->getControllersPath(), $request->getRoute()->getController());

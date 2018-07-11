@@ -5,16 +5,30 @@ require_once("ErrorReporter.php");
 require_once("ClassFinder.php");
 
 /**
- * Locates error reporters on disk based on XML and development environment, then instances them based on their matching XML tag.
+ * Locates based on reporters tag @ XML and instances found reporters able to log error info to a storage medium.
  */
 class ErrorReportersFinder
 {
     private $reporters = array();
 
+    /**
+     * ErrorReportersFinder constructor.
+     *
+     * @param \SimpleXMLElement $xml Contents of reporters tag @ XML
+     * @param string $reportersPath Relative path to folder in which reporter classes are found on disk.
+     * @throws Exception If detection fails (file/class not found)
+     */
     public function __construct(\SimpleXMLElement $xml, $reportersPath) {
         $this->setReporters($xml, $reportersPath);
     }
-    
+
+    /**
+     * Sets found reporters based on their class name.
+     *
+     * @param \SimpleXMLElement $xml Contents of reporters tag @ XML
+     * @param string $reportersPath Relative path to folder in which reporter classes are found on disk.
+     * @throws Exception If XML contains invalid information.
+     */
     private function setReporters(\SimpleXMLElement $xml, $reportersPath) {
         $tmp = (array) $xml;
         if(empty($tmp["reporter"])) return;
@@ -31,9 +45,9 @@ class ErrorReportersFinder
     }
     
     /**
-     * Gets list of error reporters found in XML for development environment.
+     * Gets found reporters by their class name.
      * 
-     * @return ErrorReporter[string]
+     * @return ErrorReporter[string] List of error reporters by class name.
      */
     public function getReporters() {
         return $this->reporters;

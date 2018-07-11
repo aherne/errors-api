@@ -7,14 +7,28 @@ require_once("RoutesFinder.php");
 require_once("ReportersList.php");
 
 /**
- * Detects MVC Errors API settings from XML
+ * Detects settings necessary to configure MVC Errors API based on contents of XML file and development environment:
+ * - whether or not error details should be displayed
+ * - default content types of rendered response
+ * - location of controllers that map exceptions thrown
+ * - location of views that map exceptions thrown
+ * - possible objects to use in reporting error to
+ * - possible objects to use in rendering response
+ * - possible routes that map controllers/views to exception
  */
 class Application
 {
     private $simpleXMLElement;
     private $controllersPath, $viewsPath, $defaultContentType, $displayErrors = false;
     private $reporters=array(), $renderers=array(), $routes=array();
-    
+
+    /**
+     * Performs detection process.
+     *
+     * @param string $xmlPath Relative location of XML file containing settings.
+     * @param string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
+     * @throws Exception If detection fails due to an error.
+     */
     public function __construct($xmlPath, $developmentEnvironment) {
         if(!file_exists($xmlPath)) throw new Exception("XML configuration file not found!");
         $this->simpleXMLElement = simplexml_load_file($xmlPath);
@@ -29,7 +43,7 @@ class Application
     }
     
     /**
-     * Sets default response content type. Maps to application.default_default_content_type @ XML.
+     * Sets default response content type. Maps to tag application.default_default_content_type @ XML.
      */
     private function setDefaultContentType() {
         $this->defaultContentType = (string) $this->simpleXMLElement->application->default_content_type;
@@ -45,7 +59,7 @@ class Application
     }
     
     /**
-     * Sets path to controllers folder. Maps to application.paths.controllers @ XML.
+     * Sets path to controllers folder. Maps to tag application.paths.controllers @ XML.
      */
     private function setControllersPath() {
         $this->controllersPath = (string) $this->simpleXMLElement->application->paths->controllers;
@@ -77,7 +91,7 @@ class Application
     }
     
     /**
-     * Sets whether or not error details should be displayed in rendered response. Maps to application.display_errors @ XML.
+     * Sets whether or not error details should be displayed in rendered response. Maps to tag application.display_errors @ XML.
      * 
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
      */
@@ -93,16 +107,12 @@ class Application
     public function getDisplayErrors() {
         return $this->displayErrors;
     }
-    
+
     /**
-     * Gets a pointer to XML file reader.
+     * Sets ErrorReporter instances that will later be used to report exception to. Maps to tag reporters @ XML.
      *
-     * @return \SimpleXMLElement
+     * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
      */
-    public function getXML() {
-        return $this->simpleXMLElement;
-    }
-    
     private function setReporters($developmentEnvironment) {
         $erp = new ErrorReportersFinder(
             $this->simpleXMLElement->reporters->{$developmentEnvironment},
@@ -110,11 +120,19 @@ class Application
             );
         $this->reporters = new ReportersList($erp->getReporters());
     }
-    
+
+    /**
+     * Gets ErrorReporter instances that will later on be used to report exception to
+     *
+     * @return ReportersList Configurable list of error reporters.
+     */
     public function getReporters() {
         return $this->reporters;
     }
-    
+
+    /**
+     * Sets ErrorRenderer instances that will later be used to render response to exception. Maps to tag renderers @ XML.
+     */
     private function setRenderers() {
         $erf = new ErrorRenderersFinder(
             $this->simpleXMLElement->renderers,
@@ -122,18 +140,40 @@ class Application
             );
         $this->renderers = $erf->getRenderers();
     }
-    
+
+    /**
+     * Gets ErrorRenderer instances that will later be used to render response to exception
+     *
+     * @return ErrorRenderer[string] List of error renderers by content type.
+     */
     public function getRenderers() {
         return $this->renderers;
     }
-    
+
+    /**
+     * Sets routes that map exceptions that will later on be used to resolve controller & view. Maps to tag exceptions @ XML
+     */
     private function setRoutes() {
         $rf = new RoutesFinder($this->simpleXMLElement->exceptions);
         $this->routes = $rf->getRoutes();
     }
-    
+
+    /**
+     * Gets routes that map exceptions that will later on be used to resolve controller & view.
+     *
+     * @return Route[string] List of routes by exception class name.
+     */
     public function getRoutes() {
         return $this->routes;
+    }
+
+    /**
+     * Gets a pointer to XML file reader.
+     *
+     * @return \SimpleXMLElement
+     */
+    public function getXML() {
+        return $this->simpleXMLElement;
     }
 }
 

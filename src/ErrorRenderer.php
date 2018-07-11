@@ -2,13 +2,13 @@
 namespace Lucinda\MVC\STDERR;
 
 /**
- * Defines blueprint for output following a routed exception.
+ * Defines blueprint for rendering a response back to caller after an exception fed STDERR
  */
 interface ErrorRenderer {
 	/**
-	 * Renders view to screen.
-	 * 
-	 * @param Response $view
+	 * Renders response to screen.
+	 *
+     * @param Response $response Encapsulates response to send back to caller.
 	 */
-	function render(Response $view);
+	function render(Response $response);
 }

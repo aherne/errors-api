@@ -5,7 +5,7 @@ require_once("Route.php");
 require_once("ErrorType.php");
 
 /**
- * Locates route in XML based on exception thrown.
+ * Locates based on exceptions tag @ XML and instances found routes able to log error info to a storage medium.
  */
 class RoutesFinder {
     private $routes = array();
@@ -13,7 +13,8 @@ class RoutesFinder {
     /**
      * RouteFinder constructor.
      *
-     * @param Application $application
+     * @param \SimpleXMLElement $xml
+     * @throws Exception If tag fails.
      */
     public function __construct(\SimpleXMLElement $xml) {
         $this->setRoutes($xml);
@@ -23,6 +24,7 @@ class RoutesFinder {
      * Locates route from XML exceptions tag or latter's exception tag child.
      *
      * @param Application $application
+     * @throws Exception
      */
     private function setRoutes(\SimpleXMLElement $xml) {
         // get default route
@@ -59,7 +61,7 @@ class RoutesFinder {
     /**
      * Gets routes detected.
      *
-     * @return Route[string]
+     * @return Route[string] List of routes found by handled exception they match.
      */
     public function getRoutes() {
         return $this->routes;

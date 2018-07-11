@@ -5,15 +5,30 @@ require_once("ErrorRenderer.php");
 require_once("ClassFinder.php");
 
 /**
- * Locates error renderer on disk based on XML, then instances it with its XML tag
+ * Locates based on renderers tag @ XML and instances found renderers able to give a response back to caller after an error
+ * fed STDERR flow.
  */
 class ErrorRenderersFinder {
     private $renderers = array();
 
+    /**
+     * ErrorRenderersFinder constructor.
+     *
+     * @param \SimpleXMLElement $xml Contents of renderers tag @ XML
+     * @param string $renderersPath Relative path to folder in which renderer classes are found on disk.
+     * @throws Exception If XML contains invalid information.
+     */
     public function __construct(\SimpleXMLElement $xml, $renderersPath) {
         $this->setRenderer($xml, $renderersPath);
     }
 
+    /**
+     * Sets renderers based on content type
+     *
+     * @param \SimpleXMLElement $xml Contents of renderers tag @ XML
+     * @param string $renderersPath Relative path to folder in which renderer classes are found on disk.
+     * @throws Exception If XML contains invalid information.
+     */
     private function setRenderer(\SimpleXMLElement $xml, $renderersPath) {
         $tmp = (array) $xml;
         if(empty($tmp["renderer"])) return;
@@ -32,6 +47,11 @@ class ErrorRenderersFinder {
         }
     }
 
+    /**
+     * Gets found renderers
+     *
+     * @return ErrorRenderer[string] List of error renderers by content type.
+     */
     public function getRenderers() {
         return $this->renderers;
     }

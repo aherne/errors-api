@@ -13,8 +13,9 @@ class Response
 
     /**
      * View constructor.
-     * @param Application $application Collects information about application
-     * @param Request $request Collects information about exception route
+     *
+     * @param Application $application Encapsulates application settings detected from xml and development environment.
+     * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
      */
     public function __construct(Application $application, Request $request){
         $routeInfo = $request->getRoute();

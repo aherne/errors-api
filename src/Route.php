@@ -2,7 +2,7 @@
 namespace Lucinda\MVC\STDERR;
 
 /**
- * Encapsulates a route that matches a thrown exception
+ * Encapsulates a route that matches a handled exception
  */
 class Route
 {
@@ -13,7 +13,7 @@ class Route
     private $contentType;
 
     /**
-     * Gets controller class name that handles exception thrown.
+     * Gets controller class name that handles exception handled.
      *
      * @return string
      */
@@ -33,9 +33,9 @@ class Route
     }
 
     /**
-     * Gets HTTP status associated to exception thrown.
+     * Gets HTTP status associated to exception handled.
      *
-     * @return integer
+     * @return string
      */
     public function getHttpStatus()
     {
@@ -43,9 +43,9 @@ class Route
     }
 
     /**
-     * Gets error type associated to exception thrown.
-     * 
-     * @return ErrorType
+     * Gets error type associated to exception handled.
+     *
+     * @return  ErrorType Enum of possible error types.
      */
     public function getErrorType()
     {
@@ -53,7 +53,7 @@ class Route
     }
 
     /**
-     * Gets content type associated to exception thrown.
+     * Gets content type associated to exception handled.
      *
      * @return string
      */
@@ -63,9 +63,9 @@ class Route
     }
 
     /**
-     * Sets controller class name that handles exception thrown.
+     * Sets controller class name that handles exception handled.
      *
-     * @param mixed $controller
+     * @param string $controller
      */
     public function setController($controller)
     {
@@ -75,7 +75,7 @@ class Route
     /**
      * Sets file that holds what is displayed when error response is rendered.
      *
-     * @param mixed $view
+     * @param string $view
      */
     public function setView($view)
     {
@@ -83,7 +83,7 @@ class Route
     }
 
     /**
-     * Sets HTTP status associated to exception thrown.
+     * Sets HTTP status associated to exception handled.
      *
      * @param integer $httpStatus
      */
@@ -93,9 +93,9 @@ class Route
     }
 
     /**
-     * Sets error type associated to exception thrown.
+     * Sets error type associated to exception handled.
      *
-     * @param integer $errorType
+     * @param ErrorType $errorType Enum of possible error types.
      */
     public function setErrorType($errorType)
     {
@@ -103,7 +103,7 @@ class Route
     }
 
     /**
-     * Sets content type associated to exception thrown.
+     * Sets content type associated to exception handled.
      *
      * @param string $contentType
      */

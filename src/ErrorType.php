@@ -2,7 +2,7 @@
 namespace Lucinda\MVC\STDERR;
 
 /**
- * Enum of possible error types
+ * C++ style enum of possible error types
  */
 class ErrorType
 {

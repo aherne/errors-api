@@ -2,7 +2,7 @@
 namespace Lucinda\MVC\STDERR;
 
 /**
- * Blueprint for handling an error (user-defined or system exception, incl. PHP errors)
+ * Blueprint for handling an Throwable/Exception that got original client's request go to STDERR
  */
 interface ErrorHandler
 {
