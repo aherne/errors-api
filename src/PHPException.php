@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\Framework\STDERR;
+namespace Lucinda\MVC\STDERR;
 
 /**
  * Exception caught automatically when a PHP error is encountered.

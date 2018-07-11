@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\Framework\STDERR;
+namespace Lucinda\MVC\STDERR;
 
 require_once("Route.php");
 require_once("ErrorType.php");
@@ -16,7 +16,7 @@ class RoutesFinder {
      * @param Application $application
      */
     public function __construct(\SimpleXMLElement $xml) {
-        $this->setRoutes($application);
+        $this->setRoutes($xml);
     }
 
     /**
@@ -24,9 +24,9 @@ class RoutesFinder {
      *
      * @param Application $application
      */
-    private function setRoute(\SimpleXMLElement $xml) {
+    private function setRoutes(\SimpleXMLElement $xml) {
         // get default route
-        $this->route["*"] = $this->compileRoute($xml);
+        $this->routes[""] = $this->compileRoute($xml);
         
         // override with specific route, if set
         $tmp = (array) $xml;
@@ -35,7 +35,8 @@ class RoutesFinder {
         if(!is_array($tmp)) $tmp = array($tmp);
         foreach($tmp as $info) {
             $currentClassName = (string) $info['class'];
-            $this->route[$currentClassName] = $this->compileRoute($info);
+            if(!$currentClassName) throw new Exception("Exception class not defined!");
+            $this->routes[$currentClassName] = $this->compileRoute($info);
         }
     }
 

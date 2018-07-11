@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\Framework\STDERR;
+namespace Lucinda\MVC\STDERR;
 
 /**
  * Encapsulates an abstract controller that feeds on exceptions, able to set exception-specific rendering/reporting policies

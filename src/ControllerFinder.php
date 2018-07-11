@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\Framework\STDERR;
+namespace Lucinda\MVC\STDERR;
 
 require_once("Controller.php");
 
@@ -18,7 +18,7 @@ class ControllerFinder {
      * @throws Exception
      */
     public function __construct(Application $application, Request $request, Response $response) {
-        $this->setController($application, $request, $response, $reporters);
+        $this->setController($application, $request, $response);
     }
 
     /**

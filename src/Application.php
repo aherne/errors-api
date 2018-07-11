@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\Framework\STDERR;
+namespace Lucinda\MVC\STDERR;
 
 require_once("ErrorReportersFinder.php");
 require_once("ErrorRenderersFinder.php");

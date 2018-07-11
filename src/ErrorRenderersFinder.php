@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\Framework\STDERR;
+namespace Lucinda\MVC\STDERR;
 
 require_once("ErrorRenderer.php");
 
@@ -22,7 +22,7 @@ class ErrorRenderersFinder {
             $className = (string) $info['class'];
             $currentContentType = (string) $info["content_type"];
             if(!$currentContentType) throw new Exception("Renderer missing content type!");
-            $file = $application->getRenderersPath()."/".$className.".php";
+            $file = $renderersPath."/".$className.".php";
             if(!file_exists($file)) throw new Exception("Renderer file not found: ".$file);
             require_once($file);
             if(!class_exists($className)) throw new Exception("Renderer class not found: ".$className);

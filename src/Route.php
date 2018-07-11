@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\Framework\STDERR;
+namespace Lucinda\MVC\STDERR;
 
 /**
  * Encapsulates a route that matches a thrown exception
@@ -11,7 +11,6 @@ class Route
     private $httpStatus;
     private $errorType;
     private $contentType;
-    private $exception;
 
     /**
      * Gets controller class name that handles exception thrown.

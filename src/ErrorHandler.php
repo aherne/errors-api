@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\Framework\STDERR;
+namespace Lucinda\MVC\STDERR;
 
 /**
  * Blueprint for handling an error (user-defined or system exception, incl. PHP errors)

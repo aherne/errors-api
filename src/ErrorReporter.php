@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\Framework\STDERR;
+namespace Lucinda\MVC\STDERR;
 
 /**
  * Defines blueprint for reporting a routed exception
@@ -10,5 +10,5 @@ interface ErrorReporter {
 	 * 
 	 * @param Request $request
 	 */
-    function report($request);
+    function report(Request $request);
 }

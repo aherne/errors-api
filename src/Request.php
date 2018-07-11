@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\Framework\STDERR;
+namespace Lucinda\MVC\STDERR;
 
 class Request
 {
@@ -7,6 +7,9 @@ class Request
     const DEFAULT_ERROR_TYPE = ErrorType::NONE;
     
     private $exception;
+    /**
+     * @var Route
+     */
     private $route;
     
     public function __construct(Application $application, $exception, $customContentType) {
@@ -19,7 +22,7 @@ class Request
         $targetClass = get_class($exception);
         
         // detects route
-        $this->route = $routes["*"];
+        $this->route = $routes[""];
         foreach($routes as $currentClass=>$route) {
             if($currentClass == $targetClass) {
                 $this->route = $route;
