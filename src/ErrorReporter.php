@@ -9,7 +9,6 @@ interface ErrorReporter {
 	 * Reports error info to a storage medium.
 	 *
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
-     * @param ErrorType $errorType Enum of possible error types.
 	 */
-    function report(Request $request, $errorType);
+    function report(Request $request);
 }

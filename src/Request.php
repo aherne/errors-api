@@ -7,7 +7,6 @@ namespace Lucinda\MVC\STDERR;
 class Request
 {
     const DEFAULT_HTTP_STATUS = 500;
-    const DEFAULT_ERROR_TYPE = ErrorType::NONE;
 
     private $exception;
     private $route;
@@ -48,9 +47,6 @@ class Request
         }
         if(!$this->route->getContentType()) {
             $this->route->setContentType($customContentType?$customContentType:$application->getDefaultContentType());
-        }
-        if(!$this->route->getErrorType()) {
-            $this->route->setErrorType(self::DEFAULT_ERROR_TYPE);
         }
     }
 

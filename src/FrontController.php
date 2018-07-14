@@ -72,11 +72,9 @@ class FrontController implements ErrorHandler
             }
 
             // reports error
-            if($request->getRoute()->getErrorType()!==ErrorType::NONE) {
-                $reporters = $application->getReporters()->toArray();
-                foreach($reporters as $reporter) {
-                    $reporter->report($request, $request->getRoute()->getErrorType());
-                }
+            $reporters = $application->getReporters()->toArray();
+            foreach($reporters as $reporter) {
+                $reporter->report($request);
             }
 
             // renders output
