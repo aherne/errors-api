@@ -2,7 +2,7 @@
 namespace Lucinda\MVC\STDERR;
 
 require_once("Controller.php");
-require_once("ClassFinder.php");
+require_once("ClassLoader.php");
 
 /**
  * Locates MVC controller on disk based on controller path & route detected beforehand,
@@ -32,8 +32,8 @@ class ControllerFinder {
      * @throws Exception If detection fails due to file/class not found.
      */
     private function setController(Application $application, Request $request, Response $response) {
-        $classFinder = new ClassFinder($application->getControllersPath(), $request->getRoute()->getController());
-        $controllerClass = $classFinder->getName();
+        $controllerClass = $request->getRoute()->getController();
+        load_class($application->getControllersPath(), $controllerClass);
         $object = new $controllerClass($application, $request, $response);
         if(!($object instanceof Controller)) throw new Exception("Class must be instance of Controller");
         $this->controller = $object;

@@ -2,7 +2,7 @@
 namespace Lucinda\MVC\STDERR;
 
 require_once("ErrorRenderer.php");
-require_once("ClassFinder.php");
+require_once("ClassLoader.php");
 
 /**
  * Locates based on renderers tag @ XML and instances found renderers able to give a response back to caller after an error
@@ -37,10 +37,9 @@ class ErrorRenderersFinder {
         foreach($tmp as $info) {
             $currentContentType = (string) $info["content_type"];
             if(!$currentContentType) throw new Exception("Renderer missing content type!");
-
-            $classFinder = new ClassFinder($renderersPath, (string) $info['class']);
-            $rendererClass = $classFinder->getName();
-
+            
+            $rendererClass = (string) $info['class'];
+            load_class($renderersPath, $rendererClass);
             $object = new $rendererClass($info);
             if(!($object instanceof ErrorRenderer)) throw new Exception("Renderer must be instance of ErrorRenderer");
             $this->renderers[$currentContentType] = $object;
