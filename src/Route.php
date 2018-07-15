@@ -9,6 +9,7 @@ class Route
     private $controller;
     private $view;
     private $httpStatus;
+    private $errorType;
     private $contentType;
 
     /**
@@ -39,6 +40,16 @@ class Route
     public function getHttpStatus()
     {
         return $this->httpStatus;
+    }
+    
+    /**
+     * Gets error type associated to exception handled.
+     *
+     * @return integer One of possible values of ErrorType enum
+     */
+    public function getErrorType()
+    {
+        return $this->errorType;
     }
 
     /**
@@ -89,6 +100,16 @@ class Route
     public function setContentType($contentType)
     {
         $this->contentType = $contentType;
+    }
+    
+    /**
+     * Sets error type associated to exception handled.
+     *
+     * @param integer $errorType One of possible values of ErrorType enum
+     */
+    public function setErrorType($errorType)
+    {
+        $this->errorType = $errorType;
     }
 }
 

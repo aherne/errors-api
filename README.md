@@ -1,0 +1,1 @@
+ErrorReporter & ErrorRenderer should not be an interface, but an abstract class with SimpleXMLElement arg constructor
