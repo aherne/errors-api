@@ -6,7 +6,7 @@ namespace Lucinda\MVC\STDERR;
  */
 class Request
 {
-    const DEFAULT_HTTP_STATUS = 500;
+    const DEFAULT_HTTP_STATUS = "500 Internal Server Error";
 
     private $exception;
     private $route;

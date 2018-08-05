@@ -8,7 +8,6 @@ require_once("ReportersList.php");
 
 /**
  * Detects settings necessary to configure MVC Errors API based on contents of XML file and development environment:
- * - whether or not error details should be displayed
  * - default content types of rendered response
  * - location of controllers that map exceptions thrown
  * - location of views that map exceptions thrown
@@ -19,7 +18,7 @@ require_once("ReportersList.php");
 class Application
 {
     private $simpleXMLElement;
-    private $controllersPath, $viewsPath, $defaultContentType, $displayErrors = false;
+    private $controllersPath, $viewsPath, $defaultContentType;
     private $reporters=array(), $renderers=array(), $routes=array();
 
     /**
@@ -33,7 +32,6 @@ class Application
         if(!file_exists($xmlPath)) throw new Exception("XML configuration file not found!");
         $this->simpleXMLElement = simplexml_load_file($xmlPath);
 
-        $this->setDisplayErrors($developmentEnvironment);
         $this->setDefaultContentType();
         $this->setControllersPath();
         $this->setViewsPath();
@@ -90,24 +88,6 @@ class Application
         return $this->viewsPath;
     }
     
-    /**
-     * Sets whether or not error details should be displayed in rendered response. Maps to tag application.display_errors @ XML.
-     * 
-     * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
-     */
-    private function setDisplayErrors($developmentEnvironment) {
-        $this->displayErrors = ((string) $this->simpleXMLElement->application->display_errors->{$developmentEnvironment} ? true : false);
-    }
-    
-    /**
-     * Gets whether or not error details should be displayed in rendered response
-     * 
-     * @return boolean
-     */
-    public function getDisplayErrors() {
-        return $this->displayErrors;
-    }
-
     /**
      * Sets ErrorReporter instances that will later be used to report exception to. Maps to tag reporters @ XML.
      *

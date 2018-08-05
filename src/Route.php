@@ -85,7 +85,7 @@ class Route
     /**
      * Sets HTTP status associated to exception handled.
      *
-     * @param integer $httpStatus
+     * @param string $httpStatus
      */
     public function setHttpStatus($httpStatus)
     {
