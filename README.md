@@ -2,7 +2,7 @@
 
 STDERR micro-framework that feeds on errors (exceptions) instead of web requests, able to provide a powerful unified error handling strategy that works on MVC principles. Once an error has occurred in STDOUT flow (as a request is handled to produce a response), it gets automatically redirected (via standard PHP error redirection functions) to a dormant framework that wakes up when getting an error to handle. 
 
-##Initialization
+## Initialization
 
 In order to take advantage of this software and make sure it handles all errors, your application bootstrap must start with:
 
@@ -18,7 +18,7 @@ This loads STDERR framework then starts its front controller who registers itsel
 
 Once framework initializes, it lies dormant waiting for error requests to handle.
 
-##Handling
+## Handling
 
 Once an error has occurred in your application, framework's FrontController *handle* method will be automatically called to handle it. Handling process involves following steps:
 
