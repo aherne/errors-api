@@ -10,9 +10,6 @@
 			<reporters>application/reporters</reporters>
 			<renderers>application/renderers</renderers>
 		</paths>
-		<display_errors>
-			<ENVIRONMENT>1</ENVIRONMENT>
-		</display_errors>
 	</application>
 	<reporters>
 		<ENVIRONMENT>
