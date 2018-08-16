@@ -38,6 +38,9 @@ class ErrorRenderersFinder {
             $currentContentType = (string) $info["content_type"];
             if(!$currentContentType) throw new Exception("Renderer missing content type!");
             
+            $charset = (string) $info["charset"];
+            if($charset) $currentContentType .= "; charset=".$charset;
+            
             $rendererClass = (string) $info['class'];
             load_class($renderersPath, $rendererClass);
             $object = new $rendererClass($info);
