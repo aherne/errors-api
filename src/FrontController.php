@@ -14,14 +14,16 @@ class FrontController implements ErrorHandler
     private $contentType;
     private $documentDescriptor;
     private $developmentEnvironment;
+    private $emergencyHandler;
 
     /**
      * Redirects all uncaught exceptions and PHP errors in current application to itself.
      *
      * @param string $documentDescriptor Path to XML file containing your application settings.
      * @param string $developmentEnvironment Development environment application is running into (eg: local, dev, live)
+     * @param ErrorHandler $emergencyHandler Handler to use if an error occurs while FrontController handles an exception 
      */
-    public function __construct($documentDescriptor="configuration.xml", $developmentEnvironment) {
+    public function __construct($documentDescriptor="configuration.xml", $developmentEnvironment, ErrorHandler $emergencyHandler) {
         // sets up system to track errors
         error_reporting(E_ALL);
         set_error_handler('\\Lucinda\\MVC\\STDERR\\PHPException::nonFatalError', E_ALL);
@@ -33,6 +35,7 @@ class FrontController implements ErrorHandler
         // registers args to be used on demand
         $this->documentDescriptor = $documentDescriptor;
         $this->developmentEnvironment = $developmentEnvironment;
+        $this->emergencyHandler = $emergencyHandler;
     }
 
     /**
@@ -50,11 +53,9 @@ class FrontController implements ErrorHandler
      * @param \Exception|\Throwable $e Encapsulates error information.
      */
     public function handle($exception) {
-        // registers emergency handler
-        require_once("EmergencyHandler.php");
-        $emergencyHandler = new EmergencyHandler();
-        PHPException::setErrorHandler($emergencyHandler);
-        set_exception_handler(array($emergencyHandler,"handle"));
+        // redirects errors to emergency handler
+        PHPException::setErrorHandler($this->emergencyHandler);
+        set_exception_handler(array($this->emergencyHandler,"handle"));
         
         // finds application settings based on XML and development environment
         require_once("Application.php");
