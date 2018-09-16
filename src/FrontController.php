@@ -63,11 +63,11 @@ class FrontController implements ErrorHandler
 
         // finds and instances routes based on XML and exception received
         require_once("Request.php");
-        $request = new Request($application, $exception, $this->contentType);
+        $request = new Request($application, $exception);
 
         // compiles a view object from content type and http status
         require_once("Response.php");
-        $response = new Response($application, $request);
+        $response = new Response($application, $request, $this->contentType);
 
         // runs controller, able to alter reporters
         if($request->getRoute()->getController()) {
@@ -85,12 +85,9 @@ class FrontController implements ErrorHandler
 
         // renders output
         $renderers = $application->getRenderers();
-        foreach($renderers as $contentType=>$renderer) {
-            // content type must be an EXACT match (incl. charset)
-            if($contentType == $response->getHeader("Content-Type")) {
-                $renderer->render($response);
-            }
-        }
+        if(isset($renderers[$response->getHeader("Content-Type")])) {
+            $renderers[$response->getHeader("Content-Type")]->render($response);
+        }        
 
         exit(); // forces program to end
     }

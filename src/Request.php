@@ -16,10 +16,9 @@ class Request
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param \Error|\Exception $exception Error "request" that fed STDERR stream
-     * @param string $customContentType Content type of rendered response specifically signalled to FrontController.
      */
-    public function __construct(Application $application, $exception, $customContentType) {
-        $this->setRoute($application, $exception, $customContentType);
+    public function __construct(Application $application, $exception) {
+        $this->setRoute($application, $exception);
         $this->setException($exception);
     }
 
@@ -28,9 +27,8 @@ class Request
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param \Error|\Exception $exception Error "request" that fed STDERR stream
-     * @param string $customContentType Content type of rendered response specifically signalled to FrontController.
      */
-    private function setRoute(Application $application, $exception, $customContentType) {
+    private function setRoute(Application $application, $exception) {
         $routes = $application->getRoutes();
         $targetClass = get_class($exception);
         
@@ -44,9 +42,6 @@ class Request
         // override non-existent properties with defaults
         if(!$this->route->getHttpStatus()) {
             $this->route->setHttpStatus(self::DEFAULT_HTTP_STATUS);
-        }
-        if(!$this->route->getContentType()) {
-            $this->route->setContentType($customContentType?$customContentType:$application->getDefaultContentType());
         }
     }
 

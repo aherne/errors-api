@@ -16,13 +16,36 @@ class Response
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
+     * @param string $customContentType Content type of rendered response specifically signalled to FrontController.
      */
-    public function __construct(Application $application, Request $request){
-        $routeInfo = $request->getRoute();
-        $this->headers["Content-Type"] = $request->getRoute()->getContentType();
-        $this->httpStatus = $request->getRoute()->getHttpStatus();
-        if($request->getRoute()->getView()) {
-            $this->view = ($application->getViewsPath()."/".$request->getRoute()->getView());
+    public function __construct(Application $application, Request $request, $customContentType){
+        $this->setContentType($application, $request, $customContentType);
+        $this->setHttpStatus($request->getRoute()->getHttpStatus());        
+        $this->setView($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):null);
+    }
+    
+    /**
+     * Sets content type header based on ingridients
+     *
+     * @param Application $application Encapsulates application settings detected from xml and development environment.
+     * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
+     * @param string $customContentType Content type of rendered response specifically signalled to FrontController.
+     */
+    private function setContentType(Application $application, Request $request, $customContentType) {
+        $currentContentType = "";
+        if($customContentType) {
+            $currentContentType = $customContentType;
+        } else if($request->getRoute()->getContentType()) {
+            $currentContentType = $request->getRoute()->getContentType();
+        } else {
+            $currentContentType = $application->getDefaultContentType();
+        }
+        
+        $renderers = $application->getRenderers();
+        foreach($renderers as $contentType=>$renderer) {
+            if(strpos($contentType, $currentContentType) === 0) {
+                $this->headers["Content-Type"] = $contentType;
+            }
         }
     }
     
