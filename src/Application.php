@@ -17,6 +17,7 @@ require_once("ReportersList.php");
  */
 class Application
 {
+    private $includePath;
     private $simpleXMLElement;
     private $controllersPath, $viewsPath, $defaultContentType;
     private $reporters=array(), $renderers=array(), $routes=array();
@@ -26,11 +27,14 @@ class Application
      *
      * @param string $xmlPath Relative location of XML file containing settings.
      * @param string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
+     * @param string $includePath Absolute root path where reporters / renderers / controllers / views should be located 
      * @throws Exception If detection fails due to an error.
      */
-    public function __construct($xmlPath, $developmentEnvironment) {
+    public function __construct($xmlPath, $developmentEnvironment, $includePath) {
+        $xmlPath = $includePath."/".$xmlPath;
         if(!file_exists($xmlPath)) throw new Exception("XML configuration file not found!");
         $this->simpleXMLElement = simplexml_load_file($xmlPath);
+        $this->includePath = $includePath;
 
         $this->setDefaultContentType();
         $this->setControllersPath();
@@ -60,7 +64,7 @@ class Application
      * Sets path to controllers folder. Maps to tag application.paths.controllers @ XML.
      */
     private function setControllersPath() {
-        $this->controllersPath = (string) $this->simpleXMLElement->application->paths->controllers;
+        $this->controllersPath = $this->includePath."/".$this->simpleXMLElement->application->paths->controllers;
     }
     
     /**
@@ -76,7 +80,7 @@ class Application
      * Sets views folder. Maps to application.paths.views @ XML.
      */
     private function setViewsPath() {
-        $this->viewsPath = (string) $this->simpleXMLElement->application->paths->views;
+        $this->viewsPath = $this->includePath."/".$this->simpleXMLElement->application->paths->views;
     }
     
     /**
@@ -96,7 +100,7 @@ class Application
     private function setReporters($developmentEnvironment) {
         $erp = new ErrorReportersFinder(
             $this->simpleXMLElement->reporters->{$developmentEnvironment},
-            (string) $this->simpleXMLElement->application->paths->reporters
+            $this->includePath."/".$this->simpleXMLElement->application->paths->reporters
             );
         $this->reporters = new ReportersList($erp->getReporters());
     }
@@ -116,7 +120,7 @@ class Application
     private function setRenderers() {
         $erf = new ErrorRenderersFinder(
             $this->simpleXMLElement->renderers,
-            (string) $this->simpleXMLElement->application->paths->renderers
+            $this->includePath."/".$this->simpleXMLElement->application->paths->renderers
             );
         $this->renderers = $erf->getRenderers();
     }
