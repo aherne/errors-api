@@ -48,7 +48,8 @@ class Application
      * Sets default response content type. Maps to tag application.default_default_content_type @ XML.
      */
     private function setDefaultContentType() {
-        $this->defaultContentType = (string) $this->simpleXMLElement->application->default_content_type;
+        $this->defaultContentType = (string) $this->simpleXMLElement->application["default_content_type"];
+        if(!$this->defaultContentType) throw new Exception("Attribute 'default_content_type' is mandatory for 'application' tag");
     }
     
     /**

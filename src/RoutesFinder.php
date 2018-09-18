@@ -54,7 +54,7 @@ class RoutesFinder {
         $route->setView((string) $info["view"]);
         $route->setHttpStatus((string) $info["http_status"]);
         $route->setContentType((string) $info["content_type"]);
-        $route->setErrorType((integer) $info["error_type"]);
+        $route->setErrorType((string) $info["error_type"]);
         return $route;        
     }
 

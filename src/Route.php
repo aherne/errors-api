@@ -45,7 +45,7 @@ class Route
     /**
      * Gets error type associated to exception handled.
      *
-     * @return integer One of possible values of ErrorType enum
+     * @return string One of possible values of ErrorType enum
      */
     public function getErrorType()
     {
@@ -105,7 +105,7 @@ class Route
     /**
      * Sets error type associated to exception handled.
      *
-     * @param integer $errorType One of possible values of ErrorType enum
+     * @param string $errorType One of possible values of ErrorType enum
      */
     public function setErrorType($errorType)
     {
