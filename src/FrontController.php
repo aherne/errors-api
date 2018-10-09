@@ -59,7 +59,6 @@ class FrontController implements ErrorHandler
         // redirects errors to emergency handler
         PHPException::setErrorHandler($this->emergencyHandler);
         set_exception_handler(array($this->emergencyHandler,"handle"));
-        ini_set("display_errors",1);
         
         // finds application settings based on XML and development environment
         require_once("Application.php");
