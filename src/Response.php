@@ -130,6 +130,24 @@ class Response
     {
         $this->headers[$name] = $value;
     }
+    
+    /**
+     * Redirects to a new location.
+     *
+     * @param string $location
+     * @param boolean $permanent
+     * @param boolean $preventCaching
+     * @return void
+     */
+    public function redirect($location, $permanent=true, $preventCaching=false) {
+        if($preventCaching) {
+            header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
+            header("Pragma: no-cache");
+            header("Expires: 0");
+        }
+        header('Location: '.$location, true, $permanent?301:302);
+        exit();
+    }
 
     /**
      * Sets relative path of view that contains response body.
