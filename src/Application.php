@@ -135,6 +135,15 @@ class Application
     public function getRenderer($contentType) {
         return (isset($this->renderers[$contentType])?$this->renderers[$contentType]:null);
     }
+    
+    /**
+     * Gets all ErrorRenderer instances by content type
+     * 
+     * @return ErrorRenderer[string]
+     */
+    public function getRenderers() {
+        return $this->renderers;
+    }
 
     /**
      * Sets routes that map exceptions that will later on be used to resolve controller & view. Maps to tag exceptions @ XML
