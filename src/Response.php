@@ -9,6 +9,7 @@ class Response
     private $httpStatus;
     private $body;
     private $headers=array();
+    private $attributes=array();
     private $view;
 
     /**
@@ -50,6 +51,16 @@ class Response
     }
     
     /**
+     * Sets relative path of view that contains response body.
+     *
+     * @param string $view
+     */
+    public function setView($view)
+    {
+        $this->view = $view;
+    }
+    
+    /**
      * Gets relative path of view that contains response body.
      *
      * @return string
@@ -57,6 +68,16 @@ class Response
     public function getView()
     {
         return $this->view;
+    }
+    
+    /**
+     * Sets response HTTP status
+     *
+     * @param integer $httpStatus
+     */
+    public function setHttpStatus($httpStatus)
+    {
+        $this->httpStatus = $httpStatus;
     }
 
     /**
@@ -68,6 +89,16 @@ class Response
     {
         return $this->httpStatus;
     }
+    
+    /**
+     * Sets response body
+     *
+     * @param string $body
+     */
+    public function setBody($body)
+    {
+        $this->body = $body;
+    }
 
     /**
      * Gets response body
@@ -77,6 +108,28 @@ class Response
     public function getBody()
     {
         return $this->body;
+    }
+    
+    /**
+     * Sets response header by name and value.
+     *
+     * @param string $name
+     * @param string $value
+     */
+    public function setHeader($name, $value)
+    {
+        $this->headers[$name] = $value;
+    }
+    
+    /**
+     * Gets value of response header by name
+     *
+     * @param string $name
+     * @return NULL|string
+     */
+    public function getHeader($name)
+    {
+        return (isset($this->headers[$name])?$this->headers[$name]:null);
     }
 
     /**
@@ -90,45 +143,35 @@ class Response
     }
     
     /**
-     * Gets value of response header by name
-     * 
+     * Sets response attribute by name and value.
+     *
      * @param string $name
-     * @return NULL|string
+     * @param mixed $value
      */
-    public function getHeader($name)
+    public function setAttribute($name, $value)
     {
-        return (isset($this->headers[$name])?$this->headers[$name]:null);
-    }
-
-    /**
-     * Sets response HTTP status
-     *
-     * @param integer $httpStatus
-     */
-    public function setHttpStatus($httpStatus)
-    {
-        $this->httpStatus = $httpStatus;
-    }
-
-    /**
-     * Sets response body
-     *
-     * @param string $body
-     */
-    public function setBody($body)
-    {
-        $this->body = $body;
+        $this->attributes[$name] = $value;
     }
     
     /**
-     * Sets response header by name and value.
+     * Gets value of response attribute by name
      *
      * @param string $name
-     * @param string $value
+     * @return NULL|mixed
      */
-    public function setHeader($name, $value)
+    public function getAttribute($name)
     {
-        $this->headers[$name] = $value;
+        return (isset($this->attributes[$name])?$this->attributes[$name]:null);
+    }
+    
+    /**
+     * Gets response attributes
+     *
+     * @return array[string:string]
+     */
+    public function getAttributes()
+    {
+        return $this->attributes;
     }
     
     /**
@@ -148,15 +191,22 @@ class Response
         header('Location: '.$location, true, $permanent?301:302);
         exit();
     }
-
+        
     /**
-     * Sets relative path of view that contains response body.
-     *
-     * @param string $view
+     * Commits response to client.
      */
-    public function setView($view)
-    {
-        $this->view = $view;
+    public function commit() {
+        // do not display anything, if headers have already been sent
+        if(headers_sent()) return;
+        
+        // sends headers
+        header("HTTP/1.1 ".$this->httpStatus);        
+        foreach($this->headers as $name=>$value) {
+            header($name.": ".$value);
+        }
+        
+        // show output
+        echo $this->body;
     }
 }
 

@@ -53,7 +53,7 @@ class FrontController implements ErrorHandler
     /**
      * Runs framework logic on handled STDERR flow
      *
-     * @param \Exception|\Throwable $e Encapsulates error information.
+     * @param \Exception|\Throwable $exception Encapsulates error information.
      */
     public function handle($exception) {
         // redirects errors to emergency handler
@@ -87,9 +87,9 @@ class FrontController implements ErrorHandler
         }
 
         // renders output
-        $renderers = $application->getRenderers();
-        if(isset($renderers[$response->getHeader("Content-Type")])) {
-            $renderers[$response->getHeader("Content-Type")]->render($response);
+        $renderer = $application->getRenderer($response->getHeader("Content-Type"));
+        if($renderer) {
+            $renderer->render($response);
         }        
 
         exit(); // forces program to end

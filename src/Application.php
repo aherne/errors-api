@@ -127,12 +127,13 @@ class Application
     }
 
     /**
-     * Gets ErrorRenderer instances that will later be used to render response to exception
+     * Gets ErrorRenderer by content type
      *
-     * @return ErrorRenderer[string] List of error renderers by content type.
+     * @param string $contentType
+     * @return ErrorRenderer|null
      */
-    public function getRenderers() {
-        return $this->renderers;
+    public function getRenderer($contentType) {
+        return (isset($this->renderers[$contentType])?$this->renderers[$contentType]:null);
     }
 
     /**
