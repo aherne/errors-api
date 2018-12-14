@@ -86,12 +86,15 @@ class FrontController implements ErrorHandler
             $reporter->report($request);
         }
 
-        // renders output
+        // resolves view
         $renderer = $application->getRenderer($response->getHeader("Content-Type"));
         if($renderer) {
             $renderer->render($response);
         }        
 
+        // commits response
+        $response->commit();
+        
         exit(); // forces program to end
     }
 }
