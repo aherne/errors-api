@@ -21,13 +21,14 @@ class Application
     private $simpleXMLElement;
     private $controllersPath, $viewsPath, $defaultContentType;
     private $reporters=array(), $renderers=array(), $routes=array();
-
+    private $displayErrors=false;
+    
     /**
      * Performs detection process.
      *
      * @param string $xmlPath Relative location of XML file containing settings.
      * @param string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
-     * @param string $includePath Absolute root path where reporters / renderers / controllers / views should be located 
+     * @param string $includePath Absolute root path where reporters / renderers / controllers / views should be located
      * @throws Exception If detection fails due to an error.
      */
     public function __construct($xmlPath, $developmentEnvironment, $includePath) {
@@ -35,10 +36,11 @@ class Application
         if(!file_exists($xmlPath)) throw new Exception("XML configuration file not found!");
         $this->simpleXMLElement = simplexml_load_file($xmlPath);
         $this->includePath = $includePath;
-
+        
         $this->setDefaultContentType();
         $this->setControllersPath();
         $this->setViewsPath();
+        $this->setDisplayErrors();
         $this->setReporters($developmentEnvironment);
         $this->setRenderers();
         $this->setRoutes();
@@ -94,6 +96,25 @@ class Application
     }
     
     /**
+     * Sets whether or not error details should be displayed. Maps to application.display_errors @ XML / environment
+     *
+     * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
+     */
+    private function setDisplayErrors($developmentEnvironment) {
+        $value = $this->simpleXMLElement->application->display_errors->{$developmentEnvironment};
+        $this->displayErrors = $value?true:false;
+    }
+    
+    /**
+     * Gets whether or not error details should be displayed.
+     *
+     * @return boolean
+     */
+    public function getDisplayErrors() {
+        return $this->displayErrors;
+    }
+    
+    /**
      * Sets ErrorReporter instances that will later be used to report exception to. Maps to tag reporters @ XML.
      *
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
@@ -105,7 +126,7 @@ class Application
             );
         $this->reporters = new ReportersList($erp->getReporters());
     }
-
+    
     /**
      * Gets ErrorReporter instances that will later on be used to report exception to
      *
@@ -114,7 +135,7 @@ class Application
     public function getReporters() {
         return $this->reporters;
     }
-
+    
     /**
      * Sets ErrorRenderer instances that will later be used to render response to exception. Maps to tag renderers @ XML.
      */
@@ -125,26 +146,16 @@ class Application
             );
         $this->renderers = $erf->getRenderers();
     }
-
-    /**
-     * Gets ErrorRenderer by content type
-     *
-     * @param string $contentType
-     * @return ErrorRenderer|null
-     */
-    public function getRenderer($contentType) {
-        return (isset($this->renderers[$contentType])?$this->renderers[$contentType]:null);
-    }
     
     /**
-     * Gets all ErrorRenderer instances by content type
-     * 
-     * @return ErrorRenderer[string]
+     * Gets ErrorRenderer instances that will later be used to render response to exception
+     *
+     * @return ErrorRenderer[string] List of error renderers by content type.
      */
     public function getRenderers() {
         return $this->renderers;
     }
-
+    
     /**
      * Sets routes that map exceptions that will later on be used to resolve controller & view. Maps to tag exceptions @ XML
      */
@@ -152,7 +163,7 @@ class Application
         $rf = new RoutesFinder($this->simpleXMLElement->exceptions);
         $this->routes = $rf->getRoutes();
     }
-
+    
     /**
      * Gets routes that map exceptions that will later on be used to resolve controller & view.
      *
@@ -161,7 +172,7 @@ class Application
     public function getRoutes() {
         return $this->routes;
     }
-
+    
     /**
      * Gets a pointer to XML file reader.
      *
@@ -171,4 +182,3 @@ class Application
         return $this->simpleXMLElement;
     }
 }
-
