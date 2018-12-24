@@ -68,12 +68,14 @@ class FrontController implements ErrorHandler
         require_once("Request.php");
         $request = new Request($application, $exception);
 		
-		// builds reporters list
+		// builds reporters list then reports exception
 		require_once("ErrorReporter.php");
 		require_once("locators/ReportersLocator.php");
 		$locator = new ReportersLocator($application);
 		$reportersList = $locator->getReporters();
-        $reportersList->report($request);
+        foreach($reportersList as $reporter) {
+			$reporter->report($request);
+		}
 
         // compiles a view object from content type and http status
         require_once("Response.php");

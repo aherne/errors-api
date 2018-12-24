@@ -43,7 +43,7 @@ class RendererLocator {
     /**
      * Gets renderer found.
      *
-     * @return Renderer
+     * @return ErrorRenderer
      */
     public function getRenderer() {
         return $this->renderer;
