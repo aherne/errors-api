@@ -1,10 +1,9 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("ErrorReportersFinder.php");
-require_once("ErrorRenderersFinder.php");
-require_once("RoutesFinder.php");
-require_once("ReportersList.php");
+require_once("application/ErrorReportersFinder.php");
+require_once("application/ErrorRenderersFinder.php");
+require_once("application/RoutesFinder.php");
 
 /**
  * Detects settings necessary to configure MVC Errors API based on contents of XML file and development environment:
@@ -19,7 +18,7 @@ class Application
 {
     private $includePath;
     private $simpleXMLElement;
-    private $controllersPath, $viewsPath, $defaultContentType;
+    private $controllersPath, $viewsPath, $reportersPath, $renderersPath, $defaultContentType;
     private $reporters=array(), $renderers=array(), $routes=array();
     private $displayErrors=false;
     
@@ -39,8 +38,10 @@ class Application
         
         $this->setDefaultContentType();
         $this->setControllersPath();
+        $this->setReportersPath();
+        $this->setRenderersPath();
         $this->setViewsPath();
-        $this->setDisplayErrors();
+        $this->setDisplayErrors($developmentEnvironment);
         $this->setReporters($developmentEnvironment);
         $this->setRenderers();
         $this->setRoutes();
@@ -77,6 +78,38 @@ class Application
      */
     public function getControllersPath() {
         return $this->controllersPath;
+    }
+    
+    /**
+     * Sets path to reporters folder. Maps to tag application.paths.reporters @ XML.
+     */
+    private function setReportersPath() {
+        $this->reportersPath = $this->includePath."/".$this->simpleXMLElement->application->paths->reporters;
+    }
+    
+    /**
+     * Gets path to reporters folder.
+     *
+     * @return string
+     */
+    public function getReportersPath() {
+        return $this->reportersPath;
+    }
+    
+    /**
+     * Sets path to renderers folder. Maps to tag application.paths.renderers @ XML.
+     */
+    private function setRenderersPath() {
+        $this->renderersPath = $this->includePath."/".$this->simpleXMLElement->application->paths->renderers;
+    }
+    
+    /**
+     * Gets path to renderers folder.
+     *
+     * @return string
+     */
+    public function getRenderersPath() {
+        return $this->renderersPath;
     }
     
     /**
@@ -120,17 +153,15 @@ class Application
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
      */
     private function setReporters($developmentEnvironment) {
-        $erp = new ErrorReportersFinder(
-            $this->simpleXMLElement->reporters->{$developmentEnvironment},
-            $this->includePath."/".$this->simpleXMLElement->application->paths->reporters
-            );
-        $this->reporters = new ReportersList($erp->getReporters());
+		if($this->simpleXMLElement->reporters->{$developmentEnvironment}===null) return;
+        $erp = new ErrorReportersFinder($this->simpleXMLElement->reporters->{$developmentEnvironment});
+        $this->reporters = $erp->getReporters();
     }
     
     /**
      * Gets ErrorReporter instances that will later on be used to report exception to
      *
-     * @return ReportersList Configurable list of error reporters.
+     * @return \SimpleXMLElement[string] List of error reporters by class name.
      */
     public function getReporters() {
         return $this->reporters;
@@ -140,17 +171,14 @@ class Application
      * Sets ErrorRenderer instances that will later be used to render response to exception. Maps to tag renderers @ XML.
      */
     private function setRenderers() {
-        $erf = new ErrorRenderersFinder(
-            $this->simpleXMLElement->renderers,
-            $this->includePath."/".$this->simpleXMLElement->application->paths->renderers
-            );
+        $erf = new ErrorRenderersFinder($this->simpleXMLElement->renderers);
         $this->renderers = $erf->getRenderers();
     }
     
     /**
      * Gets ErrorRenderer instances that will later be used to render response to exception
      *
-     * @return ErrorRenderer[string] List of error renderers by content type.
+     * @return \SimpleXMLElement[string] List of error renderers by content type.
      */
     public function getRenderers() {
         return $this->renderers;
@@ -172,13 +200,24 @@ class Application
     public function getRoutes() {
         return $this->routes;
     }
-    
-    /**
-     * Gets a pointer to XML file reader.
-     *
-     * @return \SimpleXMLElement
-     */
-    public function getXML() {
-        return $this->simpleXMLElement;
-    }
+	
+	/**
+	 * Gets tag based on name from main XML root or referenced XML file if "ref" attribute was set 
+	 * 
+	 * @param string $name
+	 * @throws ServletException If "ref" points to a nonexistent file.
+	 * @return \SimpleXMLElement
+	 */
+	public function getTag($name) {
+	    $xml = $this->simpleXMLElement->{$name};
+	    $xmlFilePath = (string) $xml["ref"];
+	    if($xmlFilePath) {
+	        $xmlFilePath = $this->includePath."/".$xmlFilePath.".xml";
+	        if(!file_exists($xmlFilePath)) throw new Exception("XML file not found: ".$xmlFilePath);
+	        $subXML = simplexml_load_file($xmlFilePath);
+	        return $subXML->{$name};
+	    } else {
+	        return $xml;
+	    }
+	}
 }

@@ -5,7 +5,7 @@ namespace Lucinda\MVC\STDERR;
  * Encapsulates list of reporters detected from XML and instanced by ErrorReportersFinder controllers may later on clear
  * or disable if reporting policies are exception-based instead of global.
  */
-class ReportersList
+class ReportersList implements ErrorReporter
 {
     private $reporters = array();
 
@@ -41,5 +41,15 @@ class ReportersList
     public function toArray() {
         return $this->reporters;
     }
+	/**
+	 * Reports error info to a storage medium.
+	 *
+     * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
+	 */
+    public function report(Request $request) {
+		foreach($this->reporters as $reporter) {
+			$reporter->report($request);
+		}
+	}
 }
 

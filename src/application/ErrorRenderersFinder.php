@@ -1,12 +1,8 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("ErrorRenderer.php");
-require_once("ClassLoader.php");
-
 /**
- * Locates based on renderers tag @ XML and instances found renderers able to give a response back to caller after an error
- * fed STDERR flow.
+ * Locates <renderer> tags in XML and builds .
  */
 class ErrorRenderersFinder {
     private $renderers = array();
@@ -15,21 +11,19 @@ class ErrorRenderersFinder {
      * ErrorRenderersFinder constructor.
      *
      * @param \SimpleXMLElement $xml Contents of renderers tag @ XML
-     * @param string $renderersPath Relative path to folder in which renderer classes are found on disk.
      * @throws Exception If XML contains invalid information.
      */
-    public function __construct(\SimpleXMLElement $xml, $renderersPath) {
-        $this->setRenderer($xml, $renderersPath);
+    public function __construct(\SimpleXMLElement $xml) {
+        $this->setRenderers($xml);
     }
 
     /**
      * Sets renderers based on content type
      *
      * @param \SimpleXMLElement $xml Contents of renderers tag @ XML
-     * @param string $renderersPath Relative path to folder in which renderer classes are found on disk.
      * @throws Exception If XML contains invalid information.
      */
-    private function setRenderer(\SimpleXMLElement $xml, $renderersPath) {
+    private function setRenderers(\SimpleXMLElement $xml) {
         $tmp = (array) $xml;
         if(empty($tmp["renderer"])) return;
         $tmp = $tmp["renderer"];
@@ -42,17 +36,15 @@ class ErrorRenderersFinder {
             if($charset) $currentContentType .= "; charset=".$charset;
             
             $rendererClass = (string) $info['class'];
-            load_class($renderersPath, $rendererClass);
-            $object = new $rendererClass($info);
-            if(!($object instanceof ErrorRenderer)) throw new Exception("Renderer must be instance of ErrorRenderer");
-            $this->renderers[$currentContentType] = $object;
+            if(!$rendererClass) throw new Exception("Renderer missing class!");
+            $this->renderers[$currentContentType] = $info;
         }
     }
 
     /**
      * Gets found renderers
      *
-     * @return ErrorRenderer[string] List of error renderers by content type.
+     * @return \SimpleXMLElement[string] List of error renderers by content type.
      */
     public function getRenderers() {
         return $this->renderers;

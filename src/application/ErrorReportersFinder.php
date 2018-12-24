@@ -1,9 +1,6 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("ErrorReporter.php");
-require_once("ClassLoader.php");
-
 /**
  * Locates based on reporters tag @ XML and instances found reporters able to log error info to a storage medium.
  */
@@ -15,38 +12,34 @@ class ErrorReportersFinder
      * ErrorReportersFinder constructor.
      *
      * @param \SimpleXMLElement $xml Contents of reporters tag @ XML
-     * @param string $reportersPath Relative path to folder in which reporter classes are found on disk.
      * @throws Exception If detection fails (file/class not found)
      */
-    public function __construct(\SimpleXMLElement $xml, $reportersPath) {
-        $this->setReporters($xml, $reportersPath);
+    public function __construct(\SimpleXMLElement $xml) {
+        $this->setReporters($xml);
     }
 
     /**
      * Sets found reporters based on their class name.
      *
      * @param \SimpleXMLElement $xml Contents of reporters tag @ XML
-     * @param string $reportersPath Relative path to folder in which reporter classes are found on disk.
      * @throws Exception If XML contains invalid information.
      */
-    private function setReporters(\SimpleXMLElement $xml, $reportersPath) {
+    private function setReporters(\SimpleXMLElement $xml) {
         $tmp = (array) $xml;
         if(empty($tmp["reporter"])) return;
         $tmp = $tmp["reporter"];
         if(!is_array($tmp)) $tmp = array($tmp);
         foreach($tmp as $info) {
             $reporterClass = (string) $info['class'];
-            load_class($reportersPath, $reporterClass);
-            $object = new $reporterClass($info);
-            if(!($object instanceof ErrorReporter)) throw new Exception("Reporter must be instance of ErrorReporter");
-            $this->reporters[$reporterClass] = $object;
+			if(!$reporterClass) throw new Exception("Reporter tag missing class attribute");
+            $this->reporters[$reporterClass] = $info;
         }
     }
     
     /**
      * Gets found reporters by their class name.
      * 
-     * @return ErrorReporter[string] List of error reporters by class name.
+     * @return \SimpleXMLElement[string] List of error reporters by class name.
      */
     public function getReporters() {
         return $this->reporters;

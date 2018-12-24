@@ -9,7 +9,7 @@ namespace Lucinda\MVC\STDERR;
  */
 abstract class Controller
 {
-    protected $application, $request, $response;
+    protected $application, $request, $response, $reporters;
 
     /**
      * Controller constructor.

@@ -63,36 +63,39 @@ class FrontController implements ErrorHandler
         // finds application settings based on XML and development environment
         require_once("Application.php");
         $application = new Application($this->documentDescriptor, $this->developmentEnvironment, $this->includePath);
-
+		
         // finds and instances routes based on XML and exception received
         require_once("Request.php");
         $request = new Request($application, $exception);
+		
+		// builds reporters list
+		require_once("ErrorReporter.php");
+		require_once("locators/ReportersLocator.php");
+		$locator = new ReportersLocator($application);
+		$reportersList = $locator->getReporters();
+        $reportersList->report($request);
 
         // compiles a view object from content type and http status
         require_once("Response.php");
         $response = new Response($application, $request, $this->contentType);
-
-        // runs controller, able to alter reporters
+		
+        // runs controller, able to customize response
         if($request->getRoute()->getController()) {
-            require_once("ControllerFinder.php");
-            $cf = new ControllerFinder($application, $request, $response);
-            $controller = $cf->getController();
+			require_once("Controller.php");
+            require_once("locators/ControllerLocator.php");
+            $locator = new ControllerLocator($application, $request, $response);
+            $controller = $locator->getController();
             $controller->run();
         }
 
-        // reports error
-        $reporters = $application->getReporters()->toArray();
-        foreach($reporters as $reporter) {
-            $reporter->report($request);
-        }
+        // renders response to output stream
+		require_once("ErrorRenderer.php");
+		require_once("locators/RendererLocator.php");
+		$locator = new RendererLocator($application, $response);
+        $renderer = $locator->getRenderer();
+        $renderer->render($response);
 
-        // resolves view
-        $renderer = $application->getRenderer($response->getHeader("Content-Type"));
-        if($renderer) {
-            $renderer->render($response);
-        }        
-
-        // commits response
+        // commits response to caller
         $response->commit();
         
         exit(); // forces program to end
