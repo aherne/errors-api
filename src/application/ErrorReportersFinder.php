@@ -27,9 +27,7 @@ class ErrorReportersFinder
     private function setReporters(\SimpleXMLElement $xml) {
         $tmp = (array) $xml;
         if(empty($tmp["reporter"])) return;
-        $tmp = $tmp["reporter"];
-        if(!is_array($tmp)) $tmp = array($tmp);
-        foreach($tmp as $info) {
+        foreach($tmp["reporter"] as $info) {
             $reporterClass = (string) $info['class'];
 			if(!$reporterClass) throw new Exception("Reporter tag missing class attribute");
             $this->reporters[$reporterClass] = $info;

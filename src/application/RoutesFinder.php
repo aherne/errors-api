@@ -33,9 +33,7 @@ class RoutesFinder {
         // override with specific route, if set
         $tmp = (array) $xml;
         if(empty($tmp["exception"])) return;
-        $tmp = $tmp["exception"];
-        if(!is_array($tmp)) $tmp = array($tmp);
-        foreach($tmp as $info) {
+        foreach($tmp["exception"] as $info) {
             $currentClassName = (string) $info['class'];
             if(!$currentClassName) throw new Exception("Exception class not defined!");
             $this->routes[$currentClassName] = $this->compileRoute($info);
