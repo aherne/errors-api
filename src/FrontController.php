@@ -51,9 +51,8 @@ class FrontController implements ErrorHandler
     }
 
     /**
-     * Runs framework logic on handled STDERR flow
-     *
-     * @param \Exception|\Throwable $exception Encapsulates error information.
+     * {@inheritDoc}
+     * @see ErrorHandler::handle()
      */
     public function handle($exception) {
         // redirects errors to emergency handler

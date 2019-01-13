@@ -27,7 +27,6 @@ class ReportersLocator {
      * @throws Exception If detection fails due to file/class not found.
      */
     private function setReporters(Application $application) {
-		$reportersPath = $application->getReportersPath();
         $reporters = $application->getReporters();
 		foreach($reporters as $className=>$xml) {
 			load_class($application->getReportersPath(), $className);

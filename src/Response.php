@@ -122,10 +122,10 @@ class Response
     }
     
     /**
-     * Gets value of response header by name
+     * Gets value of response header by name or null if not found
      *
      * @param string $name
-     * @return NULL|string
+     * @return string
      */
     public function getHeader($name)
     {
@@ -135,7 +135,7 @@ class Response
     /**
      * Gets response headers
      *
-     * @return array[string:string]
+     * @return string[string]
      */
     public function getHeaders()
     {
@@ -154,10 +154,10 @@ class Response
     }
     
     /**
-     * Gets value of response attribute by name
+     * Gets value of response attribute by name or null if not found
      *
      * @param string $name
-     * @return NULL|mixed
+     * @return mixed
      */
     public function getAttribute($name)
     {
@@ -167,7 +167,7 @@ class Response
     /**
      * Gets response attributes
      *
-     * @return array[string:string]
+     * @return string[string]
      */
     public function getAttributes()
     {

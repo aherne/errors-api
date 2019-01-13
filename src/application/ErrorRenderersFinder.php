@@ -11,7 +11,7 @@ class ErrorRenderersFinder {
      * ErrorRenderersFinder constructor.
      *
      * @param \SimpleXMLElement $xml Contents of renderers tag @ XML
-     * @throws Exception If XML contains invalid information.
+     * @throws Exception If XML is misconfigured.
      */
     public function __construct(\SimpleXMLElement $xml) {
         $this->setRenderers($xml);
@@ -21,7 +21,7 @@ class ErrorRenderersFinder {
      * Sets renderers based on content type
      *
      * @param \SimpleXMLElement $xml Contents of renderers tag @ XML
-     * @throws Exception If XML contains invalid information.
+     * @throws Exception If XML is misconfigured.
      */
     private function setRenderers(\SimpleXMLElement $xml) {
         $tmp = (array) $xml;

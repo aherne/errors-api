@@ -28,7 +28,7 @@ class Application
      * @param string $xmlPath Relative location of XML file containing settings.
      * @param string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
      * @param string $includePath Absolute root path where reporters / renderers / controllers / views should be located
-     * @throws Exception If detection fails due to an error.
+     * @throws Exception If XML is misconfigured.
      */
     public function __construct($xmlPath, $developmentEnvironment, $includePath) {
         $xmlPath = $includePath."/".$xmlPath;
@@ -151,6 +151,7 @@ class Application
      * Sets ErrorReporter instances that will later be used to report exception to. Maps to tag reporters @ XML.
      *
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
+     * @throws Exception If XML is misconfigured.
      */
     private function setReporters($developmentEnvironment) {
 		if($this->simpleXMLElement->reporters->{$developmentEnvironment}===null) return;
@@ -169,6 +170,8 @@ class Application
     
     /**
      * Sets ErrorRenderer instances that will later be used to render response to exception. Maps to tag renderers @ XML.
+     * 
+     * @throws Exception If XML is misconfigured.
      */
     private function setRenderers() {
         $erf = new ErrorRenderersFinder($this->simpleXMLElement->renderers);
@@ -186,6 +189,8 @@ class Application
     
     /**
      * Sets routes that map exceptions that will later on be used to resolve controller & view. Maps to tag exceptions @ XML
+     * 
+     * @throws Exception If XML is misconfigured.
      */
     private function setRoutes() {
         $rf = new RoutesFinder($this->simpleXMLElement->exceptions);
@@ -205,7 +210,6 @@ class Application
 	 * Gets tag based on name from main XML root or referenced XML file if "ref" attribute was set 
 	 * 
 	 * @param string $name
-	 * @throws ServletException If "ref" points to a nonexistent file.
 	 * @return \SimpleXMLElement
 	 */
 	public function getTag($name) {

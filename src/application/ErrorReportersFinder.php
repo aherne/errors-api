@@ -12,7 +12,7 @@ class ErrorReportersFinder
      * ErrorReportersFinder constructor.
      *
      * @param \SimpleXMLElement $xml Contents of reporters tag @ XML
-     * @throws Exception If detection fails (file/class not found)
+     * @throws Exception If XML is misconfigured.
      */
     public function __construct(\SimpleXMLElement $xml) {
         $this->setReporters($xml);
@@ -22,7 +22,7 @@ class ErrorReportersFinder
      * Sets found reporters based on their class name.
      *
      * @param \SimpleXMLElement $xml Contents of reporters tag @ XML
-     * @throws Exception If XML contains invalid information.
+     * @throws Exception If XML is misconfigured.
      */
     private function setReporters(\SimpleXMLElement $xml) {
         $tmp = (array) $xml;

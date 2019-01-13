@@ -14,7 +14,7 @@ class RoutesFinder {
      * RouteFinder constructor.
      *
      * @param \SimpleXMLElement $xml
-     * @throws Exception If tag fails.
+     * @throws Exception If XML is misconfigured.
      */
     public function __construct(\SimpleXMLElement $xml) {
         $this->setRoutes($xml);
@@ -24,7 +24,7 @@ class RoutesFinder {
      * Locates route from XML exceptions tag or latter's exception tag child.
      *
      * @param Application $application
-     * @throws Exception
+     * @throws Exception If XML is misconfigured.
      */
     private function setRoutes(\SimpleXMLElement $xml) {
         // get default route
