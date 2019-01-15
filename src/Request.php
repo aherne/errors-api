@@ -15,7 +15,7 @@ class Request
      * Detects route based on exception handled.
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
-     * @param \Error|\Exception $exception Error "request" that fed STDERR stream
+     * @param \Exception $exception Error "request" that fed STDERR stream
      */
     public function __construct(Application $application, $exception) {
         $this->setRoute($application, $exception);
@@ -26,7 +26,7 @@ class Request
      * Detects route based on exception handled.
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
-     * @param \Error|\Exception $exception Error "request" that fed STDERR stream
+     * @param \Exception $exception Error "request" that fed STDERR stream
      */
     private function setRoute(Application $application, $exception) {
         $routes = $application->getRoutes();
@@ -57,7 +57,7 @@ class Request
     /**
      * Sets exception handled
      *
-     * @param \Error|\Exception $exception Error "request" that fed STDERR stream
+     * @param \Exception $exception Error "request" that fed STDERR stream
      */
     private function setException($exception) {
         $this->exception = $exception;
@@ -66,7 +66,7 @@ class Request
     /**
      * Gets exception handled
      *
-     * @return \Error|\Exception $exception Error "request" that fed STDERR stream
+     * @return \Exception $exception Error "request" that fed STDERR stream
      */
     public function getException() {
         return $this->exception;
