@@ -4,6 +4,5 @@ This is a revolutionary API created to elegantly and efficiently handle errors/e
 
 A STDERR micro-framework that feeds on errors (exceptions) instead of web requests, able to provide a powerful unified error handling strategy that works on MVC principles. Once an error has occurred in STDOUT flow (as a request is handled to produce a response), it gets automatically redirected (via standard PHP error redirection functions) to a dormant framework that wakes up when getting an error to handle.
 
-Read more in official documentation:
-
+More information here:
 http://www.lucinda-framework.com/stderr-mvc
