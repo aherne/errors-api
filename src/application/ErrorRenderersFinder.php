@@ -26,7 +26,8 @@ class ErrorRenderersFinder {
     private function setRenderers(\SimpleXMLElement $xml) {
         $tmp = (array) $xml;
         if(empty($tmp["renderer"])) return;
-        foreach($tmp["renderer"] as $info) {
+        $list = (is_array($tmp["renderer"])?$tmp["renderer"]:[$tmp["renderer"]]);
+        foreach($list as $info) {
             $currentContentType = (string) $info["content_type"];
             if(!$currentContentType) throw new Exception("Renderer missing content type!");
             
