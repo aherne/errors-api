@@ -135,7 +135,7 @@ class Application
      */
     private function setDisplayErrors($developmentEnvironment) {
         $value = $this->simpleXMLElement->application->display_errors->{$developmentEnvironment};
-        $this->displayErrors = $value?true:false;
+        $this->displayErrors = (string) $value?true:false;
     }
     
     /**
