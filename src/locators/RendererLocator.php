@@ -29,9 +29,9 @@ class RendererLocator {
      * @throws Exception If detection fails due to file/class not found.
      */
     private function setRenderer(Application $application, Response $response) {
-		$renderers = $application->getRenderers();
-		$contentType = $response->getHeader("Content-Type");
-		if(!isset($renderers[$contentType])) throw new Exception("No renderer found for: ".$contentType);
+        $renderers = $application->renderers();
+        $contentType = $response->headers("Content-Type");
+        if(!isset($renderers[$contentType])) throw new Exception("No renderer found for: ".$contentType);
 		
         $rendererClass = (string) $renderers[$contentType]["class"];
         load_class($application->getRenderersPath(), $rendererClass);

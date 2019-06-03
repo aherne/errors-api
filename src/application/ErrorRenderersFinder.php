@@ -43,7 +43,7 @@ class ErrorRenderersFinder {
     /**
      * Gets found renderers
      *
-     * @return \SimpleXMLElement[string] List of error renderers by content type.
+     * @return ErrorRenderer[string] List of error renderers by content type.
      */
     public function getRenderers() {
         return $this->renderers;

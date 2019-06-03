@@ -38,7 +38,7 @@ class ErrorReportersFinder
     /**
      * Gets found reporters by their class name.
      * 
-     * @return \SimpleXMLElement[string] List of error reporters by class name.
+     * @return ErrorReporter[string] List of error reporters by class name.
      */
     public function getReporters() {
         return $this->reporters;

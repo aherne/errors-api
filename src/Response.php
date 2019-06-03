@@ -1,15 +1,18 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
+require_once("response/ResponseStatus.php");
+require_once("response/ResponseStream.php");
+
 /**
  * Encapsulates error response that will be displayed back to caller
  */
 class Response
 {
-    private $httpStatus;
-    private $body;
-    private $headers=array();
-    private $attributes=array();
+    private $status;
+    private $outputStream;
+    private $headers=[];
+    private $attributes = [];
     private $view;
 
     /**
@@ -20,9 +23,19 @@ class Response
      * @param string $customContentType Content type of rendered response specifically signalled to FrontController.
      */
     public function __construct(Application $application, Request $request, $customContentType){
-        $this->setContentType($application, $request, $customContentType);
-        $this->setHttpStatus($request->getRoute()->getHttpStatus());        
+        $this->outputStream	= new ResponseStream();
+        $this->setStatus($request->getRoute()->getHttpStatus());        
         $this->setView($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):null);
+        $this->headers["Content-Type"]= $this->getContentType($application, $request, $customContentType);
+    }
+    
+    /**
+     * Gets response stream to work on.
+     *
+     * @return ResponseStream
+     */
+    public function getOutputStream() {
+        return $this->outputStream;
     }
     
     /**
@@ -32,7 +45,7 @@ class Response
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
      * @param string $customContentType Content type of rendered response specifically signalled to FrontController.
      */
-    private function setContentType(Application $application, Request $request, $customContentType) {
+    private function getContentType(Application $application, Request $request, $customContentType) {
         $currentContentType = "";
         if($customContentType) {
             $currentContentType = $customContentType;
@@ -42,12 +55,14 @@ class Response
             $currentContentType = $application->getDefaultContentType();
         }
         
-        $renderers = $application->getRenderers();
+        $renderers = $application->renderers();
         foreach($renderers as $contentType=>$renderer) {
             if(strpos($contentType, $currentContentType) === 0) {
-                $this->headers["Content-Type"] = $contentType;
+                return $contentType;
             }
         }
+        
+        throw new Exception("Content type not supported!");
     }
     
     /**
@@ -73,11 +88,11 @@ class Response
     /**
      * Sets response HTTP status
      *
-     * @param integer $httpStatus
+     * @param integer $code
      */
-    public function setHttpStatus($httpStatus)
+    public function setStatus($code)
     {
-        $this->httpStatus = $httpStatus;
+        $this->status = new ResponseStatus($code);
     }
 
     /**
@@ -85,93 +100,35 @@ class Response
      *
      * @return integer
      */
-    public function getHttpStatus()
+    public function getStatus()
     {
-        return $this->httpStatus;
+        return $this->status;
     }
     
     /**
-     * Sets response body
+     * Gets or sets headers application will send back to user.
      *
-     * @param string $body
-     */
-    public function setBody($body)
-    {
-        $this->body = $body;
-    }
-
-    /**
-     * Gets response body
-     *
-     * @return string
-     */
-    public function getBody()
-    {
-        return $this->body;
-    }
-    
-    /**
-     * Sets response header by name and value.
-     *
-     * @param string $name
+     * @param string $key
      * @param string $value
-     */
-    public function setHeader($name, $value)
-    {
-        $this->headers[$name] = $value;
-    }
-    
-    /**
-     * Gets value of response header by name or null if not found
-     *
-     * @param string $name
-     * @return string
-     */
-    public function getHeader($name)
-    {
-        return (isset($this->headers[$name])?$this->headers[$name]:null);
-    }
-
-    /**
-     * Gets response headers
-     *
-     * @return string[string]
-     */
-    public function getHeaders()
-    {
-        return $this->headers;
-    }
-    
-    /**
-     * Sets response attribute by name and value.
-     *
-     * @param string $name
-     * @param mixed $value
-     */
-    public function setAttribute($name, $value)
-    {
-        $this->attributes[$name] = $value;
-    }
-    
-    /**
-     * Gets value of response attribute by name or null if not found
-     *
-     * @param string $name
      * @return mixed
      */
-    public function getAttribute($name)
-    {
-        return (isset($this->attributes[$name])?$this->attributes[$name]:null);
+    public function headers($key="", $value=null) {
+        if(!$key) return $this->headers;
+        else if($value===null) return (isset($this->headers[$key])?$this->headers[$key]:null);
+        else $this->headers[$key] = $value;
     }
     
     /**
-     * Gets response attributes
+     * Gets or sets data that will be sent to views.
      *
-     * @return string[string]
+     * @param string $key
+     * @param string $value
+     * @return mixed
      */
-    public function getAttributes()
-    {
-        return $this->attributes;
+    public function attributes($key="", $value=null) {
+        if(!$key) return $this->attributes;
+        else if($value===null) return (isset($this->attributes[$key])?$this->attributes[$key]:null);
+        else $this->attributes[$key] = $value;
     }
     
     /**
@@ -200,13 +157,13 @@ class Response
         if(headers_sent()) return;
         
         // sends headers
-        header("HTTP/1.1 ".$this->httpStatus);        
+        header("HTTP/1.1 ".$this->status->getId()." ".$this->status->getDescription());        
         foreach($this->headers as $name=>$value) {
             header($name.": ".$value);
         }
         
         // show output
-        echo $this->body;
+        echo $this->outputStream->get();
     }
 }
 

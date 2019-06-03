@@ -6,7 +6,7 @@ namespace Lucinda\MVC\STDERR;
  */
 class Request
 {
-    const DEFAULT_HTTP_STATUS = "500 Internal Server Error";
+    const DEFAULT_HTTP_STATUS = 500;
 
     private $exception;
     private $route;
@@ -29,16 +29,12 @@ class Request
      * @param \Exception $exception Error "request" that fed STDERR stream
      */
     private function setRoute(Application $application, $exception) {
-        $routes = $application->getRoutes();
+        $routes = $application->routes();
         $targetClass = get_class($exception);
         
         // detects route
-        $this->route = $routes[""];
-        foreach($routes as $currentClass=>$route) {
-            if($currentClass == $targetClass) {
-                $this->route = $route;
-            }
-        }
+        $this->route = (isset($routes[$targetClass])?$routes[$targetClass]:$routes[""]);
+        
         // override non-existent properties with defaults
         if(!$this->route->getHttpStatus()) {
             $this->route->setHttpStatus(self::DEFAULT_HTTP_STATUS);

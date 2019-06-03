@@ -76,8 +76,8 @@ class FrontController implements ErrorHandler
 			$reporter->report($request);
 		}
 
-        // compiles a view object from content type and http status
-        require_once("Response.php");
+		// compiles a view object from content type and http status
+		require_once("Response.php");
         $response = new Response($application, $request, $this->contentType);
 		
         // runs controller, able to customize response
@@ -93,12 +93,11 @@ class FrontController implements ErrorHandler
 		require_once("ErrorRenderer.php");
 		require_once("locators/RendererLocator.php");
 		$locator = new RendererLocator($application, $response);
-        $renderer = $locator->getRenderer();
+		$renderer = $locator->getRenderer();
         $renderer->render($response);
-
+        
         // commits response to caller
         $response->commit();
-        
         exit(); // forces program to end
     }
 }
