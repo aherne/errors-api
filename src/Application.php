@@ -197,7 +197,7 @@ class Application
      * Gets ErrorReporter instances that will later on be used to report exception to
      *
      * @param string $className
-     * @return mixed
+     * @return ErrorReporter[string]|NULL|ErrorReporter
      */
     public function reporters($className="") {
         if(!$className) return $this->reporters;
@@ -218,7 +218,7 @@ class Application
      * Gets ErrorRenderer instances that will later be used to render response to exception
      *
      * @param string $contentType
-     * @return mixed
+     * @return ErrorRenderer[string]|NULL|ErrorRenderer
      */
     public function renderers($contentType="") {
         if(!$contentType) return $this->renderers;
@@ -239,7 +239,7 @@ class Application
      * Gets routes that map exceptions that will later on be used to resolve controller & view.
      *
      * @param string $exceptionClassName
-     * @return mixed
+     * @return Route[string]|NULL|Route
      */
     public function routes($exceptionClassName="") {
         if(!$exceptionClassName) return $this->routes;

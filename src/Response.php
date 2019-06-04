@@ -14,6 +14,7 @@ class Response
     private $headers=[];
     private $attributes = [];
     private $view;
+    private $isDisabled;
 
     /**
      * View constructor.
@@ -106,11 +107,11 @@ class Response
     }
     
     /**
-     * Gets or sets headers application will send back to user.
+     * Gets or sets response headers will send back to user.
      *
      * @param string $key
      * @param string $value
-     * @return mixed
+     * @return string[string]|NULL|string
      */
     public function headers($key="", $value=null) {
         if(!$key) return $this->headers;
@@ -122,8 +123,8 @@ class Response
      * Gets or sets data that will be sent to views.
      *
      * @param string $key
-     * @param string $value
-     * @return mixed
+     * @param mixed $value
+     * @return mixed[string]|NULL|mixed
      */
     public function attributes($key="", $value=null) {
         if(!$key) return $this->attributes;
@@ -148,22 +149,41 @@ class Response
         header('Location: '.$location, true, $permanent?301:302);
         exit();
     }
+    
+    /**
+     * Disables response. A disabled response will output nothing.
+     */
+    public function disable() {
+        $this->isDisabled = true;
+    }
+    
+    /**
+     * Checks if response is disabled.
+     *
+     * @return boolean
+     */
+    public function isDisabled() {
+        return $this->isDisabled;
+    }
         
     /**
      * Commits response to client.
      */
     public function commit() {
         // do not display anything, if headers have already been sent
-        if(headers_sent()) return;
-        
-        // sends headers
-        header("HTTP/1.1 ".$this->status->getId()." ".$this->status->getDescription());        
-        foreach($this->headers as $name=>$value) {
-            header($name.": ".$value);
+        if(!headers_sent() && $this->status) {
+            header("HTTP/1.1 ".$this->status->getId()." ".$this->status->getDescription());     
         }
         
-        // show output
-        echo $this->outputStream->get();
+        if(!$this->isDisabled) {
+            // sends headers   
+            foreach($this->headers as $name=>$value) {
+                header($name.": ".$value);
+            }
+            
+            // show output
+            echo $this->outputStream->get();
+        }
     }
 }
 

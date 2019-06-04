@@ -90,11 +90,13 @@ class FrontController implements ErrorHandler
         }
 
         // renders response to output stream
-		require_once("ErrorRenderer.php");
-		require_once("locators/RendererLocator.php");
-		$locator = new RendererLocator($application, $response);
-		$renderer = $locator->getRenderer();
-        $renderer->render($response);
+        if(!$response->isDisabled()) {
+    		require_once("ErrorRenderer.php");
+    		require_once("locators/RendererLocator.php");
+    		$locator = new RendererLocator($application, $response);
+    		$renderer = $locator->getRenderer();
+            $renderer->render($response);
+        }
         
         // commits response to caller
         $response->commit();
