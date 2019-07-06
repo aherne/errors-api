@@ -90,7 +90,7 @@ class FrontController implements ErrorHandler
         }
 
         // renders response to output stream
-        if(!$response->isDisabled()) {
+        if(!$response->isDisabled() && $response->getOutputStream()->isEmpty()) {
     		require_once("ErrorRenderer.php");
     		require_once("locators/RendererLocator.php");
     		$locator = new RendererLocator($application, $response);
