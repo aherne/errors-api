@@ -14,7 +14,8 @@ class ErrorReportersFinder
      * @param \SimpleXMLElement $xml Contents of reporters tag @ XML
      * @throws Exception If XML is misconfigured.
      */
-    public function __construct(\SimpleXMLElement $xml) {
+    public function __construct(\SimpleXMLElement $xml)
+    {
         $this->setReporters($xml);
     }
 
@@ -24,24 +25,29 @@ class ErrorReportersFinder
      * @param \SimpleXMLElement $xml Contents of reporters tag @ XML
      * @throws Exception If XML is misconfigured.
      */
-    private function setReporters(\SimpleXMLElement $xml) {
+    private function setReporters(\SimpleXMLElement $xml)
+    {
         $tmp = (array) $xml;
-        if(empty($tmp["reporter"])) return;
+        if (empty($tmp["reporter"])) {
+            return;
+        }
         $list = (is_array($tmp["reporter"])?$tmp["reporter"]:[$tmp["reporter"]]);
-        foreach($list as $info) {
+        foreach ($list as $info) {
             $reporterClass = (string) $info['class'];
-			if(!$reporterClass) throw new Exception("Reporter tag missing class attribute");
+            if (!$reporterClass) {
+                throw new Exception("Reporter tag missing class attribute");
+            }
             $this->reporters[$reporterClass] = $info;
         }
     }
     
     /**
      * Gets found reporters by their class name.
-     * 
+     *
      * @return ErrorReporter[string] List of error reporters by class name.
      */
-    public function getReporters() {
+    public function getReporters()
+    {
         return $this->reporters;
     }
 }
-

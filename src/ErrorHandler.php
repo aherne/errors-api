@@ -11,6 +11,5 @@ interface ErrorHandler
      *
      * @param \Exception $exception Encapsulates error information.
      */
-    function handle($exception);
+    public function handle($exception);
 }
-

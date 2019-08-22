@@ -7,7 +7,8 @@ require_once("ErrorType.php");
 /**
  * Locates based on exceptions tag @ XML and instances found routes able to log error info to a storage medium.
  */
-class RoutesFinder {
+class RoutesFinder
+{
     private $routes = array();
 
     /**
@@ -16,7 +17,8 @@ class RoutesFinder {
      * @param \SimpleXMLElement $xml
      * @throws Exception If XML is misconfigured.
      */
-    public function __construct(\SimpleXMLElement $xml) {
+    public function __construct(\SimpleXMLElement $xml)
+    {
         $this->setRoutes($xml);
     }
 
@@ -26,17 +28,22 @@ class RoutesFinder {
      * @param Application $application
      * @throws Exception If XML is misconfigured.
      */
-    private function setRoutes(\SimpleXMLElement $xml) {
+    private function setRoutes(\SimpleXMLElement $xml)
+    {
         // get default route
         $this->routes[""] = $this->compileRoute($xml);
         
         // override with specific route, if set
         $tmp = (array) $xml;
-        if(empty($tmp["exception"])) return;
+        if (empty($tmp["exception"])) {
+            return;
+        }
         $list = (is_array($tmp["exception"])?$tmp["exception"]:[$tmp["exception"]]);
-        foreach($list as $info) {
+        foreach ($list as $info) {
             $currentClassName = (string) $info['class'];
-            if(!$currentClassName) throw new Exception("Exception class not defined!");
+            if (!$currentClassName) {
+                throw new Exception("Exception class not defined!");
+            }
             $this->routes[$currentClassName] = $this->compileRoute($info);
         }
     }
@@ -47,14 +54,15 @@ class RoutesFinder {
      * @param \SimpleXMLElement $info
      * @return Route
      */
-    private function compileRoute(\SimpleXMLElement $info) {
+    private function compileRoute(\SimpleXMLElement $info)
+    {
         $route = new Route();
         $route->setController((string) $info["controller"]);
         $route->setView((string) $info["view"]);
         $route->setHttpStatus((string) $info["http_status"]);
         $route->setContentType((string) $info["content_type"]);
         $route->setErrorType((string) $info["error_type"]);
-        return $route;        
+        return $route;
     }
 
     /**
@@ -62,7 +70,8 @@ class RoutesFinder {
      *
      * @return Route[string] List of routes found by handled exception they match.
      */
-    public function getRoutes() {
+    public function getRoutes()
+    {
         return $this->routes;
     }
 }

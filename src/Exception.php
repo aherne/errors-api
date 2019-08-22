@@ -7,4 +7,3 @@ namespace Lucinda\MVC\STDERR;
 class Exception extends \Exception
 {
 }
-

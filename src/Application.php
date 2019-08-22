@@ -18,8 +18,16 @@ class Application
 {
     private $includePath;
     private $simpleXMLElement;
-    private $controllersPath, $viewsPath, $reportersPath, $renderersPath, $publicPath, $defaultContentType, $version;
-    private $reporters=array(), $renderers=array(), $routes=array();
+    private $controllersPath;
+    private $viewsPath;
+    private $reportersPath;
+    private $renderersPath;
+    private $publicPath;
+    private $defaultContentType;
+    private $version;
+    private $reporters=array();
+    private $renderers=array();
+    private $routes=array();
     private $displayErrors=false;
     
     /**
@@ -30,9 +38,12 @@ class Application
      * @param string $includePath Absolute root path where reporters / renderers / controllers / views should be located
      * @throws Exception If XML is misconfigured.
      */
-    public function __construct($xmlPath, $developmentEnvironment, $includePath) {
+    public function __construct($xmlPath, $developmentEnvironment, $includePath)
+    {
         $xmlPath = $includePath."/".$xmlPath;
-        if(!file_exists($xmlPath)) throw new Exception("XML configuration file not found!");
+        if (!file_exists($xmlPath)) {
+            throw new Exception("XML configuration file not found!");
+        }
         $this->simpleXMLElement = simplexml_load_file($xmlPath);
         $this->includePath = $includePath;
         
@@ -52,9 +63,12 @@ class Application
     /**
      * Sets default response content type. Maps to tag application.default_default_content_type @ XML.
      */
-    private function setDefaultContentType() {
+    private function setDefaultContentType()
+    {
         $this->defaultContentType = (string) $this->simpleXMLElement->application["default_content_type"];
-        if(!$this->defaultContentType) throw new Exception("Attribute 'default_content_type' is mandatory for 'application' tag");
+        if (!$this->defaultContentType) {
+            throw new Exception("Attribute 'default_content_type' is mandatory for 'application' tag");
+        }
     }
     
     /**
@@ -62,14 +76,16 @@ class Application
      *
      * @return string
      */
-    public function getDefaultContentType() {
+    public function getDefaultContentType()
+    {
         return $this->defaultContentType;
     }
     
     /**
      * Sets path to controllers folder. Maps to tag application.paths.controllers @ XML.
      */
-    private function setControllersPath() {
+    private function setControllersPath()
+    {
         $this->controllersPath = $this->includePath."/".$this->simpleXMLElement->application->paths->controllers;
     }
     
@@ -78,14 +94,16 @@ class Application
      *
      * @return string
      */
-    public function getControllersPath() {
+    public function getControllersPath()
+    {
         return $this->controllersPath;
     }
     
     /**
      * Sets path to reporters folder. Maps to tag application.paths.reporters @ XML.
      */
-    private function setReportersPath() {
+    private function setReportersPath()
+    {
         $this->reportersPath = $this->includePath."/".$this->simpleXMLElement->application->paths->reporters;
     }
     
@@ -94,14 +112,16 @@ class Application
      *
      * @return string
      */
-    public function getReportersPath() {
+    public function getReportersPath()
+    {
         return $this->reportersPath;
     }
     
     /**
      * Sets path to renderers folder. Maps to tag application.paths.renderers @ XML.
      */
-    private function setRenderersPath() {
+    private function setRenderersPath()
+    {
         $this->renderersPath = $this->includePath."/".$this->simpleXMLElement->application->paths->renderers;
     }
     
@@ -110,14 +130,16 @@ class Application
      *
      * @return string
      */
-    public function getRenderersPath() {
+    public function getRenderersPath()
+    {
         return $this->renderersPath;
     }
     
     /**
      * Sets views folder. Maps to application.paths.views @ XML.
      */
-    private function setViewsPath() {
+    private function setViewsPath()
+    {
         $this->viewsPath = $this->includePath."/".$this->simpleXMLElement->application->paths->views;
     }
     
@@ -126,14 +148,16 @@ class Application
      *
      * @return string
      */
-    public function getPublicPath() {
+    public function getPublicPath()
+    {
         return $this->publicPath;
     }
     
     /**
      * Sets public files folder. Maps to application.paths.public @ XML.
      */
-    private function setPublicPath() {
+    private function setPublicPath()
+    {
         $this->publicPath = $this->includePath."/".$this->simpleXMLElement->application->paths->public;
     }
     
@@ -142,7 +166,8 @@ class Application
      *
      * @return string
      */
-    public function getViewsPath() {
+    public function getViewsPath()
+    {
         return $this->viewsPath;
     }
     
@@ -151,7 +176,8 @@ class Application
      *
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
      */
-    private function setDisplayErrors($developmentEnvironment) {
+    private function setDisplayErrors($developmentEnvironment)
+    {
         $value = $this->simpleXMLElement->application->display_errors->{$developmentEnvironment};
         $this->displayErrors = (string) $value?true:false;
     }
@@ -161,14 +187,16 @@ class Application
      *
      * @return boolean
      */
-    public function getDisplayErrors() {
+    public function getDisplayErrors()
+    {
         return $this->displayErrors;
     }
     
     /**
      * Sets application version. Maps to application.paths.public @ XML.
      */
-    private function setVersion() {
+    private function setVersion()
+    {
         $this->version = (string) $this->simpleXMLElement->application["version"];
     }
     
@@ -177,7 +205,8 @@ class Application
      *
      * @return string
      */
-    public function getVersion() {
+    public function getVersion()
+    {
         return $this->version;
     }
     
@@ -187,8 +216,11 @@ class Application
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
      * @throws Exception If XML is misconfigured.
      */
-    private function setReporters($developmentEnvironment) {
-        if($this->simpleXMLElement->reporters->{$developmentEnvironment}===null) return;
+    private function setReporters($developmentEnvironment)
+    {
+        if ($this->simpleXMLElement->reporters->{$developmentEnvironment}===null) {
+            return;
+        }
         $erp = new ErrorReportersFinder($this->simpleXMLElement->reporters->{$developmentEnvironment});
         $this->reporters = $erp->getReporters();
     }
@@ -199,9 +231,13 @@ class Application
      * @param string $className
      * @return ErrorReporter[string]|NULL|ErrorReporter
      */
-    public function reporters($className="") {
-        if(!$className) return $this->reporters;
-        else return (isset($this->reporters[$className])?$this->reporters[$className]:null);
+    public function reporters($className="")
+    {
+        if (!$className) {
+            return $this->reporters;
+        } else {
+            return (isset($this->reporters[$className])?$this->reporters[$className]:null);
+        }
     }
     
     /**
@@ -209,7 +245,8 @@ class Application
      *
      * @throws Exception If XML is misconfigured.
      */
-    private function setRenderers() {
+    private function setRenderers()
+    {
         $erf = new ErrorRenderersFinder($this->simpleXMLElement->renderers);
         $this->renderers = $erf->getRenderers();
     }
@@ -220,9 +257,13 @@ class Application
      * @param string $contentType
      * @return ErrorRenderer[string]|NULL|ErrorRenderer
      */
-    public function renderers($contentType="") {
-        if(!$contentType) return $this->renderers;
-        else return (isset($this->renderers[$contentType])?$this->renderers[$contentType]:null);
+    public function renderers($contentType="")
+    {
+        if (!$contentType) {
+            return $this->renderers;
+        } else {
+            return (isset($this->renderers[$contentType])?$this->renderers[$contentType]:null);
+        }
     }
     
     /**
@@ -230,7 +271,8 @@ class Application
      *
      * @throws Exception If XML is misconfigured.
      */
-    private function setRoutes() {
+    private function setRoutes()
+    {
         $rf = new RoutesFinder($this->simpleXMLElement->exceptions);
         $this->routes = $rf->getRoutes();
     }
@@ -241,9 +283,13 @@ class Application
      * @param string $exceptionClassName
      * @return Route[string]|NULL|Route
      */
-    public function routes($exceptionClassName="") {
-        if(!$exceptionClassName) return $this->routes;
-        else return (isset($this->routes[$exceptionClassName])?$this->routes[$exceptionClassName]:null);
+    public function routes($exceptionClassName="")
+    {
+        if (!$exceptionClassName) {
+            return $this->routes;
+        } else {
+            return (isset($this->routes[$exceptionClassName])?$this->routes[$exceptionClassName]:null);
+        }
     }
     
     /**
@@ -252,12 +298,15 @@ class Application
      * @param string $name
      * @return \SimpleXMLElement
      */
-    public function getTag($name) {
+    public function getTag($name)
+    {
         $xml = $this->simpleXMLElement->{$name};
         $xmlFilePath = (string) $xml["ref"];
-        if($xmlFilePath) {
+        if ($xmlFilePath) {
             $xmlFilePath = $this->includePath."/".$xmlFilePath.".xml";
-            if(!file_exists($xmlFilePath)) throw new Exception("XML file not found: ".$xmlFilePath);
+            if (!file_exists($xmlFilePath)) {
+                throw new Exception("XML file not found: ".$xmlFilePath);
+            }
             $subXML = simplexml_load_file($xmlFilePath);
             return $subXML->{$name};
         } else {

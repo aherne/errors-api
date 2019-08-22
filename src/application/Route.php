@@ -112,4 +112,3 @@ class Route
         $this->errorType = $errorType;
     }
 }
-

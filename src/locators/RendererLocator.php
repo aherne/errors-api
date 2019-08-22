@@ -7,7 +7,8 @@ require_once("ClassLoader.php");
  * Locates renderer on disk based on renderers path & <renderer> tag that matches response content type
  * then instances it
  */
-class RendererLocator {
+class RendererLocator
+{
     private $renderer;
 
     /**
@@ -17,7 +18,8 @@ class RendererLocator {
      * @param Response $response Encapsulates response to send back to caller.
      * @throws Exception If detection fails due to file/class not found.
      */
-    public function __construct(Application $application, Response $response) {
+    public function __construct(Application $application, Response $response)
+    {
         $this->setRenderer($application, $response);
     }
 
@@ -28,15 +30,20 @@ class RendererLocator {
      * @param Response $response Encapsulates response to send back to caller.
      * @throws Exception If detection fails due to file/class not found.
      */
-    private function setRenderer(Application $application, Response $response) {
+    private function setRenderer(Application $application, Response $response)
+    {
         $renderers = $application->renderers();
         $contentType = $response->headers("Content-Type");
-        if(!isset($renderers[$contentType])) throw new Exception("No renderer found for: ".$contentType);
-		
+        if (!isset($renderers[$contentType])) {
+            throw new Exception("No renderer found for: ".$contentType);
+        }
+        
         $rendererClass = (string) $renderers[$contentType]["class"];
         load_class($application->getRenderersPath(), $rendererClass);
         $object = new $rendererClass($renderers[$contentType]);
-        if(!($object instanceof ErrorRenderer)) throw new Exception("Class must be instance of ErrorRenderer");
+        if (!($object instanceof ErrorRenderer)) {
+            throw new Exception("Class must be instance of ErrorRenderer");
+        }
         $this->renderer = $object;
     }
 
@@ -45,8 +52,8 @@ class RendererLocator {
      *
      * @return ErrorRenderer
      */
-    public function getRenderer() {
+    public function getRenderer()
+    {
         return $this->renderer;
     }
 }
-

@@ -7,7 +7,7 @@ namespace Lucinda\MVC\STDERR;
  * - SERVER: handled exception was caused by server connection failing or being mishandled
  * - CLIENT: handled exception was caused by caller trying to perform illegal operations on server (eg: trying XSS/CSRF)
  * - SYNTAX: handled exception was thrown automatically after developer performed syntax errors in code (eg: PHP, SQL)
- * - LOGICAL: handled exception was thrown by developer to signal logical errors in application flow 
+ * - LOGICAL: handled exception was thrown by developer to signal logical errors in application flow
  */
 class ErrorType
 {

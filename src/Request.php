@@ -17,7 +17,8 @@ class Request
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param \Exception $exception Error "request" that fed STDERR stream
      */
-    public function __construct(Application $application, $exception) {
+    public function __construct(Application $application, $exception)
+    {
         $this->setRoute($application, $exception);
         $this->setException($exception);
     }
@@ -28,7 +29,8 @@ class Request
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param \Exception $exception Error "request" that fed STDERR stream
      */
-    private function setRoute(Application $application, $exception) {
+    private function setRoute(Application $application, $exception)
+    {
         $routes = $application->routes();
         $targetClass = get_class($exception);
         
@@ -36,7 +38,7 @@ class Request
         $this->route = (isset($routes[$targetClass])?$routes[$targetClass]:$routes[""]);
         
         // override non-existent properties with defaults
-        if(!$this->route->getHttpStatus()) {
+        if (!$this->route->getHttpStatus()) {
             $this->route->setHttpStatus(self::DEFAULT_HTTP_STATUS);
         }
     }
@@ -46,7 +48,8 @@ class Request
      *
      * @return Route
      */
-    public function getRoute() {
+    public function getRoute()
+    {
         return $this->route;
     }
 
@@ -55,7 +58,8 @@ class Request
      *
      * @param \Exception $exception Error "request" that fed STDERR stream
      */
-    private function setException($exception) {
+    private function setException($exception)
+    {
         $this->exception = $exception;
     }
 
@@ -64,8 +68,8 @@ class Request
      *
      * @return \Exception $exception Error "request" that fed STDERR stream
      */
-    public function getException() {
+    public function getException()
+    {
         return $this->exception;
     }
 }
-

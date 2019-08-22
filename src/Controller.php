@@ -9,7 +9,10 @@ namespace Lucinda\MVC\STDERR;
  */
 abstract class Controller
 {
-    protected $application, $request, $response, $reporters;
+    protected $application;
+    protected $request;
+    protected $response;
+    protected $reporters;
 
     /**
      * Controller constructor.
@@ -17,7 +20,8 @@ abstract class Controller
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
      * @param Response $response Encapsulates response to send back to caller.
      */
-    public function __construct(Application $application, Request $request, Response $response) {
+    public function __construct(Application $application, Request $request, Response $response)
+    {
         $this->application = $application;
         $this->request = $request;
         $this->response = $response;

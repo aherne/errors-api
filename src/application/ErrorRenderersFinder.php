@@ -4,7 +4,8 @@ namespace Lucinda\MVC\STDERR;
 /**
  * Locates <renderer> tags in XML and builds .
  */
-class ErrorRenderersFinder {
+class ErrorRenderersFinder
+{
     private $renderers = array();
 
     /**
@@ -13,7 +14,8 @@ class ErrorRenderersFinder {
      * @param \SimpleXMLElement $xml Contents of renderers tag @ XML
      * @throws Exception If XML is misconfigured.
      */
-    public function __construct(\SimpleXMLElement $xml) {
+    public function __construct(\SimpleXMLElement $xml)
+    {
         $this->setRenderers($xml);
     }
 
@@ -23,19 +25,28 @@ class ErrorRenderersFinder {
      * @param \SimpleXMLElement $xml Contents of renderers tag @ XML
      * @throws Exception If XML is misconfigured.
      */
-    private function setRenderers(\SimpleXMLElement $xml) {
+    private function setRenderers(\SimpleXMLElement $xml)
+    {
         $tmp = (array) $xml;
-        if(empty($tmp["renderer"])) return;
+        if (empty($tmp["renderer"])) {
+            return;
+        }
         $list = (is_array($tmp["renderer"])?$tmp["renderer"]:[$tmp["renderer"]]);
-        foreach($list as $info) {
+        foreach ($list as $info) {
             $currentContentType = (string) $info["content_type"];
-            if(!$currentContentType) throw new Exception("Renderer missing content type!");
+            if (!$currentContentType) {
+                throw new Exception("Renderer missing content type!");
+            }
             
             $charset = (string) $info["charset"];
-            if($charset) $currentContentType .= "; charset=".$charset;
+            if ($charset) {
+                $currentContentType .= "; charset=".$charset;
+            }
             
             $rendererClass = (string) $info['class'];
-            if(!$rendererClass) throw new Exception("Renderer missing class!");
+            if (!$rendererClass) {
+                throw new Exception("Renderer missing class!");
+            }
             $this->renderers[$currentContentType] = $info;
         }
     }
@@ -45,7 +56,8 @@ class ErrorRenderersFinder {
      *
      * @return ErrorRenderer[string] List of error renderers by content type.
      */
-    public function getRenderers() {
+    public function getRenderers()
+    {
         return $this->renderers;
     }
 }
