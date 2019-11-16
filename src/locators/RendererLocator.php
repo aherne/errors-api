@@ -32,11 +32,11 @@ class RendererLocator
      * @param Format $detectedResponseFormat Response format detected by FrontController
      * @throws Exception If detection fails due to file/class not found.
      */
-    private function setRenderer(Application $application, Response $response, $detectedResponseFormat)
-    {
+    private function setRenderer(Application $application, Response $response, Format $detectedResponseFormat)
+    {       
         $rendererClass = (string) $detectedResponseFormat->getViewRenderer();
         load_class($application->getRenderersPath(), $rendererClass);
-        $object = new $rendererClass($renderers[$contentType]);
+        $object = new $rendererClass();
         if (!($object instanceof ErrorRenderer)) {
             throw new Exception("Class must be instance of ErrorRenderer");
         }
