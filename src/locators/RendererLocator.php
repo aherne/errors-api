@@ -16,11 +16,12 @@ class RendererLocator
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param Response $response Encapsulates response to send back to caller.
+     * @param Format $detectedResponseFormat Response format detected by FrontController
      * @throws Exception If detection fails due to file/class not found.
      */
-    public function __construct(Application $application, Response $response)
+    public function __construct(Application $application, Response $response, Format $detectedResponseFormat)
     {
-        $this->setRenderer($application, $response);
+        $this->setRenderer($application, $response, $detectedResponseFormat);
     }
 
     /**
@@ -28,17 +29,12 @@ class RendererLocator
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param Response $response Encapsulates response to send back to caller.
+     * @param Format $detectedResponseFormat Response format detected by FrontController
      * @throws Exception If detection fails due to file/class not found.
      */
-    private function setRenderer(Application $application, Response $response)
+    private function setRenderer(Application $application, Response $response, $detectedResponseFormat)
     {
-        $renderers = $application->renderers();
-        $contentType = $response->headers("Content-Type");
-        if (!isset($renderers[$contentType])) {
-            throw new Exception("No renderer found for: ".$contentType);
-        }
-        
-        $rendererClass = (string) $renderers[$contentType]["class"];
+        $rendererClass = (string) $detectedResponseFormat->getViewRenderer();
         load_class($application->getRenderersPath(), $rendererClass);
         $object = new $rendererClass($renderers[$contentType]);
         if (!($object instanceof ErrorRenderer)) {

@@ -11,7 +11,7 @@ require_once("Exception.php");
  */
 class FrontController implements ErrorHandler
 {
-    private $contentType;
+    private $displayFormat;
     private $documentDescriptor;
     private $developmentEnvironment;
     private $includePath;
@@ -43,13 +43,13 @@ class FrontController implements ErrorHandler
     }
 
     /**
-     * Sets desired content type of rendered response
+     * Sets desired display format of rendered response
      *
-     * @param string $contentType
+     * @param string $displayFormat
      */
-    public function setContentType($contentType)
+    public function setDisplayFormat($displayFormat)
     {
-        $this->contentType = $contentType;
+        $this->displayFormat = $displayFormat;
     }
 
     /**
@@ -58,17 +58,22 @@ class FrontController implements ErrorHandler
      */
     public function handle($exception)
     {
+        // sets include path
+        set_include_path($this->includePath);
+        
         // redirects errors to emergency handler
         PHPException::setErrorHandler($this->emergencyHandler);
         set_exception_handler(array($this->emergencyHandler,"handle"));
         
         // finds application settings based on XML and development environment
         require_once("Application.php");
-        $application = new Application($this->documentDescriptor, $this->developmentEnvironment, $this->includePath);
+        $application = new Application($this->documentDescriptor, $this->developmentEnvironment);
         
         // finds and instances routes based on XML and exception received
         require_once("Request.php");
-        $request = new Request($application, $exception);
+        $routes = $application->routes();
+        $targetClass = get_class($exception);
+        $request = new Request((isset($routes[$targetClass])?$routes[$targetClass]:$routes[""]), $exception);
         
         // builds reporters list then reports exception
         require_once("ErrorReporter.php");
@@ -78,10 +83,15 @@ class FrontController implements ErrorHandler
         foreach ($reportersList as $reporter) {
             $reporter->report($request);
         }
+        
+        // detects response format
+        $format = $application->renderers($this->displayFormat?$this->displayFormat:$application->getDefaultFormat());
 
         // compiles a view object from content type and http status
         require_once("Response.php");
-        $response = new Response($application, $request, $this->contentType);
+        $response = new Response($format->getContentType().($format->getCharacterEncoding()?"; charset=".$format->getCharacterEncoding():""));
+        $response->setStatus($request->getRoute()->getHttpStatus());
+        $response->setView($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):null);
         
         // runs controller, able to customize response
         if ($request->getRoute()->getController()) {
@@ -96,7 +106,7 @@ class FrontController implements ErrorHandler
         if (!$response->isDisabled() && $response->getOutputStream()->isEmpty()) {
             require_once("ErrorRenderer.php");
             require_once("locators/RendererLocator.php");
-            $locator = new RendererLocator($application, $response);
+            $locator = new RendererLocator($application, $response, $format);
             $renderer = $locator->getRenderer();
             $renderer->render($response);
         }

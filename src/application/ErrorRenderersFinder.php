@@ -1,6 +1,8 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
+require_once("Format.php");
+
 /**
  * Locates <renderer> tags in XML and builds .
  */
@@ -33,28 +35,30 @@ class ErrorRenderersFinder
         }
         $list = (is_array($tmp["renderer"])?$tmp["renderer"]:[$tmp["renderer"]]);
         foreach ($list as $info) {
-            $currentContentType = (string) $info["content_type"];
-            if (!$currentContentType) {
+            $displayFormat = (string) $info["format"];
+            if (!$displayFormat) {
+                throw new Exception("Renderer missing display format!");
+            }
+            
+            $contentType = (string) $info["content_type"];
+            if (!$contentType) {
                 throw new Exception("Renderer missing content type!");
             }
             
             $charset = (string) $info["charset"];
-            if ($charset) {
-                $currentContentType .= "; charset=".$charset;
-            }
             
             $rendererClass = (string) $info['class'];
             if (!$rendererClass) {
                 throw new Exception("Renderer missing class!");
             }
-            $this->renderers[$currentContentType] = $info;
+            $this->renderers[$displayFormat] = new Format($displayFormat, $contentType, $charset, $rendererClass);
         }
     }
 
     /**
      * Gets found renderers
      *
-     * @return ErrorRenderer[string] List of error renderers by content type.
+     * @return Format[string] List of error renderers by content type.
      */
     public function getRenderers()
     {

@@ -15,20 +15,16 @@ class Response
     private $attributes = [];
     private $view;
     private $isDisabled;
-
+    
     /**
-     * View constructor.
+     * Constructs an empty response based on content type
      *
-     * @param Application $application Encapsulates application settings detected from xml and development environment.
-     * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
-     * @param string $customContentType Content type of rendered response specifically signalled to FrontController.
+     * @param string $contentType Value of content type header that will be sent in response
      */
-    public function __construct(Application $application, Request $request, $customContentType)
+    public function __construct($contentType)
     {
         $this->outputStream	= new ResponseStream();
-        $this->setStatus($request->getRoute()->getHttpStatus());
-        $this->setView($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):null);
-        $this->headers["Content-Type"]= $this->getContentType($application, $request, $customContentType);
+        $this->headers["Content-Type"] = $contentType;
     }
     
     /**
@@ -39,34 +35,6 @@ class Response
     public function getOutputStream()
     {
         return $this->outputStream;
-    }
-    
-    /**
-     * Sets content type header based on ingridients
-     *
-     * @param Application $application Encapsulates application settings detected from xml and development environment.
-     * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
-     * @param string $customContentType Content type of rendered response specifically signalled to FrontController.
-     */
-    private function getContentType(Application $application, Request $request, $customContentType)
-    {
-        $currentContentType = "";
-        if ($customContentType) {
-            $currentContentType = $customContentType;
-        } elseif ($request->getRoute()->getContentType()) {
-            $currentContentType = $request->getRoute()->getContentType();
-        } else {
-            $currentContentType = $application->getDefaultContentType();
-        }
-        
-        $renderers = $application->renderers();
-        foreach ($renderers as $contentType=>$renderer) {
-            if (strpos($contentType, $currentContentType) === 0) {
-                return $contentType;
-            }
-        }
-        
-        throw new Exception("Content type not supported!");
     }
     
     /**

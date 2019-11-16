@@ -12,7 +12,6 @@ abstract class Controller
     protected $application;
     protected $request;
     protected $response;
-    protected $reporters;
 
     /**
      * Controller constructor.

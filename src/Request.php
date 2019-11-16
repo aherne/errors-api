@@ -14,12 +14,12 @@ class Request
     /**
      * Detects route based on exception handled.
      *
-     * @param Application $application Encapsulates application settings detected from xml and development environment.
+     * @param Route $route Matching route information detected from XML
      * @param \Exception $exception Error "request" that fed STDERR stream
      */
-    public function __construct(Application $application, $exception)
+    public function __construct(Route $route, $exception)
     {
-        $this->setRoute($application, $exception);
+        $this->setRoute($route);
         $this->setException($exception);
     }
 
@@ -27,16 +27,10 @@ class Request
      * Detects route based on exception handled.
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
-     * @param \Exception $exception Error "request" that fed STDERR stream
      */
-    private function setRoute(Application $application, $exception)
+    private function setRoute(Route $route)
     {
-        $routes = $application->routes();
-        $targetClass = get_class($exception);
-        
-        // detects route
-        $this->route = (isset($routes[$targetClass])?$routes[$targetClass]:$routes[""]);
-        
+        $this->route = $route;
         // override non-existent properties with defaults
         if (!$this->route->getHttpStatus()) {
             $this->route->setHttpStatus(self::DEFAULT_HTTP_STATUS);
