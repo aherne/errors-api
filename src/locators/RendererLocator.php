@@ -1,8 +1,6 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("ClassLoader.php");
-
 /**
  * Locates renderer on disk based on renderers path & <renderer> tag that matches response content type
  * then instances it
@@ -33,7 +31,7 @@ class RendererLocator
      * @throws Exception If detection fails due to file/class not found.
      */
     private function setRenderer(Application $application, Response $response, Format $detectedResponseFormat)
-    {       
+    {
         $rendererClass = (string) $detectedResponseFormat->getViewRenderer();
         load_class($application->getRenderersPath(), $rendererClass);
         $object = new $rendererClass();

@@ -1,9 +1,9 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("application/ErrorReportersFinder.php");
-require_once("application/ErrorRenderersFinder.php");
-require_once("application/RoutesFinder.php");
+require("application/ErrorReportersFinder.php");
+require("application/ErrorRenderersFinder.php");
+require("application/RoutesFinder.php");
 
 /**
  * Detects settings necessary to configure MVC Errors API based on contents of XML file and development environment:

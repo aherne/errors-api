@@ -1,8 +1,8 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("response/ResponseStatus.php");
-require_once("response/ResponseStream.php");
+require("response/ResponseStatus.php");
+require("response/ResponseStream.php");
 
 /**
  * Encapsulates error response that will be displayed back to caller

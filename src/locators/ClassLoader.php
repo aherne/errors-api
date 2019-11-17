@@ -19,7 +19,7 @@ function load_class($classPath, $className)
     if (!file_exists($filePath)) {
         throw new Exception("File not found: ".$simpleClassName);
     }
-    require_once($filePath);
+    require($filePath);
 
     // validates if class exists
     if (!class_exists($className)) {

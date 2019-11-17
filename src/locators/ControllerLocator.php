@@ -1,8 +1,6 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("ClassLoader.php");
-
 /**
  * Locates MVC controller on disk based on controller path & route detected beforehand,
  * then instances it from received parameters

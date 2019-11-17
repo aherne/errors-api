@@ -1,8 +1,6 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("ClassLoader.php");
-
 /**
  * Locates reporters on disk based on reporters path & <reporter> tags detected beforehand,
  * then instances them

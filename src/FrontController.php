@@ -1,9 +1,9 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("ErrorHandler.php");
-require_once("PHPException.php");
-require_once("Exception.php");
+require("ErrorHandler.php");
+require("PHPException.php");
+require("Exception.php");
 
 /**
  * Error handler that bootstraps all uncaught exceptions and PHP errors as a STDERR front controller that feeds on
@@ -65,19 +65,22 @@ class FrontController implements ErrorHandler
         PHPException::setErrorHandler($this->emergencyHandler);
         set_exception_handler(array($this->emergencyHandler,"handle"));
         
+        // loads class locators
+        require("locators/ClassLoader.php");
+        
         // finds application settings based on XML and development environment
-        require_once("Application.php");
+        require("Application.php");
         $application = new Application($this->documentDescriptor, $this->developmentEnvironment);
         
         // finds and instances routes based on XML and exception received
-        require_once("Request.php");
+        require("Request.php");
         $routes = $application->routes();
         $targetClass = get_class($exception);
         $request = new Request((isset($routes[$targetClass])?$routes[$targetClass]:$routes[""]), $exception);
         
         // builds reporters list then reports exception
-        require_once("ErrorReporter.php");
-        require_once("locators/ReportersLocator.php");
+        require("ErrorReporter.php");
+        require("locators/ReportersLocator.php");
         $locator = new ReportersLocator($application);
         $reportersList = $locator->getReporters();
         foreach ($reportersList as $reporter) {
@@ -88,15 +91,15 @@ class FrontController implements ErrorHandler
         $format = $application->renderers($this->displayFormat?$this->displayFormat:$application->getDefaultFormat());
 
         // compiles a view object from content type and http status
-        require_once("Response.php");
+        require("Response.php");
         $response = new Response($format->getContentType().($format->getCharacterEncoding()?"; charset=".$format->getCharacterEncoding():""));
         $response->setStatus($request->getRoute()->getHttpStatus());
         $response->setView($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):null);
         
         // runs controller, able to customize response
         if ($request->getRoute()->getController()) {
-            require_once("Controller.php");
-            require_once("locators/ControllerLocator.php");
+            require("Controller.php");
+            require("locators/ControllerLocator.php");
             $locator = new ControllerLocator($application, $request, $response);
             $controller = $locator->getController();
             $controller->run();
@@ -104,8 +107,8 @@ class FrontController implements ErrorHandler
 
         // renders response to output stream
         if (!$response->isDisabled() && $response->getOutputStream()->isEmpty()) {
-            require_once("ErrorRenderer.php");
-            require_once("locators/RendererLocator.php");
+            require("ErrorRenderer.php");
+            require("locators/RendererLocator.php");
             $locator = new RendererLocator($application, $response, $format);
             $renderer = $locator->getRenderer();
             $renderer->render($response);

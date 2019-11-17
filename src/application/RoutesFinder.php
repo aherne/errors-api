@@ -1,8 +1,8 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("Route.php");
-require_once("ErrorType.php");
+require("Route.php");
+require("ErrorType.php");
 
 /**
  * Locates based on exceptions tag @ XML and instances found routes able to log error info to a storage medium.

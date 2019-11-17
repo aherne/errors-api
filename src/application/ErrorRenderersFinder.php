@@ -1,7 +1,7 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require_once("Format.php");
+require("Format.php");
 
 /**
  * Locates <renderer> tags in XML and builds .
