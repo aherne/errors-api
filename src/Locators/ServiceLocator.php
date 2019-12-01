@@ -1,5 +1,6 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR\Locators;
+
 
 /**
  * Blueprint for locating a service class name on disk based on given criteria
@@ -13,7 +14,7 @@ abstract class ServiceLocator
      *
      * @return string
      */
-    public function getClassName()
+    public function getClassName(): string
     {
         return $this->className;
     }

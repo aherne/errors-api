@@ -1,5 +1,6 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
+
 
 /**
  * Resolves View into a Response based on Application settings
@@ -46,7 +47,7 @@ abstract class ViewResolver implements Runnable
     /**
      * Gets body to feed response with
      *
-     * @return mixed Content to display: string for html/json/xml response formats.
+     * @return string Content to display: string for html/json/xml response formats.
      */
-    abstract protected function getContent();
+    abstract protected function getContent(): string;
 }

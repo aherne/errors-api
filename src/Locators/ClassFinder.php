@@ -1,5 +1,7 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR\Locators;
+
+use Lucinda\STDERR\Exception;
 
 /**
  * Locates and loads class on disk based on folder and name
@@ -10,7 +12,7 @@ class ClassFinder
     
     /**
      * Sets folder in which class should be searched for
-     * 
+     *
      * @param string $folder
      */
     public function __construct($folder)
@@ -20,7 +22,7 @@ class ClassFinder
     
     /**
      * Locates and loads class on disk based on source name which may include subfolder and namespace
-     * 
+     *
      * @param string $className
      * @throws Exception
      * @return string

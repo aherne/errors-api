@@ -1,5 +1,9 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR\Locators;
+
+use Lucinda\STDERR\Application;
+use Lucinda\STDERR\Request;
+use Lucinda\STDERR\Exception;
 
 /**
  * Locates MVC controller on disk based on controller path & route detected beforehand
@@ -13,7 +17,7 @@ class ControllerLocator extends ServiceLocator
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
      * @throws Exception If detection fails due to file/class not found.
      */
-    public function __construct(Application $application, Request $request)
+    public function __construct(Application $application, Request $request): void
     {
         if (!$request->getRoute()->getController()) {
             return;
@@ -28,7 +32,7 @@ class ControllerLocator extends ServiceLocator
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
      * @throws Exception If detection fails due to file/class not found or not instanceof \\Lucinda\\STDERR\\Controller.
      */
-    private function setClassName(Application $application, Request $request)
+    private function setClassName(Application $application, Request $request): void
     {
         $classFinder = new ClassFinder($application->getControllersPath());
         $this->className = $classFinder->find($request->getRoute()->getController());

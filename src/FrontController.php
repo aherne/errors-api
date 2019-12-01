@@ -1,5 +1,9 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
+
+use Lucinda\STDERR\Locators\ReporterLocator;
+use Lucinda\STDERR\Locators\ControllerLocator;
+use Lucinda\STDERR\Locators\ViewResolverLocator;
 
 /**
  * Error handler that bootstraps all uncaught exceptions and PHP errors as a STDERR front controller that feeds on
@@ -21,7 +25,7 @@ class FrontController implements ErrorHandler
      * @param string $includePath Absolute root path where reporters / resolvers / controllers / views should be located
      * @param ErrorHandler $emergencyHandler Handler to use if an error occurs while FrontController handles an exception
      */
-    public function __construct($documentDescriptor, $developmentEnvironment, $includePath, ErrorHandler $emergencyHandler)
+    public function __construct(string $documentDescriptor, string $developmentEnvironment, string $includePath, ErrorHandler $emergencyHandler): void
     {
         // sets up system to track errors
         error_reporting(E_ALL);
@@ -43,16 +47,17 @@ class FrontController implements ErrorHandler
      *
      * @param string $displayFormat
      */
-    public function setDisplayFormat($displayFormat)
+    public function setDisplayFormat(string $displayFormat): void
     {
         $this->displayFormat = $displayFormat;
     }
-
+    
     /**
-     * {@inheritDoc}
-     * @see ErrorHandler::handle()
+     * Handles errors by delegating to registered storage mediums (if any) then output using display method (if any)
+     *
+     * @param \Throwable $exception Encapsulates error information.
      */
-    public function handle($exception)
+    public function handle(\Throwable $exception): void
     {
         // sets include path
         set_include_path($this->includePath);

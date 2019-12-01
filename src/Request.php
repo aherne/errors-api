@@ -1,5 +1,7 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
+
+use Lucinda\STDERR\Application\Route;
 
 /**
  * Encapsulates a STDERR request by matching routes @ XML with exception handled
@@ -15,9 +17,9 @@ class Request
      * Detects route based on exception handled.
      *
      * @param Route $route Matching route information detected from XML
-     * @param \Exception $exception Error "request" that fed STDERR stream
+     * @param \Throwable $exception Error "request" that fed STDERR stream
      */
-    public function __construct(Route $route, $exception)
+    public function __construct(Route $route, \Throwable $exception): void
     {
         $this->setRoute($route);
         $this->setException($exception);
@@ -26,9 +28,9 @@ class Request
     /**
      * Detects route based on exception handled.
      *
-     * @param Application $application Encapsulates application settings detected from xml and development environment.
+     * @param Route $route
      */
-    private function setRoute(Route $route)
+    private function setRoute(Route $route): void
     {
         $this->route = $route;
         // override non-existent properties with defaults
@@ -42,7 +44,7 @@ class Request
      *
      * @return Route
      */
-    public function getRoute()
+    public function getRoute(): Route
     {
         return $this->route;
     }
@@ -50,9 +52,9 @@ class Request
     /**
      * Sets exception handled
      *
-     * @param \Exception $exception Error "request" that fed STDERR stream
+     * @param \Throwable $exception Error "request" that fed STDERR stream
      */
-    private function setException($exception)
+    private function setException(\Throwable $exception): void
     {
         $this->exception = $exception;
     }
@@ -60,9 +62,9 @@ class Request
     /**
      * Gets exception handled
      *
-     * @return \Exception $exception Error "request" that fed STDERR stream
+     * @return \Throwable $exception Error "request" that fed STDERR stream
      */
-    public function getException()
+    public function getException(): \Throwable
     {
         return $this->exception;
     }

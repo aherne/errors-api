@@ -5,6 +5,15 @@
     "keywords": ["STDERR","mvc","errors","handling"],
     "homepage": "http://www.lucinda-framework.com/stderr-mvc",
     "license": "MIT",
+    "require": {
+        "php": "^7.1",
+        "ext-simplexml": "*"
+    },
+    "autoload": {
+    	"psr-4": {
+        	"Lucinda\\STDERR\\": "src/"
+    	}
+    },
     "authors": [
         {
             "name": "Lucian Popescu",

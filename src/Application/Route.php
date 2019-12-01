@@ -1,5 +1,7 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR\Application;
+
+use Lucinda\STDERR\Exception;
 
 /**
  * Encapsulates a route that matches a handled exception
@@ -18,7 +20,7 @@ class Route
      * @param \SimpleXMLElement $info
      * @throws Exception If tag is misconfigured
      */
-    public function __construct(\SimpleXMLElement $info)
+    public function __construct(\SimpleXMLElement $info): void
     {
         $this->controller = (string) $info["controller"];
         $this->view = (string) $info["view"];
@@ -32,7 +34,7 @@ class Route
      *
      * @return string
      */
-    public function getController()
+    public function getController(): string
     {
         return $this->controller;
     }
@@ -42,7 +44,7 @@ class Route
      *
      * @return string
      */
-    public function getView()
+    public function getView(): string
     {
         return $this->view;
     }
@@ -52,7 +54,7 @@ class Route
      *
      * @return string
      */
-    public function getHttpStatus()
+    public function getHttpStatus(): string
     {
         return $this->httpStatus;
     }
@@ -62,7 +64,7 @@ class Route
      *
      * @return string One of possible values of ErrorType enum
      */
-    public function getErrorType()
+    public function getErrorType(): string
     {
         return $this->errorType;
     }
@@ -72,7 +74,7 @@ class Route
      *
      * @return string
      */
-    public function getContentType()
+    public function getContentType(): string
     {
         return $this->contentType;
     }

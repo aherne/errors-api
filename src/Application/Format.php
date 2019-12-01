@@ -1,5 +1,7 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR\Application;
+
+use Lucinda\STDERR\Exception;
 
 /**
  * Encapsulates file format information:
@@ -21,7 +23,7 @@ class Format
      * @param \SimpleXMLElement $info
      * @throws Exception If tag is misconfigured
      */
-    public function __construct(\SimpleXMLElement $info)
+    public function __construct(\SimpleXMLElement $info): void
     {
         $this->name = (string) $info["name"];
         
@@ -44,7 +46,7 @@ class Format
      * @return string
      * @example json
      */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
@@ -55,7 +57,7 @@ class Format
      * @return string
      * @example application/json
      */
-    public function getContentType()
+    public function getContentType(): string
     {
         return $this->contentType;
     }
@@ -65,7 +67,7 @@ class Format
      *
      * @return string
      */
-    public function getCharacterEncoding()
+    public function getCharacterEncoding(): string
     {
         return $this->characterEncoding;
     }
@@ -76,7 +78,7 @@ class Format
      * @return string
      * @example JsonResolver
      */
-    public function getViewResolver()
+    public function getViewResolver(): string
     {
         return $this->viewResolverClass;
     }

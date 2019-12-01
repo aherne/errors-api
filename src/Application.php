@@ -1,5 +1,8 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
+
+use Lucinda\STDERR\Application\Format;
+use Lucinda\STDERR\Application\Route;
 
 /**
  * Detects settings necessary to configure MVC Errors API based on contents of XML file and development environment:
@@ -32,7 +35,7 @@ class Application
      * @param string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
      * @throws Exception If XML is misconfigured.
      */
-    public function __construct($xmlPath, $developmentEnvironment)
+    public function __construct(string $xmlPath, string $developmentEnvironment): void
     {
         if (!file_exists($xmlPath)) {
             throw new Exception("XML configuration file not found!");
@@ -51,7 +54,7 @@ class Application
      * @param string $developmentEnvironment
      * @throws Exception If xml content has failed validation.
      */
-    private function setApplicationInfo($developmentEnvironment): void
+    private function setApplicationInfo(string $developmentEnvironment): void
     {
         $xml = $this->getTag("application");
         if (empty($xml)) {
@@ -79,7 +82,7 @@ class Application
      *
      * @return string
      */
-    public function getDefaultFormat()
+    public function getDefaultFormat(): string
     {
         return $this->defaultFormat;
     }
@@ -89,7 +92,7 @@ class Application
      *
      * @return string
      */
-    public function getControllersPath()
+    public function getControllersPath(): string
     {
         return $this->controllersPath;
     }
@@ -99,7 +102,7 @@ class Application
      *
      * @return string
      */
-    public function getReportersPath()
+    public function getReportersPath(): string
     {
         return $this->reportersPath;
     }
@@ -109,7 +112,7 @@ class Application
      *
      * @return string
      */
-    public function getViewResolversPath()
+    public function getViewResolversPath(): string
     {
         return $this->viewResolversPath;
     }
@@ -119,7 +122,7 @@ class Application
      *
      * @return string
      */
-    public function getPublicPath()
+    public function getPublicPath(): string
     {
         return $this->publicPath;
     }
@@ -129,7 +132,7 @@ class Application
      *
      * @return string
      */
-    public function getViewsPath()
+    public function getViewsPath(): string
     {
         return $this->viewsPath;
     }
@@ -139,7 +142,7 @@ class Application
      *
      * @return boolean
      */
-    public function getDisplayErrors()
+    public function getDisplayErrors(): bool
     {
         return $this->displayErrors;
     }
@@ -149,7 +152,7 @@ class Application
      *
      * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }
@@ -160,7 +163,7 @@ class Application
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
      * @throws Exception If XML is misconfigured.
      */
-    private function setReporters($developmentEnvironment)
+    private function setReporters(string $developmentEnvironment): void
     {
         $xml = $this->simpleXMLElement->reporters->{$developmentEnvironment};
         if ($xml===null) {
@@ -186,7 +189,7 @@ class Application
      * @param string $className
      * @return \SimpleXMLElement|array|null
      */
-    public function reporters($className="")
+    public function reporters(string $className="")
     {
         if (!$className) {
             return $this->reporters;
@@ -201,7 +204,7 @@ class Application
      *
      * @throws Exception If XML is misconfigured.
      */
-    private function setFormats()
+    private function setFormats(): void
     {
         $xml = $this->simpleXMLElement->formats;
         $tmp = (array) $xml;
@@ -224,7 +227,7 @@ class Application
      * @param string $displayFormat
      * @return Format|array|null
      */
-    public function formats($displayFormat="")
+    public function formats(string $displayFormat="")
     {
         if (!$displayFormat) {
             return $this->formats;
@@ -238,7 +241,7 @@ class Application
      *
      * @throws Exception If XML is misconfigured.
      */
-    private function setRoutes()
+    private function setRoutes(): void
     {
         $xml = $this->simpleXMLElement->exceptions;
         
@@ -266,7 +269,7 @@ class Application
      * @param string $exceptionClassName
      * @return Route|array|null
      */
-    public function routes($exceptionClassName="")
+    public function routes(string $exceptionClassName="")
     {
         if (!$exceptionClassName) {
             return $this->routes;
@@ -281,7 +284,7 @@ class Application
      * @param string $name
      * @return \SimpleXMLElement
      */
-    public function getTag($name)
+    public function getTag(string $name): \SimpleXMLElement
     {
         $xml = $this->simpleXMLElement->{$name};
         $xmlFilePath = (string) $xml["ref"];

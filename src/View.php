@@ -1,5 +1,6 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
+
 
 /**
  * Compiles criterias that will be used in generating response body

@@ -1,5 +1,7 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR\Response;
+
+use Lucinda\STDERR\Exception;
 
 /**
  * Encapsulates HTTP response status logic in accordance to HTTP/1.1 specifications
@@ -80,7 +82,7 @@ class ResponseStatus
      * @param integer $code
      * @throws Exception If incorrect numeric code is supplied.
      */
-    public function __construct($code)
+    public function __construct(int $code): void
     {
         if (!array_key_exists($code, self::HTTP_STATUSES)) {
             throw new Exception("Unsupported HTTP status: ".$code);
@@ -93,7 +95,7 @@ class ResponseStatus
      *
      * @return integer
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -103,7 +105,7 @@ class ResponseStatus
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return self::HTTP_STATUSES[$this->id];
     }

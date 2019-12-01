@@ -1,5 +1,7 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
+
+use Lucinda\STDERR\Response\ResponseStatus;
 
 /**
  * Encapsulates error response that will be displayed back to caller
@@ -15,7 +17,7 @@ class Response
      *
      * @param string $contentType Value of content type header that will be sent in response
      */
-    public function __construct($contentType)
+    public function __construct(string $contentType): void
     {
         $this->headers["Content-Type"] = $contentType;
     }
@@ -25,7 +27,7 @@ class Response
      *
      * @param integer $code
      */
-    public function setStatus($code)
+    public function setStatus(int $code): void
     {
         $this->status = new ResponseStatus($code);
     }
@@ -35,7 +37,7 @@ class Response
      *
      * @return integer
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
@@ -67,7 +69,7 @@ class Response
      * @param string $value
      * @return string[string]|NULL|string
      */
-    public function headers($key="", $value=null)
+    public function headers(string $key="", string $value=null)
     {
         if (!$key) {
             return $this->headers;
@@ -84,9 +86,8 @@ class Response
      * @param string $location
      * @param boolean $permanent
      * @param boolean $preventCaching
-     * @return void
      */
-    public static function redirect($location, $permanent=true, $preventCaching=false)
+    public static function redirect(string $location, bool $permanent=true, bool $preventCaching=false): void
     {
         if ($preventCaching) {
             header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
@@ -100,7 +101,7 @@ class Response
     /**
      * Commits response to client.
      */
-    public function commit()
+    public function commit(): void
     {
         // sends headers
         if (!headers_sent()) {
