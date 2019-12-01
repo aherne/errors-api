@@ -1,10 +1,6 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require("ErrorHandler.php");
-require("PHPException.php");
-require("Exception.php");
-
 /**
  * Error handler that bootstraps all uncaught exceptions and PHP errors as a STDERR front controller that feeds on
  * exception instances instead of requests.
@@ -22,7 +18,7 @@ class FrontController implements ErrorHandler
      *
      * @param string $documentDescriptor Path to XML file containing your application settings.
      * @param string $developmentEnvironment Development environment application is running into (eg: local, dev, live)
-     * @param string $includePath Absolute root path where reporters / renderers / controllers / views should be located
+     * @param string $includePath Absolute root path where reporters / resolvers / controllers / views should be located
      * @param ErrorHandler $emergencyHandler Handler to use if an error occurs while FrontController handles an exception
      */
     public function __construct($documentDescriptor, $developmentEnvironment, $includePath, ErrorHandler $emergencyHandler)
@@ -65,57 +61,51 @@ class FrontController implements ErrorHandler
         PHPException::setErrorHandler($this->emergencyHandler);
         set_exception_handler(array($this->emergencyHandler,"handle"));
         
-        // loads class locators
-        require("locators/ClassLoader.php");
-        
         // finds application settings based on XML and development environment
-        require("Application.php");
         $application = new Application($this->documentDescriptor, $this->developmentEnvironment);
         
         // finds and instances routes based on XML and exception received
-        require("Request.php");
         $routes = $application->routes();
         $targetClass = get_class($exception);
         $request = new Request((isset($routes[$targetClass])?$routes[$targetClass]:$routes[""]), $exception);
         
         // builds reporters list then reports exception
-        require("ErrorReporter.php");
-        require("locators/ReportersLocator.php");
-        $locator = new ReportersLocator($application);
-        $reportersList = $locator->getReporters();
-        foreach ($reportersList as $reporter) {
-            $reporter->report($request);
+        $reporters = $application->reporters();
+        foreach($reporters as $className=>$xml) {
+            $locator = new ReporterLocator($application, $className);
+            $className = $locator->getClassName();            
+            $object = new $className($request, $xml);
+            $object->run();
+        }        
+
+        // compiles a view object
+        $view = new View($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):null);
+        
+        // locates and runs controller
+        $locator = new ControllerLocator($application, $request);
+        $className = $locator->getClassName();
+        if ($className) {
+            $object = new $className($application, $request, $view);
+            $object->run();
         }
         
         // detects response format
-        $format = $application->renderers($this->displayFormat?$this->displayFormat:$application->getDefaultFormat());
-
-        // compiles a view object from content type and http status
-        require("Response.php");
+        $format = $application->formats($this->displayFormat?$this->displayFormat:$application->getDefaultFormat());
+        
+        // compiles a response object from content type and http status
         $response = new Response($format->getContentType().($format->getCharacterEncoding()?"; charset=".$format->getCharacterEncoding():""));
         $response->setStatus($request->getRoute()->getHttpStatus());
-        $response->setView($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):null);
         
-        // runs controller, able to customize response
-        if ($request->getRoute()->getController()) {
-            require("Controller.php");
-            require("locators/ControllerLocator.php");
-            $locator = new ControllerLocator($application, $request, $response);
-            $controller = $locator->getController();
-            $controller->run();
-        }
-
-        // renders response to output stream
-        if (!$response->isDisabled() && $response->getOutputStream()->isEmpty()) {
-            require("ErrorRenderer.php");
-            require("locators/RendererLocator.php");
-            $locator = new RendererLocator($application, $response, $format);
-            $renderer = $locator->getRenderer();
-            $renderer->render($response);
-        }
+        // set up response based on view
+        $locator = new ViewResolverLocator($application, $format);
+        $className = $locator->getClassName();
+        $object = new $className($application, $view, $response);
+        $object->run();
         
         // commits response to caller
         $response->commit();
-        exit(); // forces program to end
+        
+        // forces program to end
+        exit(); 
     }
 }

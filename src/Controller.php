@@ -7,27 +7,22 @@ namespace Lucinda\MVC\STDERR;
  * - allow exception-specific view setup (eg: exceptions that map to multiple views or views using templating)
  * - any other response-changing strategies
  */
-abstract class Controller
+abstract class Controller implements Runnable
 {
     protected $application;
     protected $request;
-    protected $response;
+    protected $view;
 
     /**
      * Controller constructor.
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
-     * @param Response $response Encapsulates response to send back to caller.
+     * @param View $view Encapsulates response body.
      */
-    public function __construct(Application $application, Request $request, Response $response)
+    public function __construct(Application $application, Request $request, View $view)
     {
         $this->application = $application;
         $this->request = $request;
-        $this->response = $response;
+        $this->view = $view;
     }
-
-    /**
-     * Executes controller logic. Here is where each extending controller will need to write its logic to.
-     */
-    abstract public function run();
 }

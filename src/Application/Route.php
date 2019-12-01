@@ -11,6 +11,21 @@ class Route
     private $httpStatus;
     private $errorType;
     private $contentType;
+    
+    /**
+     * Detects route info from <exception> tag
+     *
+     * @param \SimpleXMLElement $info
+     * @throws Exception If tag is misconfigured
+     */
+    public function __construct(\SimpleXMLElement $info)
+    {
+        $this->controller = (string) $info["controller"];
+        $this->view = (string) $info["view"];
+        $this->httpStatus = (string) $info["http_status"];
+        $this->errorType = (string) $info["content_type"];
+        $this->contentType = (string) $info["error_type"];
+    }
 
     /**
      * Gets controller class name that handles exception handled.
@@ -60,55 +75,5 @@ class Route
     public function getContentType()
     {
         return $this->contentType;
-    }
-
-    /**
-     * Sets controller class name that handles exception handled.
-     *
-     * @param string $controller
-     */
-    public function setController($controller)
-    {
-        $this->controller = $controller;
-    }
-
-    /**
-     * Sets file that holds what is displayed when error response is rendered.
-     *
-     * @param string $view
-     */
-    public function setView($view)
-    {
-        $this->view = $view;
-    }
-
-    /**
-     * Sets HTTP status associated to exception handled.
-     *
-     * @param string $httpStatus
-     */
-    public function setHttpStatus($httpStatus)
-    {
-        $this->httpStatus = $httpStatus;
-    }
-
-    /**
-     * Sets content type associated to exception handled.
-     *
-     * @param string $contentType
-     */
-    public function setContentType($contentType)
-    {
-        $this->contentType = $contentType;
-    }
-    
-    /**
-     * Sets error type associated to exception handled.
-     *
-     * @param string $errorType One of possible values of ErrorType enum
-     */
-    public function setErrorType($errorType)
-    {
-        $this->errorType = $errorType;
     }
 }

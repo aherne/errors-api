@@ -7,31 +7,35 @@ namespace Lucinda\MVC\STDERR;
  * - content type: content type that corresponds to above file format
  * - character encoding: charset associated to content type
  * - view resolver: (optional) view resolver class name. If not set, framework will resolve into an empty view with headers only.
- * Utility @ Application class.
- *
- * @author aherne
  */
 class Format
 {
     private $name;
     private $contentType;
-    private $viewRendererClass;
+    private $viewResolverClass;
     private $characterEncoding;
 
     /**
-     * Saves response format data detected from XML tag "renderer".
-     *
-     * @param string $name
-     * @param string $contentType
-     * @param string $characterEncoding
-     * @param string $viewRendererClass
+     * Detects format info from <format> tag
+     * 
+     * @param \SimpleXMLElement $info
+     * @throws Exception If tag is misconfigured
      */
-    public function __construct($name, $contentType, $characterEncoding="", $viewRendererClass="")
+    public function __construct(\SimpleXMLElement $info)
     {
-        $this->name = $name;
-        $this->contentType = $contentType;
-        $this->characterEncoding= $characterEncoding;
-        $this->viewRendererClass = $viewRendererClass;
+        $this->name = (string) $info["name"];
+        
+        $this->contentType = (string) $info["content_type"];
+        if (!$this->contentType) {
+            throw new Exception("Format missing content type!");
+        }
+        
+        $this->characterEncoding = (string) $info["charset"];
+        
+        $this->viewResolverClass = (string) $info['class'];
+        if (!$this->viewResolverClass) {
+            throw new Exception("Format missing class!");
+        }
     }
 
     /**
@@ -67,13 +71,13 @@ class Format
     }
 
     /**
-     * Gets view renderer class name
+     * Gets view resolver class name
      *
      * @return string
-     * @example JsonRenderer
+     * @example JsonResolver
      */
-    public function getViewRenderer()
+    public function getViewResolver()
     {
-        return $this->viewRendererClass;
+        return $this->viewResolverClass;
     }
 }

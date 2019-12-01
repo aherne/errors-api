@@ -1,20 +1,14 @@
 <?php
 namespace Lucinda\MVC\STDERR;
 
-require("response/ResponseStatus.php");
-require("response/ResponseStream.php");
-
 /**
  * Encapsulates error response that will be displayed back to caller
  */
 class Response
 {
     private $status;
-    private $outputStream;
     private $headers=[];
-    private $attributes = [];
-    private $view;
-    private $isDisabled;
+    private $body;
     
     /**
      * Constructs an empty response based on content type
@@ -23,38 +17,7 @@ class Response
      */
     public function __construct($contentType)
     {
-        $this->outputStream	= new ResponseStream();
         $this->headers["Content-Type"] = $contentType;
-    }
-    
-    /**
-     * Gets response stream to work on.
-     *
-     * @return ResponseStream
-     */
-    public function getOutputStream()
-    {
-        return $this->outputStream;
-    }
-    
-    /**
-     * Sets relative path of view that contains response body.
-     *
-     * @param string $view
-     */
-    public function setView($view)
-    {
-        $this->view = $view;
-    }
-    
-    /**
-     * Gets relative path of view that contains response body.
-     *
-     * @return string
-     */
-    public function getView()
-    {
-        return $this->view;
     }
     
     /**
@@ -78,6 +41,26 @@ class Response
     }
     
     /**
+     * Sets response body
+     *
+     * @param string $body
+     */
+    public function setBody(string $body): void
+    {
+        $this->body = $body;
+    }
+    
+    /**
+     * Gets response body
+     *
+     * @return string
+     */
+    public function getBody(): string
+    {
+        return $this->body;
+    }
+    
+    /**
      * Gets or sets response headers will send back to user.
      *
      * @param string $key
@@ -96,24 +79,6 @@ class Response
     }
     
     /**
-     * Gets or sets data that will be sent to views.
-     *
-     * @param string $key
-     * @param mixed $value
-     * @return mixed[string]|NULL|mixed
-     */
-    public function attributes($key="", $value=null)
-    {
-        if (!$key) {
-            return $this->attributes;
-        } elseif ($value===null) {
-            return (isset($this->attributes[$key])?$this->attributes[$key]:null);
-        } else {
-            $this->attributes[$key] = $value;
-        }
-    }
-    
-    /**
      * Redirects to a new location.
      *
      * @param string $location
@@ -121,7 +86,7 @@ class Response
      * @param boolean $preventCaching
      * @return void
      */
-    public function redirect($location, $permanent=true, $preventCaching=false)
+    public static function redirect($location, $permanent=true, $preventCaching=false)
     {
         if ($preventCaching) {
             header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
@@ -131,43 +96,24 @@ class Response
         header('Location: '.$location, true, $permanent?301:302);
         exit();
     }
-    
-    /**
-     * Disables response. A disabled response will output nothing.
-     */
-    public function disable()
-    {
-        $this->isDisabled = true;
-    }
-    
-    /**
-     * Checks if response is disabled.
-     *
-     * @return boolean
-     */
-    public function isDisabled()
-    {
-        return $this->isDisabled;
-    }
         
     /**
      * Commits response to client.
      */
     public function commit()
     {
-        // do not display anything, if headers have already been sent
-        if (!headers_sent() && $this->status) {
-            header("HTTP/1.1 ".$this->status->getId()." ".$this->status->getDescription());
-        }
-        
-        if (!$this->isDisabled) {
-            // sends headers
+        // sends headers
+        if (!headers_sent()) {
+            if ($this->status) {
+                header("HTTP/1.1 ".$this->status->getId()." ".$this->status->getDescription());
+            }
+            
             foreach ($this->headers as $name=>$value) {
                 header($name.": ".$value);
             }
-            
-            // show output
-            echo $this->outputStream->get();
         }
+        
+        // displays body
+        echo $this->body;
     }
 }
