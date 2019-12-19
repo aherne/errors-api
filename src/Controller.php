@@ -20,7 +20,7 @@ abstract class Controller implements Runnable
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
      * @param View $view Encapsulates response body.
      */
-    public function __construct(Application $application, Request $request, View $view): void
+    public function __construct(Application $application, Request $request, View $view)
     {
         $this->application = $application;
         $this->request = $request;

@@ -17,7 +17,7 @@ class ControllerLocator extends ServiceLocator
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
      * @throws Exception If detection fails due to file/class not found.
      */
-    public function __construct(Application $application, Request $request): void
+    public function __construct(Application $application, Request $request)
     {
         if (!$request->getRoute()->getController()) {
             return;

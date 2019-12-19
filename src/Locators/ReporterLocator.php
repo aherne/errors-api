@@ -16,7 +16,7 @@ class ReporterLocator extends ServiceLocator
      * @param string $className Name of class in XML
      * @throws Exception If detection fails due to file/class not found.
      */
-    public function __construct(Application $application, string $className): void
+    public function __construct(Application $application, string $className)
     {
         $this->setClassName($application, $className);
     }

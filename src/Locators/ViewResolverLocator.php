@@ -17,7 +17,7 @@ class ViewResolverLocator extends ServiceLocator
      * @param Format $detectedResponseFormat Response format detected by FrontController
      * @throws Exception If detection fails due to file/class not found.
      */
-    public function __construct(Application $application, Format $detectedResponseFormat): void
+    public function __construct(Application $application, Format $detectedResponseFormat)
     {
         $this->setClassName($application, $detectedResponseFormat);
     }

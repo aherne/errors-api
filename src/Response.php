@@ -1,45 +1,78 @@
 <?php
 namespace Lucinda\STDERR;
 
-use Lucinda\STDERR\Response\ResponseStatus;
+use Lucinda\STDERR\Response\Status;
+use Lucinda\STDERR\Response\View;
 
 /**
- * Encapsulates error response that will be displayed back to caller
+ * Compiles information about response
  */
 class Response
 {
     private $status;
-    private $headers=[];
-    private $body;
-    
+    private $headers = array();
+    private $body;    
+    private $view;
+
     /**
      * Constructs an empty response based on content type
      *
      * @param string $contentType Value of content type header that will be sent in response
+     * @param string $templateFile Value of view template file that will form the basis of response
      */
-    public function __construct(string $contentType): void
+    public function __construct(string $contentType, string $templateFile)
     {
         $this->headers["Content-Type"] = $contentType;
-    }
-    
-    /**
-     * Sets response HTTP status
-     *
-     * @param integer $code
-     */
-    public function setStatus(int $code): void
-    {
-        $this->status = new ResponseStatus($code);
+        $this->view = new View($templateFile);
     }
 
     /**
-     * Gets response HTTP status
+     * Sets HTTP response status by its numeric code.
      *
-     * @return integer
+     * @param integer $code
+     * @throws Exception If status code is invalid.
      */
-    public function getStatus(): int
+    public function setStatus(int $code): void
+    {
+        $this->status = new Status($code);
+    }
+
+    /**
+     * Gets HTTP response status info.
+     *
+     * @return Status
+     */
+    public function getStatus(): Status
     {
         return $this->status;
+    }
+    
+    /**
+     * Gets a pointer to View
+     * 
+     * @return View
+     */
+    public function view(): View
+    {
+        return $this->view;
+    }
+    
+    /**
+     * Gets or sets response headers will send back to user.
+     *
+     * @param string $key
+     * @param string $value
+     * @return string|array|null
+     */
+    public function headers(string $key="", string $value=null)
+    {
+        if (!$key) {
+            return $this->headers;
+        } elseif ($value===null) {
+            return (isset($this->headers[$key])?$this->headers[$key]:null);
+        } else {
+            $this->headers[$key] = $value;
+        }
     }
     
     /**
@@ -63,24 +96,6 @@ class Response
     }
     
     /**
-     * Gets or sets response headers will send back to user.
-     *
-     * @param string $key
-     * @param string $value
-     * @return string[string]|NULL|string
-     */
-    public function headers(string $key="", string $value=null)
-    {
-        if (!$key) {
-            return $this->headers;
-        } elseif ($value===null) {
-            return (isset($this->headers[$key])?$this->headers[$key]:null);
-        } else {
-            $this->headers[$key] = $value;
-        }
-    }
-    
-    /**
      * Redirects to a new location.
      *
      * @param string $location
@@ -97,7 +112,7 @@ class Response
         header('Location: '.$location, true, $permanent?301:302);
         exit();
     }
-        
+    
     /**
      * Commits response to client.
      */

@@ -19,7 +19,7 @@ class Request
      * @param Route $route Matching route information detected from XML
      * @param \Throwable $exception Error "request" that fed STDERR stream
      */
-    public function __construct(Route $route, \Throwable $exception): void
+    public function __construct(Route $route, \Throwable $exception)
     {
         $this->setRoute($route);
         $this->setException($exception);

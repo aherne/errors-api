@@ -1,6 +1,7 @@
 <?php
 namespace Lucinda\STDERR;
 
+use Lucinda\STDERR\Application\Format;
 use Lucinda\STDERR\Locators\ReporterLocator;
 use Lucinda\STDERR\Locators\ControllerLocator;
 use Lucinda\STDERR\Locators\ViewResolverLocator;
@@ -25,7 +26,7 @@ class FrontController implements ErrorHandler
      * @param string $includePath Absolute root path where reporters / resolvers / controllers / views should be located
      * @param ErrorHandler $emergencyHandler Handler to use if an error occurs while FrontController handles an exception
      */
-    public function __construct(string $documentDescriptor, string $developmentEnvironment, string $includePath, ErrorHandler $emergencyHandler): void
+    public function __construct(string $documentDescriptor, string $developmentEnvironment, string $includePath, ErrorHandler $emergencyHandler)
     {
         // sets up system to track errors
         error_reporting(E_ALL);
@@ -81,30 +82,27 @@ class FrontController implements ErrorHandler
             $className = $locator->getClassName();            
             $object = new $className($request, $xml);
             $object->run();
-        }        
-
-        // compiles a view object
-        $view = new View($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):null);
-        
-        // locates and runs controller
-        $locator = new ControllerLocator($application, $request);
-        $className = $locator->getClassName();
-        if ($className) {
-            $object = new $className($application, $request, $view);
-            $object->run();
         }
         
         // detects response format
         $format = $application->formats($this->displayFormat?$this->displayFormat:$application->getDefaultFormat());
         
         // compiles a response object from content type and http status
-        $response = new Response($format->getContentType().($format->getCharacterEncoding()?"; charset=".$format->getCharacterEncoding():""));
+        $response = new Response($this->getContentType($format), $this->getTemplateFile($application, $request));
         $response->setStatus($request->getRoute()->getHttpStatus());
+        
+        // locates and runs controller
+        $locator = new ControllerLocator($application, $request);
+        $className = $locator->getClassName();
+        if ($className) {
+            $object = new $className($application, $request, $response);
+            $object->run();
+        }
         
         // set up response based on view
         $locator = new ViewResolverLocator($application, $format);
         $className = $locator->getClassName();
-        $object = new $className($application, $view, $response);
+        $object = new $className($application, $response);
         $object->run();
         
         // commits response to caller
@@ -112,5 +110,28 @@ class FrontController implements ErrorHandler
         
         // forces program to end
         exit(); 
+    }
+    
+    /**
+     * Gets response template file
+     *
+     * @param Application $application
+     * @param Request $request
+     * @return string
+     */
+    private function getTemplateFile(Application $application, Request $request): string
+    {
+        return ($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):null);
+    }
+    
+    /**
+     * Gets response content type
+     *
+     * @param Format $format
+     * @return string
+     */
+    private function getContentType(Format $format): string
+    {
+        return $format->getContentType().($format->getCharacterEncoding()?"; charset=".$format->getCharacterEncoding():"");
     }
 }

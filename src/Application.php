@@ -35,7 +35,7 @@ class Application
      * @param string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
      * @throws Exception If XML is misconfigured.
      */
-    public function __construct(string $xmlPath, string $developmentEnvironment): void
+    public function __construct(string $xmlPath, string $developmentEnvironment)
     {
         if (!file_exists($xmlPath)) {
             throw new Exception("XML configuration file not found!");

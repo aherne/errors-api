@@ -6,7 +6,7 @@ use Lucinda\STDERR\Exception;
 /**
  * Encapsulates HTTP response status logic in accordance to HTTP/1.1 specifications
  */
-class ResponseStatus
+class Status
 {
     const HTTP_STATUSES = array(
         100=>'Continue',
@@ -82,7 +82,7 @@ class ResponseStatus
      * @param integer $code
      * @throws Exception If incorrect numeric code is supplied.
      */
-    public function __construct(int $code): void
+    public function __construct(int $code)
     {
         if (!array_key_exists($code, self::HTTP_STATUSES)) {
             throw new Exception("Unsupported HTTP status: ".$code);

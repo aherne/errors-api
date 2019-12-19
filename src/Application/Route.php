@@ -20,7 +20,7 @@ class Route
      * @param \SimpleXMLElement $info
      * @throws Exception If tag is misconfigured
      */
-    public function __construct(\SimpleXMLElement $info): void
+    public function __construct(\SimpleXMLElement $info)
     {
         $this->controller = (string) $info["controller"];
         $this->view = (string) $info["view"];
