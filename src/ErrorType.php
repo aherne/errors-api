@@ -1,7 +1,6 @@
 <?php
 namespace Lucinda\STDERR;
 
-
 /**
  * Enum that contains all available error types associated to a handled exception via following constants:
  * - NONE: handled exception is not an error

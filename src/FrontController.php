@@ -77,9 +77,9 @@ class FrontController implements ErrorHandler
         
         // builds reporters list then reports exception
         $reporters = $application->reporters();
-        foreach($reporters as $className=>$xml) {
+        foreach ($reporters as $className=>$xml) {
             $locator = new ReporterLocator($application, $className);
-            $className = $locator->getClassName();            
+            $className = $locator->getClassName();
             $object = new $className($request, $xml);
             $object->run();
         }
@@ -109,7 +109,7 @@ class FrontController implements ErrorHandler
         $response->commit();
         
         // forces program to end
-        exit(); 
+        exit();
     }
     
     /**

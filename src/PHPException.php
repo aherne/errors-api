@@ -1,7 +1,6 @@
 <?php
 namespace Lucinda\STDERR;
 
-
 /**
  * Exception caught automatically when a PHP error is encountered.
  */

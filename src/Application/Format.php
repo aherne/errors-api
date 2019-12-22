@@ -19,7 +19,7 @@ class Format
 
     /**
      * Detects format info from <format> tag
-     * 
+     *
      * @param \SimpleXMLElement $info
      * @throws Exception If tag is misconfigured
      */

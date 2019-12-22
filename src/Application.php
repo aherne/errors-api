@@ -50,7 +50,7 @@ class Application
     
     /**
      * Sets basic application info based on contents of "application" XML tag
-     * 
+     *
      * @param string $developmentEnvironment
      * @throws Exception If xml content has failed validation.
      */
@@ -180,7 +180,7 @@ class Application
                 throw new Exception("Reporter tag missing class attribute");
             }
             $this->reporters[$reporterClass] = $info;
-        }        
+        }
     }
     
     /**
@@ -237,7 +237,7 @@ class Application
     }
     
     /**
-     * Reads content of tag exceptions 
+     * Reads content of tag exceptions
      *
      * @throws Exception If XML is misconfigured.
      */

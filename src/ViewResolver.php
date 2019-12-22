@@ -1,7 +1,6 @@
 <?php
 namespace Lucinda\STDERR;
 
-
 /**
  * Resolves View into a Response based on Application settings
  */

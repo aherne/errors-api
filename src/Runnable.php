@@ -1,7 +1,6 @@
 <?php
 namespace Lucinda\STDERR;
 
-
 /**
  * Defines blueprints of an object that can be ran by FrontController
  */

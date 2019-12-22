@@ -8,7 +8,7 @@ use Lucinda\STDERR\Exception;
 /**
  * Locates view resolver class on disk based on path & formats tag
  */
-class ViewResolverLocator extends ServiceLocator 
+class ViewResolverLocator extends ServiceLocator
 {
     /**
      * Starts detection process.
