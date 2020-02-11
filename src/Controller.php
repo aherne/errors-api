@@ -11,18 +11,18 @@ abstract class Controller implements Runnable
 {
     protected $application;
     protected $request;
-    protected $view;
+    protected $response;
 
     /**
      * Controller constructor.
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
-     * @param View $view Encapsulates response body.
+     * @param Response $response Encapsulates response.
      */
-    public function __construct(Application $application, Request $request, View $view)
+    public function __construct(Application $application, Request $request, Response $response)
     {
         $this->application = $application;
         $this->request = $request;
-        $this->view = $view;
+        $this->response = $response;
     }
 }

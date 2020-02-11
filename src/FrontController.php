@@ -30,8 +30,8 @@ class FrontController implements ErrorHandler
     {
         // sets up system to track errors
         error_reporting(E_ALL);
-        set_error_handler('\\Lucinda\\MVC\\STDERR\\PHPException::nonFatalError', E_ALL);
-        register_shutdown_function('\\Lucinda\\MVC\\STDERR\\PHPException::fatalError');
+        set_error_handler('\\Lucinda\\STDERR\\PHPException::nonFatalError', E_ALL);
+        register_shutdown_function('\\Lucinda\\STDERR\\PHPException::fatalError');
         PHPException::setErrorHandler($this);
         set_exception_handler(array($this,"handle"));
         ini_set("display_errors", 0);
@@ -100,10 +100,12 @@ class FrontController implements ErrorHandler
         }
         
         // set up response based on view
-        $locator = new ViewResolverLocator($application, $format);
-        $className = $locator->getClassName();
-        $object = new $className($application, $response);
-        $object->run();
+        if ($response->getBody()===null) {
+            $locator = new ViewResolverLocator($application, $format);
+            $className = $locator->getClassName();
+            $object = new $className($application, $response);
+            $object->run();
+        }
         
         // commits response to caller
         $response->commit();

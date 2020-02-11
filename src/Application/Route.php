@@ -12,7 +12,6 @@ class Route
     private $view;
     private $httpStatus;
     private $errorType;
-    private $contentType;
     
     /**
      * Detects route info from <exception> tag
@@ -25,8 +24,7 @@ class Route
         $this->controller = (string) $info["controller"];
         $this->view = (string) $info["view"];
         $this->httpStatus = (string) $info["http_status"];
-        $this->errorType = (string) $info["content_type"];
-        $this->contentType = (string) $info["error_type"];
+        $this->errorType = (string) $info["error_type"];
     }
 
     /**
@@ -67,15 +65,5 @@ class Route
     public function getErrorType(): string
     {
         return $this->errorType;
-    }
-
-    /**
-     * Gets content type associated to exception handled.
-     *
-     * @return string
-     */
-    public function getContentType(): string
-    {
-        return $this->contentType;
     }
 }

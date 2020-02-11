@@ -20,7 +20,6 @@ class Application
     private $viewsPath;
     private $reportersPath;
     private $viewResolversPath;
-    private $publicPath;
     private $defaultFormat;
     private $version;
     private $displayErrors=false;
@@ -70,7 +69,6 @@ class Application
         $this->reportersPath = (string) $xml->paths->reporters;
         $this->viewResolversPath = (string) $xml->paths->resolvers;
         $this->viewsPath = (string) $xml->paths->views;
-        $this->publicPath = (string) $xml->paths->public;
         $this->version = (string) $xml["version"];
         
         $value = $this->simpleXMLElement->application->display_errors->{$developmentEnvironment};
@@ -118,16 +116,6 @@ class Application
     }
     
     /**
-     * Gets path to public files folder.
-     *
-     * @return string
-     */
-    public function getPublicPath(): string
-    {
-        return $this->publicPath;
-    }
-    
-    /**
      * Gets path to views folder.
      *
      * @return string
@@ -169,11 +157,7 @@ class Application
         if ($xml===null) {
             return;
         }
-        $tmp = (array) $xml;
-        if (empty($tmp["reporter"])) {
-            return;
-        }
-        $list = (is_array($tmp["reporter"])?$tmp["reporter"]:[$tmp["reporter"]]);
+        $list = $xml->xpath("//reporter");
         foreach ($list as $info) {
             $reporterClass = (string) $info['class'];
             if (!$reporterClass) {
@@ -207,11 +191,10 @@ class Application
     private function setFormats(): void
     {
         $xml = $this->simpleXMLElement->formats;
-        $tmp = (array) $xml;
-        if (empty($tmp["format"])) {
-            return;
+        if($xml===null) {
+            throw new Exception("Tag is required: formats");
         }
-        $list = (is_array($tmp["format"])?$tmp["format"]:[$tmp["format"]]);
+        $list = $xml->xpath("//format");
         foreach ($list as $info) {
             $name = (string) $info["name"];
             if (!$name) {
@@ -246,14 +229,10 @@ class Application
         $xml = $this->simpleXMLElement->exceptions;
         
         // get default route
-        $this->routes[""] = $this->compileRoute($xml);
+        $this->routes[""] = new Route($xml);
         
         // override with specific route, if set
-        $tmp = (array) $xml;
-        if (empty($tmp["exception"])) {
-            return [];
-        }
-        $list = (is_array($tmp["exception"])?$tmp["exception"]:[$tmp["exception"]]);
+        $list = $xml->xpath("//exception");
         foreach ($list as $info) {
             $currentClassName = (string) $info['class'];
             if (!$currentClassName) {

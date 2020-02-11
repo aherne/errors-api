@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<xml>
+  <application default_format="html" version="1.0.0">
+    <paths>
+      <controllers>mocks/controllers</controllers>
+      <views>mocks/views</views>
+      <reporters>mocks/reporters</reporters>
+      <resolvers>mocks/resolvers</resolvers>
+    </paths>
+    <display_errors>
+      <local>1</local>
+    </display_errors>
+  </application>
+  <formats>
+    <format name="html" content_type="text/html" class="ViewLanguageRenderer" charset="UTF-8"/>
+  </formats>
+  <exceptions http_status="500" error_type="LOGICAL" view="500">
+    <exception class="PathNotFoundException" controller="PathNotFoundController" http_status="404" error_type="CLIENT" view="404"/>
+  </exceptions>
+  <reporters>
+    <local>
+      <reporter class="FileReporter" path="errors" format="%d %m"/>
+    </local>
+  </reporters>
+</xml>
