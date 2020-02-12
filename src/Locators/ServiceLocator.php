@@ -13,7 +13,7 @@ abstract class ServiceLocator
      *
      * @return string
      */
-    public function getClassName(): string
+    public function getClassName(): ?string
     {
         return $this->className;
     }

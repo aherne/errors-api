@@ -109,9 +109,6 @@ class FrontController implements ErrorHandler
         
         // commits response to caller
         $response->commit();
-        
-        // forces program to end
-        exit();
     }
     
     /**

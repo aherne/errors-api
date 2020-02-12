@@ -10,7 +10,7 @@ class ClassFinderTest
     public function find()
     {
         $finder = new ClassFinder(dirname(__DIR__));
-        return new Result($finder->find("Test\Lucinda\STDERR\MockErrorHandler")=="Test\Lucinda\STDERR\MockErrorHandler");
+        return new Result($finder->find("Test\Lucinda\STDERR\MockEmergencyHandler")=="Test\Lucinda\STDERR\MockEmergencyHandler");
     }
         
 

@@ -13,7 +13,7 @@ class PHPExceptionTest
         error_reporting(E_ALL);
         set_error_handler('\\Lucinda\\STDERR\\PHPException::nonFatalError', E_ALL);
         register_shutdown_function('\\Lucinda\\STDERR\\PHPException::fatalError');
-        $this->handler = new MockErrorHandler();        
+        $this->handler = new MockEmergencyHandler();        
     }
     
     public function setErrorHandler()
