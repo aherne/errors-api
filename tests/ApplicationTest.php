@@ -61,9 +61,9 @@ class ApplicationTest
     }
         
 
-    public function formats()
+    public function resolvers()
     {
-        return new Result($this->object->formats("html")!==null);
+        return new Result($this->object->resolvers("html")!==null);
     }
         
 

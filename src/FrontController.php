@@ -85,7 +85,7 @@ class FrontController implements ErrorHandler
         }
         
         // detects response format
-        $format = $application->formats($this->displayFormat?$this->displayFormat:$application->getDefaultFormat());
+        $format = $application->resolvers($this->displayFormat?$this->displayFormat:$application->getDefaultFormat());
         
         // compiles a response object from content type and http status
         $response = new Response($this->getContentType($format), $this->getTemplateFile($application, $request));

@@ -25,7 +25,7 @@ class Application
     private $displayErrors=false;
     private $reporters=array();
     private $routes=array();
-    private $formats=array();
+    private $resolvers=array();
     
     /**
      * Performs detection process.
@@ -44,7 +44,7 @@ class Application
         $this->setApplicationInfo($developmentEnvironment);
         $this->setReporters($developmentEnvironment);
         $this->setRoutes();
-        $this->setFormats();
+        $this->setResolvers();
     }
     
     /**
@@ -65,10 +65,10 @@ class Application
             throw new Exception("Attribute 'default_format' is mandatory for 'application' tag");
         }
         
-        $this->controllersPath = (string) $xml->paths->controllers;
-        $this->reportersPath = (string) $xml->paths->reporters;
-        $this->viewResolversPath = (string) $xml->paths->resolvers;
-        $this->viewsPath = (string) $xml->paths->views;
+        $this->controllersPath = (string) $xml->paths["controllers"];
+        $this->reportersPath = (string) $xml->paths["reporters"];
+        $this->viewResolversPath = (string) $xml->paths["resolvers"];
+        $this->viewsPath = (string) $xml->paths["views"];
         $this->version = (string) $xml["version"];
         
         $value = $this->simpleXMLElement->application->display_errors->{$developmentEnvironment};
@@ -184,38 +184,38 @@ class Application
     
     
     /**
-     * Reads content of tag formats
+     * Reads content of tag resolvers
      *
      * @throws Exception If XML is misconfigured.
      */
-    private function setFormats(): void
+    private function setResolvers(): void
     {
-        $xml = $this->simpleXMLElement->formats;
+        $xml = $this->simpleXMLElement->resolvers;
         if($xml===null) {
-            throw new Exception("Tag is required: formats");
+            throw new Exception("Tag is required: resolvers");
         }
-        $list = $xml->xpath("//format");
+        $list = $xml->xpath("//resolver");
         foreach ($list as $info) {
-            $name = (string) $info["name"];
+            $name = (string) $info["format"];
             if (!$name) {
-                throw new Exception("Format missing name!");
+                throw new Exception("Resolver missing format!");
             }
-            $this->formats[$name] = new Format($info);
+            $this->resolvers[$name] = new Format($info);
         }
     }
     
     /**
-     * Gets content of tag formats encapsulated as Format objects
+     * Gets content of tag resolvers encapsulated as Format objects
      *
      * @param string $displayFormat
      * @return Format|array|null
      */
-    public function formats(string $displayFormat="")
+    public function resolvers(string $displayFormat="")
     {
         if (!$displayFormat) {
-            return $this->formats;
+            return $this->resolvers;
         } else {
-            return (isset($this->formats[$displayFormat])?$this->formats[$displayFormat]:null);
+            return (isset($this->resolvers[$displayFormat])?$this->resolvers[$displayFormat]:null);
         }
     }
     
