@@ -12,7 +12,7 @@ class HtmlRenderer extends ViewResolver
                 throw new Exception("View file not found");
             }
             ob_start();
-            $_VIEW = $view->data();
+            $_VIEW = $view->getData();
             require($view->getFile().".html");
             $output = ob_get_contents();
             ob_end_clean();

@@ -191,7 +191,7 @@ class Application
     private function setResolvers(): void
     {
         $xml = $this->simpleXMLElement->resolvers;
-        if($xml===null) {
+        if ($xml===null) {
             throw new Exception("Tag is required: resolvers");
         }
         $list = $xml->xpath("//resolver");

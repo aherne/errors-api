@@ -1,6 +1,5 @@
 <?php
 namespace Test\Lucinda\STDERR\Locators;
-    
 
 use Lucinda\STDERR\Application;
 use Lucinda\STDERR\Request;
@@ -10,7 +9,6 @@ use Test\Lucinda\STDERR\PathNotFoundException;
 
 class ControllerLocatorTest
 {
-
     public function getClassName()
     {
         $result = [];
@@ -18,7 +16,7 @@ class ControllerLocatorTest
         $application = new Application(dirname(__DIR__)."/configuration.xml", "local");
         
         $locator = new ControllerLocator(
-            $application, 
+            $application,
             new Request($application->routes()[""], new \Exception("asd"))
         );
         $result[] = new Result($locator->getClassName()===null, "tested default controller");
@@ -31,6 +29,4 @@ class ControllerLocatorTest
         
         return $result;
     }
-        
-
 }

@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\STDERR\Response;
-    
+
 use Lucinda\STDERR\Response\View;
 use Lucinda\UnitTest\Result;
 
@@ -26,11 +26,34 @@ class ViewTest
     }
         
 
-    public function data()
+    public function getData()
     {
-        $this->object->data("test", "me");
-        return new Result($this->object->data("test")=="me");
+        $this->object["test1"] = "me1";
+        $this->object["test2"] = "me2";
+        return new Result($this->object->getData()==["test1"=>"me1","test2"=>"me2"]);
+    }
+
+    public function offsetExists()
+    {
+        return new Result($this->object->offsetExists("test1"));
     }
         
 
+    public function offsetGet()
+    {
+        return new Result($this->object->offsetGet("test1")=="me1");
+    }
+        
+
+    public function offsetSet()
+    {
+        $this->object->offsetSet("test3", "me3");
+        return new Result($this->object->offsetExists("test3"));
+    }
+
+    public function offsetUnset()
+    {
+        $this->object->offsetUnset("test3");
+        return new Result(!$this->object->offsetExists("test3"));
+    }
 }

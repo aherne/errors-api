@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\STDERR;
-    
+
 use Lucinda\STDERR\Response;
 use Lucinda\UnitTest\Result;
 
@@ -66,6 +66,4 @@ class ResponseTest
         ob_end_clean();
         return new Result($result=="asd");
     }
-        
-
 }

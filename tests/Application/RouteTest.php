@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\STDERR\Application;
-    
+
 use Lucinda\STDERR\Application\Route;
 use Lucinda\UnitTest\Result;
 use Lucinda\STDERR\ErrorType;
@@ -38,6 +38,4 @@ class RouteTest
     {
         return new Result($this->object->getErrorType()==ErrorType::CLIENT);
     }
-        
-
 }

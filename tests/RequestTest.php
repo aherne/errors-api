@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\STDERR;
-    
+
 use Lucinda\STDERR\Request;
 use Lucinda\STDERR\Application\Route;
 use Lucinda\UnitTest\Result;
@@ -30,6 +30,4 @@ class RequestTest
     {
         return new Result($this->object->getException()==$this->exception);
     }
-        
-
 }

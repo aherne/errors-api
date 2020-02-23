@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\STDERR\Response;
-    
+
 use Lucinda\STDERR\Response\Status;
 use Lucinda\UnitTest\Result;
 
@@ -23,6 +23,4 @@ class StatusTest
     {
         return new Result($this->object->getDescription()=="Not Found");
     }
-        
-
 }

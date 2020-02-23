@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\STDERR\Locators;
-    
+
 use Lucinda\STDERR\Locators\ViewResolverLocator;
 use Lucinda\STDERR\Application;
 use Lucinda\UnitTest\Result;

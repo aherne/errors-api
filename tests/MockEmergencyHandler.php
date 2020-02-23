@@ -11,4 +11,3 @@ class MockEmergencyHandler implements ErrorHandler
         die($exception->getMessage());
     }
 }
-

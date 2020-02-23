@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\STDERR;
-    
+
 use Lucinda\STDERR\PHPException;
 use Lucinda\UnitTest\Result;
 
@@ -13,7 +13,7 @@ class PHPExceptionTest
         error_reporting(E_ALL);
         set_error_handler('\\Lucinda\\STDERR\\PHPException::nonFatalError', E_ALL);
         register_shutdown_function('\\Lucinda\\STDERR\\PHPException::fatalError');
-        $this->handler = new MockEmergencyHandler();        
+        $this->handler = new MockEmergencyHandler();
     }
     
     public function setErrorHandler()
@@ -39,6 +39,4 @@ class PHPExceptionTest
     {
         return new Result(false, "PHP fatal errors cannot be unit tested!");
     }
-        
-
 }

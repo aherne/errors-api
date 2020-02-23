@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\STDERR\Application;
-    
+
 use Lucinda\STDERR\Application\Format;
 use Lucinda\UnitTest\Result;
 
@@ -37,6 +37,4 @@ class FormatTest
     {
         return new Result($this->object->getViewResolver()=="ViewLanguageRenderer");
     }
-        
-
 }

@@ -1,6 +1,6 @@
 <?php
 namespace Test\Lucinda\STDERR;
-    
+
 use Lucinda\STDERR\Application;
 use Lucinda\UnitTest\Result;
 
@@ -77,6 +77,4 @@ class ApplicationTest
     {
         return new Result($this->object->getTag("reporters")!==null);
     }
-        
-
 }
