@@ -355,15 +355,20 @@ Class [Lucinda\STDERR\Response\Status](https://github.com/aherne/errors-api/blob
 
 ### Class View
 
-Class [Lucinda\STDERR\Response\View](https://github.com/aherne/errors-api/blob/v2.0.0/src/Response/View.php) encapsulates template and data to be converted later on by resolvers to a response body. It defines following public methods relevant to developers:
+Class [Lucinda\STDERR\Response\View](https://github.com/aherne/errors-api/blob/v2.0.0/src/Response/View.php) implements [\ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php) and encapsulates template and data that will later be bound to a response body. It defines following public methods relevant to developers:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
 | getFile | void | string | Gets location of template file saved by method below. |
 | setFile | string | int | Sets location of template file to be used in generating response body. |
-| data | void | array | Gets all data that will be bound to template when response body will be generated. |
-| data | string $name | mixed | Gets value of a data attribute saved by operation below based on name. If not found, null is returned! |
-| data | string $name, mixed $value | void | Sets data attribute to bind to template later on by name and value. |
+| getData | void | array | Gets all data that will be bound to template when response body will be generated. |
+
+By virtue of implementing [\ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php), developers are able to work with this object as if it were an array:
+
+```php
+$this->response->view()["hello"] = "world";
+
+```
 
 ### Abstract Class Reporter
 
@@ -436,7 +441,7 @@ Developers need to implement *run* method for each controller, where they are ab
 By far the most common operation a controller will do is sending data to view via *view* method of [Lucinda\STDERR\Response](#class-response). Example:
 
 ```php
-$this->response->view()->data("hello", "world");
+$this->response->view()["hello"] = "world";
 ```
 
 To better understand how *controllers* attribute @ [application](#application) and *class* attribute @ [exception](#exceptions) matching [\Throwable](https://www.php.net/manual/en/class.throwable.php) play together in locating [Lucinda\STDERR\Controller](#abstract-class-controller) that will mitigate requests and responses later on, let's take a look at table below:
@@ -455,7 +460,7 @@ class PathNotFoundController extends \Lucinda\STDERR\Controller
 {
     public function run(): void
     {
-        $this->response->view()->data("page", $_SERVER["REQUEST_URI"]);
+        $this->response->view()["page"] = $_SERVER["REQUEST_URI"];
     }
 }
 ```
@@ -503,7 +508,7 @@ class HtmlRenderer extends \Lucinda\STDERR\ViewResolver
                 throw new Exception("View file not found");
             }
             ob_start();
-            $_VIEW = $view->data();
+            $_VIEW = $view->getData();
             require($view->getFile().".html");
             $output = ob_get_contents();
             ob_end_clean();
@@ -526,3 +531,4 @@ For tests and examples, check following files/folders in API sources:
 - [test.php](https://github.com/aherne/errors-api/blob/v2.0.0/test.php): runs unit tests in console
 - [unit-tests.xml](https://github.com/aherne/errors-api/blob/v2.0.0/unit-tests.xml): sets up unit tests and mocks "loggers" tag
 - [tests](https://github.com/aherne/errors-api/blob/v2.0.0/tests): unit tests for classes from [src](https://github.com/aherne/errors-api/blob/v2.0.0/src) folder
+
