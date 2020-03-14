@@ -18,25 +18,25 @@ class Format
     private $characterEncoding;
 
     /**
-     * Detects format info from <format> tag
+     * Detects format info from <resolver> tag
      *
      * @param \SimpleXMLElement $info
      * @throws Exception If tag is misconfigured
      */
     public function __construct(\SimpleXMLElement $info)
     {
-        $this->name = (string) $info["name"];
+        $this->name = (string) $info["format"];
         
         $this->contentType = (string) $info["content_type"];
         if (!$this->contentType) {
-            throw new Exception("Format missing content type!");
+            throw new Exception("Attribute 'content_type' is mandatory for 'resolver' tag");
         }
         
         $this->characterEncoding = (string) $info["charset"];
         
         $this->viewResolverClass = (string) $info['class'];
         if (!$this->viewResolverClass) {
-            throw new Exception("Format missing class!");
+            throw new Exception("Attribute 'class' is mandatory for 'resolver' tag");
         }
     }
 

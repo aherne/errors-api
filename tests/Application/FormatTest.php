@@ -11,7 +11,7 @@ class FormatTest
     public function __construct()
     {
         $this->object = new Format(simplexml_load_string('
-        <format name="html" content_type="text/html" class="ViewLanguageRenderer" charset="UTF-8"/>
+        <resolver format="html" content_type="text/html" class="ViewLanguageRenderer" charset="UTF-8"/>
         '));
     }
 

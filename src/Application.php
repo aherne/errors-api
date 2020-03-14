@@ -37,7 +37,7 @@ class Application
     public function __construct(string $xmlPath, string $developmentEnvironment)
     {
         if (!file_exists($xmlPath)) {
-            throw new Exception("XML configuration file not found!");
+            throw new Exception("XML file not found: ".$xmlFilePath);
         }
         $this->simpleXMLElement = simplexml_load_file($xmlPath);
         
@@ -161,9 +161,12 @@ class Application
         foreach ($list as $info) {
             $reporterClass = (string) $info['class'];
             if (!$reporterClass) {
-                throw new Exception("Reporter tag missing class attribute");
+                throw new Exception("Reporter tag missing 'class' attribute");
             }
             $this->reporters[$reporterClass] = $info;
+        }
+        if (empty($this->reporters)) {
+            throw new Exception("Tag is empty: reporters");
         }
     }
     
@@ -198,9 +201,12 @@ class Application
         foreach ($list as $info) {
             $name = (string) $info["format"];
             if (!$name) {
-                throw new Exception("Resolver missing format!");
+                throw new Exception("Resolver missing 'format' attribute!");
             }
             $this->resolvers[$name] = new Format($info);
+        }
+        if (empty($this->resolvers)) {
+            throw new Exception("Tag is empty: resolvers");
         }
     }
     
