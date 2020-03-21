@@ -120,7 +120,7 @@ class FrontController implements ErrorHandler
      */
     private function getTemplateFile(Application $application, Request $request): string
     {
-        return ($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):null);
+        return ($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):"");
     }
     
     /**
