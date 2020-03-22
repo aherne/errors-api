@@ -208,11 +208,11 @@ Once a [\Throwable](https://www.php.net/manual/en/class.throwable.php) event has
 
 - registers handler presented as constructor argument to capture any error that might occur while handling
 - constructs a [Lucinda\STDERR\Application](#class-application) object based on XML where API is configured and development environment
-- constructs a [Lucinda\STDERR\Application\Route](#class-route) object by matching routes in [exceptions](#exceptions) tag @ XML to [\Throwable](https://www.php.net/manual/en/class.throwable.php) handled
-- constructs a [Lucinda\STDERR\Request](#class-request) object based on handled [\Throwable](https://www.php.net/manual/en/class.throwable.php) and [Lucinda\STDERR\Application\Route](#class-route) above
+- constructs a [Lucinda\STDERR\Application\Route](#class-application-route) object by matching routes in [exceptions](#exceptions) tag @ XML to [\Throwable](https://www.php.net/manual/en/class.throwable.php) handled
+- constructs a [Lucinda\STDERR\Request](#class-request) object based on handled [\Throwable](https://www.php.net/manual/en/class.throwable.php) and [Lucinda\STDERR\Application\Route](#class-application-route) above
 - constructs a list of [Lucinda\STDERR\Reporter](#abstract-class-reporter) instances based on [reporters](#reporters) tag @ XML matching development environment
 - if found, for each [Lucinda\STDERR\Reporter](#abstract-class-reporter) it calls its *run()* method in order to report [\Throwable](https://www.php.net/manual/en/class.throwable.php) to respective medium
-- constructs a [Lucinda\STDERR\Application\Format](#class-format) object encapsulating final response format based on *default_format* attribute [application](#application) tag @ XML or the one manually set via *setDisplayFormat* method
+- constructs a [Lucinda\STDERR\Application\Format](#class-application-format) object encapsulating final response format based on *default_format* attribute [application](#application) tag @ XML or the one manually set via *setDisplayFormat* method
 - constructs a [Lucinda\STDERR\Response](#class-response) object based on all objects detected above
 - locates a [Lucinda\STDERR\Controller](#abstract-class-controller) matching [\Throwable](https://www.php.net/manual/en/class.throwable.php) based on [exceptions](#exceptions) tag @ XML and objects detected above
 - if found, it executes [Lucinda\STDERR\Controller](#abstract-class-controller)'s *run* method in order to manipulate response
@@ -267,18 +267,18 @@ class EmergencyHandler implements \Lucinda\STDERR\ErrorHandler
 These classes are fully implemented by API:
 
 - [Lucinda\STDERR\Application](#class-application): reads [configuration](#configuration) XML file and encapsulates information inside
-    - [Lucinda\STDERR\Application\Route](#class-route): encapsulates [exception](#exceptions) XML tag matching [\Throwable](https://www.php.net/manual/en/class.throwable.php) handled
-    - [Lucinda\STDERR\Application\Format](#class-format): encapsulates [resolver](#resolvers) XML tag matching *default_format* attribute @ [application](#application) XML tag or one set by *setFormat* method @ [Lucinda\STDERR\FrontController](https://github.com/aherne/errors-api/blob/v2.0.0/src/FrontController.php)
-- [Lucinda\STDERR\Request](#class-request): encapsulates handled [\Throwable](https://www.php.net/manual/en/class.throwable.php) and [Lucinda\STDERR\Application\Route](#class-route)
+    - [Lucinda\STDERR\Application\Route](#class-application-route): encapsulates [exception](#exceptions) XML tag matching [\Throwable](https://www.php.net/manual/en/class.throwable.php) handled
+    - [Lucinda\STDERR\Application\Format](#class-application-format): encapsulates [resolver](#resolvers) XML tag matching *default_format* attribute @ [application](#application) XML tag or one set by *setFormat* method @ [Lucinda\STDERR\FrontController](https://github.com/aherne/errors-api/blob/v2.0.0/src/FrontController.php)
+- [Lucinda\STDERR\Request](#class-request): encapsulates handled [\Throwable](https://www.php.net/manual/en/class.throwable.php) and [Lucinda\STDERR\Application\Route](#class-application-route)
 - [Lucinda\STDERR\Response](#class-response): encapsulates response to send back to caller
-    - [Lucinda\STDERR\Response\Status](#class-status): encapsulates response HTTP status
-    - [Lucinda\STDERR\Response\View](#class-view): encapsulates view template and data that will be bound into a response body
+    - [Lucinda\STDERR\Response\Status](#class-response-status): encapsulates response HTTP status
+    - [Lucinda\STDERR\Response\View](#class-response-view): encapsulates view template and data that will be bound into a response body
 
 These abstract classes require to be extended by developers in order to gain an ability:
 
 - [Lucinda\STDERR\Reporter](#abstract-class-reporter): encapsulates [\Throwable](https://www.php.net/manual/en/class.throwable.php) reporting
 - [Lucinda\STDERR\Controller](#abstract-class-controller): encapsulates binding [Lucinda\STDERR\Request](#class-request) to [Lucinda\STDERR\Response](#class-response) based on [\Throwable](https://www.php.net/manual/en/class.throwable.php)
-- [Lucinda\STDERR\ViewResolver](#abstract-class-viewresolver): encapsulates conversion of [Lucinda\STDERR\Response\View](#class-view) into a [Lucinda\STDERR\Response](#class-response) body
+- [Lucinda\STDERR\ViewResolver](#abstract-class-viewresolver): encapsulates conversion of [Lucinda\STDERR\Response\View](#class-response-view) into a [Lucinda\STDERR\Response](#class-response) body
 
 ### Class Application
 
@@ -289,7 +289,7 @@ Class [Lucinda\STDERR\Application](https://github.com/aherne/errors-api/blob/v2.
 | getVersion | void | string | Gets application version based on *version* attribute @ [application](#application) XML tag |
 | getTag | string $name | [\SimpleXMLElement](https://www.php.net/manual/en/class.simplexmlelement.php) | Gets a pointer to a custom tag in XML root |
 
-### Class Route
+### Class Application Route
 
 Class [Lucinda\STDERR\Application\Route](https://github.com/aherne/errors-api/blob/v2.0.0/src/Application/Route.php) encapsulates information detected from matching [exception](#exceptions) XML tag and defines following public methods:
 
@@ -300,7 +300,7 @@ Class [Lucinda\STDERR\Application\Route](https://github.com/aherne/errors-api/bl
 | getHttpStatus | void | string | Gets response http status code based on *http_status* attribute  of matching *exception* tag, child of [exceptions](#exceptions) XML tag |
 | getView | void | string | Gets view path based on *view* attribute  of matching *exception* tag, child of [exceptions](#exceptions) XML tag |
 
-### Class Format
+### Class Application Format
 
 Class [Lucinda\STDERR\Application\Format](https://github.com/aherne/errors-api/blob/v2.0.0/src/Application/Format.php) encapsulates information detected from matching [resolver](#resolvers) XML tag and defines following public methods:
 
@@ -313,13 +313,13 @@ Class [Lucinda\STDERR\Application\Format](https://github.com/aherne/errors-api/b
 
 ### Class Request
 
-Class [Lucinda\STDERR\Request](https://github.com/aherne/errors-api/blob/v2.0.0/src/Request.php) encapsulates handled [\Throwable](https://www.php.net/manual/en/class.throwable.php) and matching [Lucinda\STDERR\Application\Route](#class-route). It defines following public methods relevant to developers:
+Class [Lucinda\STDERR\Request](https://github.com/aherne/errors-api/blob/v2.0.0/src/Request.php) encapsulates handled [\Throwable](https://www.php.net/manual/en/class.throwable.php) and matching [Lucinda\STDERR\Application\Route](#class-application-route). It defines following public methods relevant to developers:
 
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
 | getException | void | [\Throwable](https://www.php.net/manual/en/class.throwable.php) | Gets throwable that is being handled |
-| getRoute | void | [Lucinda\STDERR\Application\Route](#class-route) | Gets route information detected from XML based on throwable |
+| getRoute | void | [Lucinda\STDERR\Application\Route](#class-application-route) | Gets route information detected from XML based on throwable |
 
 ### Class Response
 
@@ -330,17 +330,17 @@ Class [Lucinda\STDERR\Response](https://github.com/aherne/errors-api/blob/v2.0.0
 | --- | --- | --- | --- |
 | getBody | void | string | Gets response body saved by method below. |
 | setBody | string $body | void | Sets response body. |
-| getStatus | void | [Lucinda\STDERR\Response\Status](#class-status) | Gets response http status based on code saved by method below. |
+| getStatus | void | [Lucinda\STDERR\Response\Status](#class-response-status) | Gets response http status based on code saved by method below. |
 | setStatus | int $code | void | Sets response http status code. |
 | headers | void | array | Gets all response http headers saved by methods below. |
 | headers | string $name | ?string | Gets value of a response http header based on its name. If not found, null is returned! |
 | headers | string $name, string $value | void | Sets value of response http header based on its name. |
 | redirect | string $location, bool $permanent=true, bool $preventCaching=false | void | Redirects caller to location url using 301 http status if permanent, otherwise 302. |
-| view | void | [Lucinda\STDERR\Response\View](#class-view) | Gets a pointer to view encapsulating data based on which response body will be compiled |
+| view | void | [Lucinda\STDERR\Response\View](#class-response-view) | Gets a pointer to view encapsulating data based on which response body will be compiled |
 
 When API completes handling, it will call *commit* method to send headers and response body back to caller!
 
-### Class Status
+### Class Response Status
 
 Class [Lucinda\STDERR\Response\Status](https://github.com/aherne/errors-api/blob/v2.0.0/src/Response/Status.php) encapsulates response HTTP status and defines following public methods relevant to developers:
 
@@ -349,7 +349,7 @@ Class [Lucinda\STDERR\Response\Status](https://github.com/aherne/errors-api/blob
 | getDescription | void | string | Gets response http status code description (eg: "not modified"). |
 | getId | void | int | Sets response http status code. |
 
-### Class View
+### Class Response View
 
 Class [Lucinda\STDERR\Response\View](https://github.com/aherne/errors-api/blob/v2.0.0/src/Response/View.php) implements [\ArrayAccess](https://www.php.net/manual/en/class.arrayaccess.php) and encapsulates template and data that will later be bound to a response body. It defines following public methods relevant to developers:
 
@@ -469,7 +469,7 @@ Defined in XML as:
 
 ### Abstract Class ViewResolver
 
-Abstract class [Lucinda\STDERR\ViewResolver](https://github.com/aherne/errors-api/blob/v2.0.0/src/ViewResolver.php) implements [Lucinda\STDERR\Runnable](https://github.com/aherne/errors-api/blob/v2.0.0/src/Runnable.php)) and encapsulates conversion of [Lucinda\STDERR\Response\View](#class-view) to response body for a single [Lucinda\STDERR\Application\Format](#class-format). It defines following public method relevant to developers:
+Abstract class [Lucinda\STDERR\ViewResolver](https://github.com/aherne/errors-api/blob/v2.0.0/src/ViewResolver.php) implements [Lucinda\STDERR\Runnable](https://github.com/aherne/errors-api/blob/v2.0.0/src/Runnable.php)) and encapsulates conversion of [Lucinda\STDERR\Response\View](#class-response-view) to response body for a single [Lucinda\STDERR\Application\Format](#class-application-format). It defines following public method relevant to developers:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
