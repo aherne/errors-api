@@ -2,7 +2,7 @@
 namespace Lucinda\STDERR\Locators;
 
 use Lucinda\STDERR\Application;
-use Lucinda\STDERR\Exception;
+use Lucinda\STDERR\ConfigurationException;
 
 /**
  * Locates reporters on disk based on reporters path & <reporter> tags detected beforehand
@@ -14,7 +14,7 @@ class ReporterLocator extends ServiceLocator
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param string $className Name of class in XML
-     * @throws Exception If detection fails due to file/class not found.
+     * @throws ConfigurationException If detection fails due to file/class not found.
      */
     public function __construct(Application $application, string $className)
     {
@@ -26,7 +26,7 @@ class ReporterLocator extends ServiceLocator
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param string $className Name of class in XML
-     * @throws Exception If detection fails due to file/class not found.
+     * @throws ConfigurationException If detection fails due to file/class not found.
      */
     private function setClassName(Application $application, string $className): void
     {

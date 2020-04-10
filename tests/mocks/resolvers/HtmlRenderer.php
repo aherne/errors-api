@@ -1,6 +1,6 @@
 <?php
 use Lucinda\STDERR\ViewResolver;
-use Lucinda\STDERR\Exception;
+use Lucinda\STDERR\ConfigurationException;
 
 class HtmlRenderer extends ViewResolver
 {
@@ -9,7 +9,7 @@ class HtmlRenderer extends ViewResolver
         $view = $this->response->view();
         if ($view->getFile()) {
             if (!file_exists($view->getFile().".html")) {
-                throw new Exception("View file not found");
+                throw new ConfigurationException("View file not found");
             }
             ob_start();
             $_VIEW = $view->getData();

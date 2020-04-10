@@ -1,8 +1,6 @@
 <?php
 namespace Lucinda\STDERR\Application;
 
-use Lucinda\STDERR\Exception;
-
 /**
  * Encapsulates a route that matches a handled exception
  */
@@ -17,7 +15,6 @@ class Route
      * Detects route info from <exception> tag
      *
      * @param \SimpleXMLElement $info
-     * @throws Exception If tag is misconfigured
      */
     public function __construct(\SimpleXMLElement $info)
     {

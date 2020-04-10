@@ -3,7 +3,7 @@ namespace Lucinda\STDERR\Locators;
 
 use Lucinda\STDERR\Application;
 use Lucinda\STDERR\Request;
-use Lucinda\STDERR\Exception;
+use Lucinda\STDERR\ConfigurationException;
 
 /**
  * Locates MVC controller on disk based on controller path & route detected beforehand
@@ -15,7 +15,7 @@ class ControllerLocator extends ServiceLocator
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
-     * @throws Exception If detection fails due to file/class not found.
+     * @throws ConfigurationException If detection fails due to file/class not found.
      */
     public function __construct(Application $application, Request $request)
     {
@@ -30,7 +30,7 @@ class ControllerLocator extends ServiceLocator
      *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
-     * @throws Exception If detection fails due to file/class not found or not instanceof \\Lucinda\\STDERR\\Controller.
+     * @throws ConfigurationException If detection fails due to file/class not found or not instanceof \\Lucinda\\STDERR\\Controller.
      */
     private function setClassName(Application $application, Request $request): void
     {

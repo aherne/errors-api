@@ -3,7 +3,7 @@ namespace Test\Lucinda\STDERR;
 
 use Lucinda\STDERR\FrontController;
 use Lucinda\UnitTest\Result;
-use Lucinda\STDERR\Exception;
+use Lucinda\STDERR\ConfigurationException;
 use Lucinda\UnitTest\Validator\Strings;
 
 class FrontControllerTest
@@ -27,7 +27,7 @@ class FrontControllerTest
         $results = [];
         
         ob_start();
-        $this->object->handle(new Exception("asdf"));
+        $this->object->handle(new ConfigurationException("asdf"));
         $contents = ob_get_contents();
         ob_end_clean();
         

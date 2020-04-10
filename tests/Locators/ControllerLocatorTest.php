@@ -24,7 +24,7 @@ class ControllerLocatorTest
         $locator = new ControllerLocator(
             $application,
             new Request($application->routes()["Test\Lucinda\STDERR\PathNotFoundException"], new PathNotFoundException("asd"))
-            );
+        );
         $result[] = new Result($locator->getClassName()==="PathNotFoundController", "tested exception controller");
         
         return $result;

@@ -32,12 +32,12 @@ class Application
      *
      * @param string $xmlPath Relative location of XML file containing settings.
      * @param string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
-     * @throws Exception If XML is misconfigured.
+     * @throws ConfigurationException If XML is misconfigured.
      */
     public function __construct(string $xmlPath, string $developmentEnvironment)
     {
         if (!file_exists($xmlPath)) {
-            throw new Exception("XML file not found: ".$xmlFilePath);
+            throw new ConfigurationException("XML file not found: ".$xmlFilePath);
         }
         $this->simpleXMLElement = simplexml_load_file($xmlPath);
         
@@ -51,18 +51,18 @@ class Application
      * Sets basic application info based on contents of "application" XML tag
      *
      * @param string $developmentEnvironment
-     * @throws Exception If xml content has failed validation.
+     * @throws ConfigurationException If xml content has failed validation.
      */
     private function setApplicationInfo(string $developmentEnvironment): void
     {
         $xml = $this->getTag("application");
         if (empty($xml)) {
-            throw new Exception("Tag is mandatory: application");
+            throw new ConfigurationException("Tag is mandatory: application");
         }
         
         $this->defaultFormat = (string) $xml["default_format"];
         if (!$this->defaultFormat) {
-            throw new Exception("Attribute 'default_format' is mandatory for 'application' tag");
+            throw new ConfigurationException("Attribute 'default_format' is mandatory for 'application' tag");
         }
         
         $this->controllersPath = (string) $xml->paths["controllers"];
@@ -149,7 +149,7 @@ class Application
      * Reads content of tag reporters
      *
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
-     * @throws Exception If XML is misconfigured.
+     * @throws ConfigurationException If XML is misconfigured.
      */
     private function setReporters(string $developmentEnvironment): void
     {
@@ -161,12 +161,12 @@ class Application
         foreach ($list as $info) {
             $reporterClass = (string) $info['class'];
             if (!$reporterClass) {
-                throw new Exception("Reporter tag missing 'class' attribute");
+                throw new ConfigurationException("Reporter tag missing 'class' attribute");
             }
             $this->reporters[$reporterClass] = $info;
         }
         if (empty($this->reporters)) {
-            throw new Exception("Tag is empty: reporters");
+            throw new ConfigurationException("Tag is empty: reporters");
         }
     }
     
@@ -189,24 +189,24 @@ class Application
     /**
      * Reads content of tag resolvers
      *
-     * @throws Exception If XML is misconfigured.
+     * @throws ConfigurationException If XML is misconfigured.
      */
     private function setResolvers(): void
     {
         $xml = $this->simpleXMLElement->resolvers;
         if ($xml===null) {
-            throw new Exception("Tag is required: resolvers");
+            throw new ConfigurationException("Tag is required: resolvers");
         }
         $list = $xml->xpath("//resolver");
         foreach ($list as $info) {
             $name = (string) $info["format"];
             if (!$name) {
-                throw new Exception("Resolver missing 'format' attribute!");
+                throw new ConfigurationException("Resolver missing 'format' attribute!");
             }
             $this->resolvers[$name] = new Format($info);
         }
         if (empty($this->resolvers)) {
-            throw new Exception("Tag is empty: resolvers");
+            throw new ConfigurationException("Tag is empty: resolvers");
         }
     }
     
@@ -228,7 +228,7 @@ class Application
     /**
      * Reads content of tag exceptions
      *
-     * @throws Exception If XML is misconfigured.
+     * @throws ConfigurationException If XML is misconfigured.
      */
     private function setRoutes(): void
     {
@@ -242,7 +242,7 @@ class Application
         foreach ($list as $info) {
             $currentClassName = (string) $info['class'];
             if (!$currentClassName) {
-                throw new Exception("Exception class not defined!");
+                throw new ConfigurationException("Exception class not defined!");
             }
             $this->routes[$currentClassName] = new Route($info);
         }
@@ -268,6 +268,7 @@ class Application
      *
      * @param string $name
      * @return \SimpleXMLElement
+     * @throws ConfigurationException If XML is misconfigured.
      */
     public function getTag(string $name): \SimpleXMLElement
     {
@@ -276,7 +277,7 @@ class Application
         if ($xmlFilePath) {
             $xmlFilePath = $xmlFilePath.".xml";
             if (!file_exists($xmlFilePath)) {
-                throw new Exception("XML file not found: ".$xmlFilePath);
+                throw new ConfigurationException("XML file not found: ".$xmlFilePath);
             }
             $subXML = simplexml_load_file($xmlFilePath);
             return $subXML->{$name};

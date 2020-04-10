@@ -1,7 +1,7 @@
 <?php
 namespace Lucinda\STDERR\Application;
 
-use Lucinda\STDERR\Exception;
+use Lucinda\STDERR\ConfigurationException;
 
 /**
  * Encapsulates file format information:
@@ -21,7 +21,7 @@ class Format
      * Detects format info from <resolver> tag
      *
      * @param \SimpleXMLElement $info
-     * @throws Exception If tag is misconfigured
+     * @throws ConfigurationException If tag is misconfigured
      */
     public function __construct(\SimpleXMLElement $info)
     {
@@ -29,14 +29,14 @@ class Format
         
         $this->contentType = (string) $info["content_type"];
         if (!$this->contentType) {
-            throw new Exception("Attribute 'content_type' is mandatory for 'resolver' tag");
+            throw new ConfigurationException("Attribute 'content_type' is mandatory for 'resolver' tag");
         }
         
         $this->characterEncoding = (string) $info["charset"];
         
         $this->viewResolverClass = (string) $info['class'];
         if (!$this->viewResolverClass) {
-            throw new Exception("Attribute 'class' is mandatory for 'resolver' tag");
+            throw new ConfigurationException("Attribute 'class' is mandatory for 'resolver' tag");
         }
     }
 
