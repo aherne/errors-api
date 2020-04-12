@@ -30,16 +30,16 @@ class Application
     /**
      * Performs detection process.
      *
-     * @param string $xmlPath Relative location of XML file containing settings.
+     * @param string $xmlFilePath Relative location of XML file containing settings.
      * @param string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
      * @throws ConfigurationException If XML is misconfigured.
      */
-    public function __construct(string $xmlPath, string $developmentEnvironment)
+    public function __construct(string $xmlFilePath, string $developmentEnvironment)
     {
-        if (!file_exists($xmlPath)) {
+        if (!file_exists($xmlFilePath)) {
             throw new ConfigurationException("XML file not found: ".$xmlFilePath);
         }
-        $this->simpleXMLElement = simplexml_load_file($xmlPath);
+        $this->simpleXMLElement = simplexml_load_file($xmlFilePath);
         
         $this->setApplicationInfo($developmentEnvironment);
         $this->setReporters($developmentEnvironment);
@@ -284,5 +284,15 @@ class Application
         } else {
             return $xml;
         }
+    }
+
+    /**
+     * Gets root XML tag
+     *
+     * @return \SimpleXMLElement
+     */
+    public function getXML(): \SimpleXMLElement
+    {
+        return $this->simpleXMLElement;
     }
 }

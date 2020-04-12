@@ -77,4 +77,9 @@ class ApplicationTest
     {
         return new Result($this->object->getTag("reporters")!==null);
     }
+
+    public function getXML()
+    {
+        return new Result($this->object->getXML() instanceof \SimpleXMLElement);
+    }
 }
