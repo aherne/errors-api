@@ -8,6 +8,8 @@ This API was created to efficiently handle errors or uncaught exceptions in a we
 - *views* are the response to send back to caller after an error/exception was handled
 - *controllers* are binding [\Throwable](https://www.php.net/manual/en/class.throwable.php) instances to models in order to configure views (typically send data to it)
 
+![diagram](https://www.lucinda-framework.com/public/images/svg/stderr-mvc-api.svg)
+
 Just as an MVC API for STDOUT handles user requests into responses, so does this MVC API for STDERR handle errors or uncaught exceptions that happen during previous handling process. Unlike anything else on the market, however, it does so in a manner that is both efficient and modular, without being bundled to any framework:
 
 - first, MVC API for STDERR (this API) registers itself as sole handler of errors and uncaught exceptions encapsulated by [\Throwable](https://www.php.net/manual/en/class.throwable.php) instances, then passively waits for latter to be triggered
