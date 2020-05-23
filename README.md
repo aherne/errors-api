@@ -1,10 +1,25 @@
 # STDERR MVC API
 
+Table of contents:
+
+- [About](#about)
+- [Configuration](#configuration)
+- [Execution](#execution)
+    - [Initialization](#initialization)
+    - [Handling](#handling)
+- [Installation](#installation)
+- [Unit Tests](#unit-tests)
+- [Reference Guide](#reference-guide)
+
+## About
+
 This API was created to efficiently handle errors or uncaught exceptions in a web application using a dialect of MVC paradigm where:
 
 - *models* are reusable logic to report [\Throwable](https://www.php.net/manual/en/class.throwable.php) instances handled or holders of data to be sent to views
 - *views* are the response to send back to caller after an error/exception was handled
 - *controllers* are binding [\Throwable](https://www.php.net/manual/en/class.throwable.php) instances to models in order to configure views (typically send data to it)
+
+![diagram](https://www.lucinda-framework.com/public/images/svg/stderr-mvc-api.svg)
 
 Just as an MVC API for STDOUT handles user requests into responses, so does this MVC API for STDERR handle errors or uncaught exceptions that happen during previous handling process. Unlike anything else on the market, however, it does so in a manner that is both efficient and modular, without being bundled to any framework:
 
@@ -22,9 +37,9 @@ Furthermore, this whole process is done in a manner that is infinitely extendabl
 API is fully PSR-4 compliant, only requiring PHP7.1+ interpreter and SimpleXML extension. To quickly see how it works, check:
 
 - **[installation](#installation)**: describes how to install API on your computer, in light of steps above
-- **[reference guide](#reference-guide)**: describes all API classes, methods and fields relevant to developers
 - **[unit tests](#unit-tests)**: API has 100% Unit Test coverage, using [UnitTest API](https://github.com/aherne/unit-testing) instead of PHPUnit for greater flexibility
 - **[example](https://github.com/aherne/errors-api/blob/v2.0.0/tests/FrontController.php)**: shows a deep example of API functionality based on [Lucinda\STDERR\FrontController](https://github.com/aherne/errors-api/blob/v2.0.0/src/FrontController.php) unit test
+- **[reference guide](#reference-guide)**: describes all API classes, methods and fields relevant to developers
 
 ## Configuration
 
@@ -175,7 +190,9 @@ Tag example:
 </exceptions>
 ```
 
-## Initialization
+## Execution
+
+### Initialization
 
 Now that developers have finished setting up XML that configures the API, they are finally able to initialize it by instantiating [Lucinda\STDERR\FrontController](https://github.com/aherne/errors-api/blob/v2.0.0/src/FrontController.php).
 
@@ -202,7 +219,7 @@ Interface [Lucinda\STDERR\ErrorHandler](https://github.com/aherne/errors-api/blo
 
 Very important to notice that once handlers are registered, API employs Aspect Oriented Programming concepts to listen *asynchronously* for error events then triggering handler automatically. So once API is initialized, you can immediately start your preferred framework that handles user requests to responses!
 
-## Handling
+### Handling
 
 Once a [\Throwable](https://www.php.net/manual/en/class.throwable.php) event has occurred inside STDOUT request-response phase, *handle* method of [Lucinda\STDERR\FrontController](https://github.com/aherne/errors-api/blob/v2.0.0/src/FrontController.php) is called. This will:
 
@@ -261,6 +278,14 @@ class EmergencyHandler implements \Lucinda\STDERR\ErrorHandler
     }
 }
 ```
+
+## Unit Tests
+
+For tests and examples, check following files/folders in API sources:
+
+- [test.php](https://github.com/aherne/errors-api/blob/v2.0.0/test.php): runs unit tests in console
+- [unit-tests.xml](https://github.com/aherne/errors-api/blob/v2.0.0/unit-tests.xml): sets up unit tests and mocks "loggers" tag
+- [tests](https://github.com/aherne/errors-api/blob/v2.0.0/tests): unit tests for classes from [src](https://github.com/aherne/errors-api/blob/v2.0.0/src) folder
 
 ## Reference Guide
 
@@ -520,10 +545,4 @@ Defined in XML as:
 <resolver format="html" content_type="text/html" class="HtmlRenderer" charset="UTF-8"/>
 ```
 
-## Unit Tests
 
-For tests and examples, check following files/folders in API sources:
-
-- [test.php](https://github.com/aherne/errors-api/blob/v2.0.0/test.php): runs unit tests in console
-- [unit-tests.xml](https://github.com/aherne/errors-api/blob/v2.0.0/unit-tests.xml): sets up unit tests and mocks "loggers" tag
-- [tests](https://github.com/aherne/errors-api/blob/v2.0.0/tests): unit tests for classes from [src](https://github.com/aherne/errors-api/blob/v2.0.0/src) folder
