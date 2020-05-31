@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
 
 /**
  * Encapsulates an abstract MVC controller that routes exceptions that once extended will be useful to:
@@ -7,7 +7,7 @@ namespace Lucinda\MVC\STDERR;
  * - allow exception-specific view setup (eg: exceptions that map to multiple views or views using templating)
  * - any other response-changing strategies
  */
-abstract class Controller
+abstract class Controller implements Runnable
 {
     protected $application;
     protected $request;
@@ -17,7 +17,7 @@ abstract class Controller
      * Controller constructor.
      * @param Application $application Encapsulates application settings detected from xml and development environment.
      * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
-     * @param Response $response Encapsulates response to send back to caller.
+     * @param Response $response Encapsulates response.
      */
     public function __construct(Application $application, Request $request, Response $response)
     {
@@ -25,9 +25,4 @@ abstract class Controller
         $this->request = $request;
         $this->response = $response;
     }
-
-    /**
-     * Executes controller logic. Here is where each extending controller will need to write its logic to.
-     */
-    abstract public function run();
 }

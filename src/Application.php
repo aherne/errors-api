@@ -1,9 +1,8 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
 
-require("application/ErrorReportersFinder.php");
-require("application/ErrorRenderersFinder.php");
-require("application/RoutesFinder.php");
+use Lucinda\STDERR\Application\Format;
+use Lucinda\STDERR\Application\Route;
 
 /**
  * Detects settings necessary to configure MVC Errors API based on contents of XML file and development environment:
@@ -20,51 +19,60 @@ class Application
     private $controllersPath;
     private $viewsPath;
     private $reportersPath;
-    private $renderersPath;
-    private $publicPath;
+    private $viewResolversPath;
     private $defaultFormat;
     private $version;
-    private $reporters=array();
-    private $renderers=array();
-    private $routes=array();
     private $displayErrors=false;
+    private $reporters=array();
+    private $routes=array();
+    private $resolvers=array();
     
     /**
      * Performs detection process.
      *
-     * @param string $xmlPath Relative location of XML file containing settings.
+     * @param string $xmlFilePath Relative location of XML file containing settings.
      * @param string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
-     * @throws Exception If XML is misconfigured.
+     * @throws ConfigurationException If XML is misconfigured.
      */
-    public function __construct($xmlPath, $developmentEnvironment)
+    public function __construct(string $xmlFilePath, string $developmentEnvironment)
     {
-        if (!file_exists($xmlPath)) {
-            throw new Exception("XML configuration file not found!");
+        if (!file_exists($xmlFilePath)) {
+            throw new ConfigurationException("XML file not found: ".$xmlFilePath);
         }
-        $this->simpleXMLElement = simplexml_load_file($xmlPath);
+        $this->simpleXMLElement = simplexml_load_file($xmlFilePath);
         
-        $this->setDefaultFormat();
-        $this->setControllersPath();
-        $this->setReportersPath();
-        $this->setRenderersPath();
-        $this->setViewsPath();
-        $this->setPublicPath();
-        $this->setDisplayErrors($developmentEnvironment);
-        $this->setVersion();
+        $this->setApplicationInfo($developmentEnvironment);
         $this->setReporters($developmentEnvironment);
-        $this->setRenderers();
         $this->setRoutes();
+        $this->setResolvers();
     }
     
     /**
-     * Gets default response display format (eg: html or json)
+     * Sets basic application info based on contents of "application" XML tag
+     *
+     * @param string $developmentEnvironment
+     * @throws ConfigurationException If xml content has failed validation.
      */
-    private function setDefaultFormat()
+    private function setApplicationInfo(string $developmentEnvironment): void
     {
-        $this->defaultFormat = (string) $this->simpleXMLElement->application["default_format"];
-        if (!$this->defaultFormat) {
-            throw new Exception("Attribute 'default_format' is mandatory for 'application' tag");
+        $xml = $this->getTag("application");
+        if (empty($xml)) {
+            throw new ConfigurationException("Tag is mandatory: application");
         }
+        
+        $this->defaultFormat = (string) $xml["default_format"];
+        if (!$this->defaultFormat) {
+            throw new ConfigurationException("Attribute 'default_format' is mandatory for 'application' tag");
+        }
+        
+        $this->controllersPath = (string) $xml->paths["controllers"];
+        $this->reportersPath = (string) $xml->paths["reporters"];
+        $this->viewResolversPath = (string) $xml->paths["resolvers"];
+        $this->viewsPath = (string) $xml->paths["views"];
+        $this->version = (string) $xml["version"];
+        
+        $value = $this->simpleXMLElement->application->display_errors->{$developmentEnvironment};
+        $this->displayErrors = (string) $value?true:false;
     }
     
     /**
@@ -72,17 +80,9 @@ class Application
      *
      * @return string
      */
-    public function getDefaultFormat()
+    public function getDefaultFormat(): string
     {
         return $this->defaultFormat;
-    }
-    
-    /**
-     * Sets path to controllers folder. Maps to tag application.paths.controllers @ XML.
-     */
-    private function setControllersPath()
-    {
-        $this->controllersPath = $this->simpleXMLElement->application->paths->controllers;
     }
     
     /**
@@ -90,17 +90,9 @@ class Application
      *
      * @return string
      */
-    public function getControllersPath()
+    public function getControllersPath(): string
     {
         return $this->controllersPath;
-    }
-    
-    /**
-     * Sets path to reporters folder. Maps to tag application.paths.reporters @ XML.
-     */
-    private function setReportersPath()
-    {
-        $this->reportersPath = $this->simpleXMLElement->application->paths->reporters;
     }
     
     /**
@@ -108,53 +100,19 @@ class Application
      *
      * @return string
      */
-    public function getReportersPath()
+    public function getReportersPath(): string
     {
         return $this->reportersPath;
     }
     
     /**
-     * Sets path to renderers folder. Maps to tag application.paths.renderers @ XML.
-     */
-    private function setRenderersPath()
-    {
-        $this->renderersPath = $this->simpleXMLElement->application->paths->renderers;
-    }
-    
-    /**
-     * Gets path to renderers folder.
+     * Gets path to view resolvers folder.
      *
      * @return string
      */
-    public function getRenderersPath()
+    public function getViewResolversPath(): string
     {
-        return $this->renderersPath;
-    }
-    
-    /**
-     * Sets views folder. Maps to application.paths.views @ XML.
-     */
-    private function setViewsPath()
-    {
-        $this->viewsPath = $this->simpleXMLElement->application->paths->views;
-    }
-    
-    /**
-     * Gets path to public files folder.
-     *
-     * @return string
-     */
-    public function getPublicPath()
-    {
-        return $this->publicPath;
-    }
-    
-    /**
-     * Sets public files folder. Maps to application.paths.public @ XML.
-     */
-    private function setPublicPath()
-    {
-        $this->publicPath = $this->simpleXMLElement->application->paths->public;
+        return $this->viewResolversPath;
     }
     
     /**
@@ -162,20 +120,9 @@ class Application
      *
      * @return string
      */
-    public function getViewsPath()
+    public function getViewsPath(): string
     {
         return $this->viewsPath;
-    }
-    
-    /**
-     * Sets whether or not error details should be displayed. Maps to application.display_errors @ XML / environment
-     *
-     * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
-     */
-    private function setDisplayErrors($developmentEnvironment)
-    {
-        $value = $this->simpleXMLElement->application->display_errors->{$developmentEnvironment};
-        $this->displayErrors = (string) $value?true:false;
     }
     
     /**
@@ -183,17 +130,9 @@ class Application
      *
      * @return boolean
      */
-    public function getDisplayErrors()
+    public function getDisplayErrors(): bool
     {
         return $this->displayErrors;
-    }
-    
-    /**
-     * Sets application version. Maps to application.paths.public @ XML.
-     */
-    private function setVersion()
-    {
-        $this->version = (string) $this->simpleXMLElement->application["version"];
     }
     
     /**
@@ -201,33 +140,43 @@ class Application
      *
      * @return string
      */
-    public function getVersion()
+    public function getVersion(): string
     {
         return $this->version;
     }
     
     /**
-     * Sets ErrorReporter instances that will later be used to report exception to. Maps to tag reporters @ XML.
+     * Reads content of tag reporters
      *
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
-     * @throws Exception If XML is misconfigured.
+     * @throws ConfigurationException If XML is misconfigured.
      */
-    private function setReporters($developmentEnvironment)
+    private function setReporters(string $developmentEnvironment): void
     {
-        if ($this->simpleXMLElement->reporters->{$developmentEnvironment}===null) {
+        $xml = $this->simpleXMLElement->reporters->{$developmentEnvironment};
+        if ($xml===null) {
             return;
         }
-        $erp = new ErrorReportersFinder($this->simpleXMLElement->reporters->{$developmentEnvironment});
-        $this->reporters = $erp->getReporters();
+        $list = $xml->xpath("//reporter");
+        foreach ($list as $info) {
+            $reporterClass = (string) $info['class'];
+            if (!$reporterClass) {
+                throw new ConfigurationException("Reporter tag missing 'class' attribute");
+            }
+            $this->reporters[$reporterClass] = $info;
+        }
+        if (empty($this->reporters)) {
+            throw new ConfigurationException("Tag is empty: reporters");
+        }
     }
     
     /**
-     * Gets ErrorReporter instances that will later on be used to report exception to
+     * Gets content of tag reporters
      *
      * @param string $className
-     * @return SimpleXMLElement[string]|NULL|SimpleXMLElement
+     * @return \SimpleXMLElement|array|null
      */
-    public function reporters($className="")
+    public function reporters(string $className="")
     {
         if (!$className) {
             return $this->reporters;
@@ -236,50 +185,76 @@ class Application
         }
     }
     
-    /**
-     * Sets ErrorRenderer instances that will later be used to render response to exception. Maps to tag renderers @ XML.
-     *
-     * @throws Exception If XML is misconfigured.
-     */
-    private function setRenderers()
-    {
-        $erf = new ErrorRenderersFinder($this->simpleXMLElement->renderers);
-        $this->renderers = $erf->getRenderers();
-    }
     
     /**
-     * Gets ErrorRenderer instances that will later be used to render response to exception
+     * Reads content of tag resolvers
      *
-     * @param string $displayFormat
-     * @return Format[string]|NULL|Format
+     * @throws ConfigurationException If XML is misconfigured.
      */
-    public function renderers($displayFormat="")
+    private function setResolvers(): void
     {
-        if (!$displayFormat) {
-            return $this->renderers;
-        } else {
-            return (isset($this->renderers[$displayFormat])?$this->renderers[$displayFormat]:null);
+        $xml = $this->simpleXMLElement->resolvers;
+        if ($xml===null) {
+            throw new ConfigurationException("Tag is required: resolvers");
+        }
+        $list = $xml->xpath("//resolver");
+        foreach ($list as $info) {
+            $name = (string) $info["format"];
+            if (!$name) {
+                throw new ConfigurationException("Resolver missing 'format' attribute!");
+            }
+            $this->resolvers[$name] = new Format($info);
+        }
+        if (empty($this->resolvers)) {
+            throw new ConfigurationException("Tag is empty: resolvers");
         }
     }
     
     /**
-     * Sets routes that map exceptions that will later on be used to resolve controller & view. Maps to tag exceptions @ XML
+     * Gets content of tag resolvers encapsulated as Format objects
      *
-     * @throws Exception If XML is misconfigured.
+     * @param string $displayFormat
+     * @return Format|array|null
      */
-    private function setRoutes()
+    public function resolvers(string $displayFormat="")
     {
-        $rf = new RoutesFinder($this->simpleXMLElement->exceptions);
-        $this->routes = $rf->getRoutes();
+        if (!$displayFormat) {
+            return $this->resolvers;
+        } else {
+            return (isset($this->resolvers[$displayFormat])?$this->resolvers[$displayFormat]:null);
+        }
     }
     
     /**
-     * Gets routes that map exceptions that will later on be used to resolve controller & view.
+     * Reads content of tag exceptions
+     *
+     * @throws ConfigurationException If XML is misconfigured.
+     */
+    private function setRoutes(): void
+    {
+        $xml = $this->simpleXMLElement->exceptions;
+        
+        // get default route
+        $this->routes[""] = new Route($xml);
+        
+        // override with specific route, if set
+        $list = $xml->xpath("//exception");
+        foreach ($list as $info) {
+            $currentClassName = (string) $info['class'];
+            if (!$currentClassName) {
+                throw new ConfigurationException("Exception class not defined!");
+            }
+            $this->routes[$currentClassName] = new Route($info);
+        }
+    }
+    
+    /**
+     * Reads content of tag exceptions encapsulated as Route objects
      *
      * @param string $exceptionClassName
-     * @return Route[string]|NULL|Route
+     * @return Route|array|null
      */
-    public function routes($exceptionClassName="")
+    public function routes(string $exceptionClassName="")
     {
         if (!$exceptionClassName) {
             return $this->routes;
@@ -293,20 +268,31 @@ class Application
      *
      * @param string $name
      * @return \SimpleXMLElement
+     * @throws ConfigurationException If XML is misconfigured.
      */
-    public function getTag($name)
+    public function getTag(string $name): \SimpleXMLElement
     {
         $xml = $this->simpleXMLElement->{$name};
         $xmlFilePath = (string) $xml["ref"];
         if ($xmlFilePath) {
             $xmlFilePath = $xmlFilePath.".xml";
             if (!file_exists($xmlFilePath)) {
-                throw new Exception("XML file not found: ".$xmlFilePath);
+                throw new ConfigurationException("XML file not found: ".$xmlFilePath);
             }
             $subXML = simplexml_load_file($xmlFilePath);
             return $subXML->{$name};
         } else {
             return $xml;
         }
+    }
+
+    /**
+     * Gets root XML tag
+     *
+     * @return \SimpleXMLElement
+     */
+    public function getXML(): \SimpleXMLElement
+    {
+        return $this->simpleXMLElement;
     }
 }

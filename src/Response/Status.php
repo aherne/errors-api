@@ -1,10 +1,12 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR\Response;
+
+use Lucinda\STDERR\ConfigurationException;
 
 /**
  * Encapsulates HTTP response status logic in accordance to HTTP/1.1 specifications
  */
-class ResponseStatus
+class Status
 {
     const HTTP_STATUSES = array(
         100=>'Continue',
@@ -78,12 +80,12 @@ class ResponseStatus
      * Sets response HTTP status by its numeric code
      *
      * @param integer $code
-     * @throws Exception If incorrect numeric code is supplied.
+     * @throws ConfigurationException If incorrect numeric code is supplied.
      */
-    public function __construct($code)
+    public function __construct(int $code)
     {
         if (!array_key_exists($code, self::HTTP_STATUSES)) {
-            throw new Exception("Unsupported HTTP status: ".$code);
+            throw new ConfigurationException("Unsupported HTTP status: ".$code);
         }
         $this->id = $code;
     }
@@ -93,7 +95,7 @@ class ResponseStatus
      *
      * @return integer
      */
-    public function getId()
+    public function getId(): int
     {
         return $this->id;
     }
@@ -103,7 +105,7 @@ class ResponseStatus
      *
      * @return string
      */
-    public function getDescription()
+    public function getDescription(): string
     {
         return self::HTTP_STATUSES[$this->id];
     }

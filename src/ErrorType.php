@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
 
 /**
  * Enum that contains all available error types associated to a handled exception via following constants:

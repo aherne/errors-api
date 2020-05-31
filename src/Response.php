@@ -1,80 +1,60 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
 
-require("response/ResponseStatus.php");
-require("response/ResponseStream.php");
+use Lucinda\STDERR\Response\Status;
+use Lucinda\STDERR\Response\View;
 
 /**
- * Encapsulates error response that will be displayed back to caller
+ * Compiles information about response
  */
 class Response
 {
     private $status;
-    private $outputStream;
-    private $headers=[];
-    private $attributes = [];
+    private $headers = array();
+    private $body;
     private $view;
-    private $isDisabled;
-    
+
     /**
      * Constructs an empty response based on content type
      *
      * @param string $contentType Value of content type header that will be sent in response
+     * @param string $templateFile Value of view template file that will form the basis of response
      */
-    public function __construct($contentType)
+    public function __construct(string $contentType, string $templateFile)
     {
-        $this->outputStream	= new ResponseStream();
         $this->headers["Content-Type"] = $contentType;
-    }
-    
-    /**
-     * Gets response stream to work on.
-     *
-     * @return ResponseStream
-     */
-    public function getOutputStream()
-    {
-        return $this->outputStream;
-    }
-    
-    /**
-     * Sets relative path of view that contains response body.
-     *
-     * @param string $view
-     */
-    public function setView($view)
-    {
-        $this->view = $view;
-    }
-    
-    /**
-     * Gets relative path of view that contains response body.
-     *
-     * @return string
-     */
-    public function getView()
-    {
-        return $this->view;
-    }
-    
-    /**
-     * Sets response HTTP status
-     *
-     * @param integer $code
-     */
-    public function setStatus($code)
-    {
-        $this->status = new ResponseStatus($code);
+        $this->view = new View($templateFile);
     }
 
     /**
-     * Gets response HTTP status
+     * Sets HTTP response status by its numeric code.
      *
-     * @return integer
+     * @param integer $code
+     * @throws ConfigurationException If status code is invalid.
      */
-    public function getStatus()
+    public function setStatus(int $code): void
+    {
+        $this->status = new Status($code);
+    }
+
+    /**
+     * Gets HTTP response status info.
+     *
+     * @return Status
+     */
+    public function getStatus(): Status
     {
         return $this->status;
+    }
+    
+    /**
+     * Gets a pointer to View
+     *
+     * @return View
+     */
+    public function view(): View
+    {
+        return $this->view;
     }
     
     /**
@@ -82,9 +62,9 @@ class Response
      *
      * @param string $key
      * @param string $value
-     * @return string[string]|NULL|string
+     * @return string|array|null
      */
-    public function headers($key="", $value=null)
+    public function headers(string $key="", string $value=null)
     {
         if (!$key) {
             return $this->headers;
@@ -96,21 +76,23 @@ class Response
     }
     
     /**
-     * Gets or sets data that will be sent to views.
+     * Sets response body
      *
-     * @param string $key
-     * @param mixed $value
-     * @return mixed[string]|NULL|mixed
+     * @param string $body
      */
-    public function attributes($key="", $value=null)
+    public function setBody(string $body): void
     {
-        if (!$key) {
-            return $this->attributes;
-        } elseif ($value===null) {
-            return (isset($this->attributes[$key])?$this->attributes[$key]:null);
-        } else {
-            $this->attributes[$key] = $value;
-        }
+        $this->body = $body;
+    }
+    
+    /**
+     * Gets response body
+     *
+     * @return string
+     */
+    public function getBody(): ?string
+    {
+        return $this->body;
     }
     
     /**
@@ -119,9 +101,8 @@ class Response
      * @param string $location
      * @param boolean $permanent
      * @param boolean $preventCaching
-     * @return void
      */
-    public function redirect($location, $permanent=true, $preventCaching=false)
+    public static function redirect(string $location, bool $permanent=true, bool $preventCaching=false): void
     {
         if ($preventCaching) {
             header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
@@ -133,41 +114,22 @@ class Response
     }
     
     /**
-     * Disables response. A disabled response will output nothing.
-     */
-    public function disable()
-    {
-        $this->isDisabled = true;
-    }
-    
-    /**
-     * Checks if response is disabled.
-     *
-     * @return boolean
-     */
-    public function isDisabled()
-    {
-        return $this->isDisabled;
-    }
-        
-    /**
      * Commits response to client.
      */
-    public function commit()
+    public function commit(): void
     {
-        // do not display anything, if headers have already been sent
-        if (!headers_sent() && $this->status) {
-            header("HTTP/1.1 ".$this->status->getId()." ".$this->status->getDescription());
-        }
-        
-        if (!$this->isDisabled) {
-            // sends headers
+        // sends headers
+        if (!headers_sent()) {
+            if ($this->status) {
+                header("HTTP/1.1 ".$this->status->getId()." ".$this->status->getDescription());
+            }
+            
             foreach ($this->headers as $name=>$value) {
                 header($name.": ".$value);
             }
-            
-            // show output
-            echo $this->outputStream->get();
         }
+        
+        // displays body
+        echo $this->body;
     }
 }

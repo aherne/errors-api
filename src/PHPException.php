@@ -1,5 +1,5 @@
 <?php
-namespace Lucinda\MVC\STDERR;
+namespace Lucinda\STDERR;
 
 /**
  * Exception caught automatically when a PHP error is encountered.
@@ -20,7 +20,7 @@ class PHPException extends \Exception
      *
      * @param ErrorHandler $errorHandler
      */
-    public static function setErrorHandler(ErrorHandler $errorHandler)
+    public static function setErrorHandler(ErrorHandler $errorHandler): void
     {
         self::$errorHandler = $errorHandler;
     }
@@ -30,7 +30,7 @@ class PHPException extends \Exception
      *
      * @return ErrorHandler
      */
-    public static function getErrorHandler()
+    public static function getErrorHandler(): ErrorHandler
     {
         return self::$errorHandler;
     }
@@ -43,7 +43,7 @@ class PHPException extends \Exception
      * @param string $file
      * @param integer $line
      */
-    public static function nonFatalError($errorNumber, $message, $file, $line)
+    public static function nonFatalError(int $errorNumber, string $message, string $file, int $line): void
     {
         $e = new self($message, $errorNumber);
         $e->line = $line;
@@ -58,7 +58,7 @@ class PHPException extends \Exception
     /**
      * Function called automatically when a fatal PHP error is encountered.
      */
-    public static function fatalError()
+    public static function fatalError(): void
     {
         $error = error_get_last();
         if ($error!==null) {
