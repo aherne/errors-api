@@ -1,9 +1,9 @@
 {
     "name": "lucinda/errors-mvc",
     "type": "library",
-    "description": "MVC API for STDERR flow in PHP applications",
-    "keywords": ["STDERR","mvc","errors","handling"],
-    "homepage": "http://www.lucinda-framework.com/stderr-mvc",
+    "description": "AOP-based MVC API for handling errors and uncaught exceptions in PHP applications",
+    "keywords": ["STDERR","mvc","errors","handling","reporting","aspect oriented programming"],
+    "homepage": "https://github.com/aherne/errors-api",
     "license": "MIT",
     "require": {
         "php": "^7.1",
