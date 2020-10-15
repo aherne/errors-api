@@ -41,16 +41,18 @@ class Application
         if (!file_exists($xmlPath)) {
             throw new Exception("XML configuration file not found!");
         }
-        $this->simpleXMLElement = simplexml_load_file($xmlPath);
+        $this->simpleXMLElement = \simplexml_load_file($xmlPath);
         
-        $this->setDefaultFormat();
-        $this->setControllersPath();
-        $this->setReportersPath();
-        $this->setRenderersPath();
-        $this->setViewsPath();
-        $this->setPublicPath();
-        $this->setDisplayErrors($developmentEnvironment);
-        $this->setVersion();
+        $xml = $this->getTag("application");
+        
+        $this->setDefaultFormat($xml);
+        $this->setControllersPath($xml);
+        $this->setReportersPath($xml);
+        $this->setRenderersPath($xml);
+        $this->setViewsPath($xml);
+        $this->setPublicPath($xml);
+        $this->setDisplayErrors($xml, $developmentEnvironment);
+        $this->setVersion($xml);
         $this->setReporters($developmentEnvironment);
         $this->setRenderers();
         $this->setRoutes();
@@ -59,9 +61,9 @@ class Application
     /**
      * Gets default response display format (eg: html or json)
      */
-    private function setDefaultFormat()
+    private function setDefaultFormat(\SimpleXMLElement $xml)
     {
-        $this->defaultFormat = (string) $this->simpleXMLElement->application["default_format"];
+        $this->defaultFormat = (string) $xml["default_format"];
         if (!$this->defaultFormat) {
             throw new Exception("Attribute 'default_format' is mandatory for 'application' tag");
         }
@@ -80,9 +82,9 @@ class Application
     /**
      * Sets path to controllers folder. Maps to tag application.paths.controllers @ XML.
      */
-    private function setControllersPath()
+    private function setControllersPath(\SimpleXMLElement $xml)
     {
-        $this->controllersPath = $this->simpleXMLElement->application->paths->controllers;
+        $this->controllersPath = $xml->paths->controllers;
     }
     
     /**
@@ -98,9 +100,9 @@ class Application
     /**
      * Sets path to reporters folder. Maps to tag application.paths.reporters @ XML.
      */
-    private function setReportersPath()
+    private function setReportersPath(\SimpleXMLElement $xml)
     {
-        $this->reportersPath = $this->simpleXMLElement->application->paths->reporters;
+        $this->reportersPath = $xml->paths->reporters;
     }
     
     /**
@@ -116,9 +118,9 @@ class Application
     /**
      * Sets path to renderers folder. Maps to tag application.paths.renderers @ XML.
      */
-    private function setRenderersPath()
+    private function setRenderersPath(\SimpleXMLElement $xml)
     {
-        $this->renderersPath = $this->simpleXMLElement->application->paths->renderers;
+        $this->renderersPath = $xml->paths->renderers;
     }
     
     /**
@@ -134,9 +136,9 @@ class Application
     /**
      * Sets views folder. Maps to application.paths.views @ XML.
      */
-    private function setViewsPath()
+    private function setViewsPath(\SimpleXMLElement $xml)
     {
-        $this->viewsPath = $this->simpleXMLElement->application->paths->views;
+        $this->viewsPath = $xml->paths->views;
     }
     
     /**
@@ -152,9 +154,9 @@ class Application
     /**
      * Sets public files folder. Maps to application.paths.public @ XML.
      */
-    private function setPublicPath()
+    private function setPublicPath(\SimpleXMLElement $xml)
     {
-        $this->publicPath = $this->simpleXMLElement->application->paths->public;
+        $this->publicPath = $xml->paths->public;
     }
     
     /**
@@ -172,9 +174,9 @@ class Application
      *
      * @param string $developmentEnvironment Environment application is running into (eg: live, dev, local)
      */
-    private function setDisplayErrors($developmentEnvironment)
+    private function setDisplayErrors(\SimpleXMLElement $xml, $developmentEnvironment)
     {
-        $value = $this->simpleXMLElement->application->display_errors->{$developmentEnvironment};
+        $value = $xml->display_errors->{$developmentEnvironment};
         $this->displayErrors = (string) $value?true:false;
     }
     
@@ -191,9 +193,9 @@ class Application
     /**
      * Sets application version. Maps to application.paths.public @ XML.
      */
-    private function setVersion()
+    private function setVersion(\SimpleXMLElement $xml)
     {
-        $this->version = (string) $this->simpleXMLElement->application["version"];
+        $this->version = (string) $xml["version"];
     }
     
     /**
@@ -214,10 +216,11 @@ class Application
      */
     private function setReporters($developmentEnvironment)
     {
-        if ($this->simpleXMLElement->reporters->{$developmentEnvironment}===null) {
+        $xml = $this->getTag("reporters");
+        if ($xml->{$developmentEnvironment}===null) {
             return;
         }
-        $erp = new ErrorReportersFinder($this->simpleXMLElement->reporters->{$developmentEnvironment});
+        $erp = new ErrorReportersFinder($xml->{$developmentEnvironment});
         $this->reporters = $erp->getReporters();
     }
     
@@ -243,7 +246,7 @@ class Application
      */
     private function setRenderers()
     {
-        $erf = new ErrorRenderersFinder($this->simpleXMLElement->renderers);
+        $erf = new ErrorRenderersFinder($this->getTag("renderers"));
         $this->renderers = $erf->getRenderers();
     }
     
@@ -269,7 +272,7 @@ class Application
      */
     private function setRoutes()
     {
-        $rf = new RoutesFinder($this->simpleXMLElement->exceptions);
+        $rf = new RoutesFinder($this->getTag("exceptions"));
         $this->routes = $rf->getRoutes();
     }
     
