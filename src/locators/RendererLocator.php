@@ -34,7 +34,7 @@ class RendererLocator
     {
         $rendererClass = (string) $detectedResponseFormat->getViewRenderer();
         load_class($application->getRenderersPath(), $rendererClass);
-        $object = new $rendererClass();
+        $object = new $rendererClass($application);
         if (!($object instanceof ErrorRenderer)) {
             throw new Exception("Class must be instance of ErrorRenderer");
         }

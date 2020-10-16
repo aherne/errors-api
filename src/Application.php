@@ -29,6 +29,8 @@ class Application
     private $routes=array();
     private $displayErrors=false;
     
+    private $objectsCache=array();
+    
     /**
      * Performs detection process.
      *
@@ -228,7 +230,7 @@ class Application
      * Gets ErrorReporter instances that will later on be used to report exception to
      *
      * @param string $className
-     * @return SimpleXMLElement[string]|NULL|SimpleXMLElement
+     * @return \SimpleXMLElement[string]|NULL|\SimpleXMLElement
      */
     public function reporters($className="")
     {
@@ -302,12 +304,18 @@ class Application
         $xml = $this->simpleXMLElement->{$name};
         $xmlFilePath = (string) $xml["ref"];
         if ($xmlFilePath) {
-            $xmlFilePath = $xmlFilePath.".xml";
-            if (!file_exists($xmlFilePath)) {
-                throw new Exception("XML file not found: ".$xmlFilePath);
+            if (isset($this->objectsCache[$name])) {
+                return $this->objectsCache[$name];
+            } else {
+                $xmlFilePath = $xmlFilePath.".xml";
+                if (!file_exists($xmlFilePath)) {
+                    throw new Exception("XML file not found: ".$xmlFilePath);
+                }
+                $subXML = simplexml_load_file($xmlFilePath);
+                $returningXML = $subXML->{$name};
+                $this->objectsCache[$name] = $returningXML;
+                return $returningXML;
             }
-            $subXML = simplexml_load_file($xmlFilePath);
-            return $subXML->{$name};
         } else {
             return $xml;
         }
