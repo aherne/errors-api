@@ -27,6 +27,8 @@ class Application
     private $routes=array();
     private $resolvers=array();
     
+    private $objectsCache=array();    
+    
     /**
      * Performs detection process.
      *
@@ -71,7 +73,7 @@ class Application
         $this->viewsPath = (string) $xml->paths["views"];
         $this->version = (string) $xml["version"];
         
-        $value = $this->simpleXMLElement->application->display_errors->{$developmentEnvironment};
+        $value = $xml->display_errors->{$developmentEnvironment};
         $this->displayErrors = (string) $value?true:false;
     }
     
@@ -153,7 +155,7 @@ class Application
      */
     private function setReporters(string $developmentEnvironment): void
     {
-        $xml = $this->simpleXMLElement->reporters->{$developmentEnvironment};
+        $xml = $this->getTag("reporters")->{$developmentEnvironment};
         if ($xml===null) {
             return;
         }
@@ -193,7 +195,7 @@ class Application
      */
     private function setResolvers(): void
     {
-        $xml = $this->simpleXMLElement->resolvers;
+        $xml = $this->getTag("resolvers");
         if ($xml===null) {
             throw new ConfigurationException("Tag is required: resolvers");
         }
@@ -232,7 +234,7 @@ class Application
      */
     private function setRoutes(): void
     {
-        $xml = $this->simpleXMLElement->exceptions;
+        $xml = $this->getTag("exceptions");
         
         // get default route
         $this->routes[""] = new Route($xml);
@@ -275,12 +277,18 @@ class Application
         $xml = $this->simpleXMLElement->{$name};
         $xmlFilePath = (string) $xml["ref"];
         if ($xmlFilePath) {
-            $xmlFilePath = $xmlFilePath.".xml";
-            if (!file_exists($xmlFilePath)) {
-                throw new ConfigurationException("XML file not found: ".$xmlFilePath);
+            if (isset($this->objectsCache[$name])) {
+                return $this->objectsCache[$name];
+            } else {
+                $xmlFilePath = $xmlFilePath.".xml";
+                if (!file_exists($xmlFilePath)) {
+                    throw new ConfigurationException("XML file not found: ".$xmlFilePath);
+                }
+                $subXML = simplexml_load_file($xmlFilePath);
+                $returningXML = $subXML->{$name};
+                $this->objectsCache[$name] = $returningXML;
+                return $returningXML;
             }
-            $subXML = simplexml_load_file($xmlFilePath);
-            return $subXML->{$name};
         } else {
             return $xml;
         }
