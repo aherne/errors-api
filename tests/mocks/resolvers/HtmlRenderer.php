@@ -1,6 +1,6 @@
 <?php
-use Lucinda\STDERR\ViewResolver;
-use Lucinda\STDERR\ConfigurationException;
+use Lucinda\MVC\ViewResolver;
+use Lucinda\MVC\ConfigurationException;
 
 class HtmlRenderer extends ViewResolver
 {

@@ -17,7 +17,7 @@ class ControllerLocatorTest
         
         $locator = new ControllerLocator(
             $application,
-            new Request($application->routes()[""], new \Exception("asd"))
+            new Request($application->routes()["default"], new \Exception("asd"))
         );
         $result[] = new Result($locator->getClassName()===null, "tested default controller");
         

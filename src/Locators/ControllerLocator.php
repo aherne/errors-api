@@ -1,9 +1,11 @@
 <?php
 namespace Lucinda\STDERR\Locators;
 
+use Lucinda\MVC\Locators\ServiceLocator;
 use Lucinda\STDERR\Application;
 use Lucinda\STDERR\Request;
-use Lucinda\STDERR\ConfigurationException;
+use Lucinda\MVC\ConfigurationException;
+use Lucinda\MVC\Locators\ClassFinder;
 
 /**
  * Locates MVC controller on disk based on controller path & route detected beforehand

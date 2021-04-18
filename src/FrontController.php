@@ -1,10 +1,11 @@
 <?php
 namespace Lucinda\STDERR;
 
-use Lucinda\STDERR\Application\Format;
+use Lucinda\MVC\Application\Format;
 use Lucinda\STDERR\Locators\ReporterLocator;
 use Lucinda\STDERR\Locators\ControllerLocator;
-use Lucinda\STDERR\Locators\ViewResolverLocator;
+use Lucinda\MVC\Locators\ViewResolverLocator;
+use Lucinda\MVC\Response;
 
 /**
  * Error handler that bootstraps all uncaught exceptions and PHP errors as a STDERR front controller that feeds on
@@ -73,7 +74,7 @@ class FrontController implements ErrorHandler
         // finds and instances routes based on XML and exception received
         $routes = $application->routes();
         $targetClass = get_class($exception);
-        $request = new Request((isset($routes[$targetClass])?$routes[$targetClass]:$routes[""]), $exception);
+        $request = new Request((isset($routes[$targetClass])?$routes[$targetClass]:$routes["default"]), $exception);
         
         // builds reporters list then reports exception
         $reporters = $application->reporters();

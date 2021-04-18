@@ -3,8 +3,7 @@ namespace Test\Lucinda\STDERR;
 
 use Lucinda\STDERR\FrontController;
 use Lucinda\UnitTest\Result;
-use Lucinda\STDERR\ConfigurationException;
-use Lucinda\UnitTest\Validator\Strings;
+use Lucinda\MVC\ConfigurationException;
 
 class FrontControllerTest
 {

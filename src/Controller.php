@@ -1,6 +1,9 @@
 <?php
 namespace Lucinda\STDERR;
 
+use Lucinda\MVC\Response;
+use Lucinda\MVC\Runnable;
+
 /**
  * Encapsulates an abstract MVC controller that routes exceptions that once extended will be useful to:
  * - enable exception-specific reporting policies
