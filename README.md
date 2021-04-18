@@ -10,7 +10,12 @@ Table of contents:
 - [Installation](#installation)
 - [Unit Tests](#unit-tests)
 - [Reference Guide](#reference-guide)
-- [How Are Components Detected](#how-are-components-detected)
+- [Specifications](#specifications)
+    - [How Is Response Format Detected](#how-is-response-format-detected)
+    - [How Are View Resolvers Located](#how-are-view-resolvers-located)
+    - [How Is Route Detected](#how-is-route-detected)
+    - [How Are Controllers Located](#how-are-controllers-located)
+    - [How Are Reporters Located](#how-are-reporters-located)
 
 ## About
 
