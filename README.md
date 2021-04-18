@@ -474,5 +474,3 @@ To better understand how *reporters* attribute in [application](#application) XM
 
 
 All classes referenced above must be instance of [Lucinda\STDERR\Reporter](#abstract-class-reporter)! API doesn't bundle any.
-
-In order to locate [Lucinda\STDERR\Reporter](#abstract-class-reporter) that will report [\Throwable](https://www.php.net/manual/en/class.throwable.php) later on
