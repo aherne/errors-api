@@ -32,6 +32,7 @@ class Application extends \Lucinda\MVC\Application
         $this->developmentEnvironment = $developmentEnvironment;
         $this->readXML($xmlFilePath);
         $this->setApplicationInfo();
+        $this->setDisplayErrors();
         $this->setReporters();
         $this->setRoutes();
         $this->setResolvers();
@@ -48,9 +49,6 @@ class Application extends \Lucinda\MVC\Application
         $xml = $this->getTag("application");
         
         $this->reportersPath = (string) $xml->paths["reporters"];
-        
-        $value = $xml->display_errors->{$this->developmentEnvironment};
-        $this->displayErrors = (string) $value?true:false;
     }
     
     /**
@@ -61,6 +59,16 @@ class Application extends \Lucinda\MVC\Application
     public function getReportersPath(): string
     {
         return $this->reportersPath;
+    }
+    
+    /**
+     * Sets whether or not error details should be displayed based on contents of "display_errors" XML tag:
+     */
+    private function setDisplayErrors(): void
+    {
+        $xml = $this->getTag("display_errors");
+        $value = $xml->{$this->developmentEnvironment};
+        $this->displayErrors = (string) $value?true:false;
     }
     
     /**

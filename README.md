@@ -47,6 +47,7 @@ API is fully PSR-4 compliant, only requiring [Abstract MVC API](https://github.c
 To configure this API you must have a XML with following tags inside:
 
 - **[application](#application)**: (mandatory) configures handling on general application basis
+- **[display_errors](#display_errors)**: (optional) configures whether or not errors should be displayed
 - **[reporters](#reporters)**: (optional) configures how your application will report handled error/exception
 - **[resolvers](#resolvers)**: (mandatory) configures formats in which your application is able to resolve responses to a handled error/exception
 - **[routes](#routes)**: (mandatory) configures error/exception based routing to controllers/views
@@ -58,33 +59,48 @@ Maximal syntax of this tag is:
 ```xml
 <application default_route="default" default_format="..." version="...">
     <paths controllers="..." resolvers="..." views="..." reporters="..."/>
-    <display_errors>
-        <{ENVIRONMENT}>1/0</{ENVIRONMENT}>
-        ...
-    </display_errors>
 </application>
 ```
 
-Most of tag logic is already covered by Abstract MVC API [specification](https://github.com/aherne/mvc#application). Following extra sub-tags/attributes are defined:
+Most of tag logic is already covered by Abstract MVC API [specification](https://github.com/aherne/mvc#application). Following extra attributes are defined:
 
 - *reporters*: (optional) holds folder in which user-defined reporters will be located. Each reporter will be a [Lucinda\STDERR\Reporter](#abstract-class-reporter) instance!
-- **display_errors**: (optional) holds whether or not handled error/exception details will be exposed back to callers based on:
-    - **{ENVIRONMENT}**: name of development environment (to be replaced with "local", "dev", "live", etc). Values of this tag:
-        - 1: indicates error/exception details will be displayed to caller
-        - 0: indicates error/exception details won't be displayed to caller
-
-If no **display_errors** is defined or no **{ENVIRONMENT}** subtag is found matching current development environment, value 0 is assumed ([\Throwable](https://www.php.net/manual/en/class.throwable.php) details won't be exposed)!
 
 Tag example:
 
 ```xml
 <application default_route="default" default_format="html" version="1.0.1">
     <paths controllers="application/controllers" resolvers="application/resolvers" views="application/views" reporters="application/reporters"/>
-    <display_errors>
-        <local>1</local>
-        <live>0</live>
-    </display_errors>
 </application>
+```
+
+### Display_Errors
+
+Maximal syntax of this tag is:
+
+```xml
+<display_errors>
+    <{ENVIRONMENT}>{VALUE}</{ENVIRONMENT}>
+    ...
+</display_errors>
+```
+
+Most of tag logic is already covered by Abstract MVC API [specification](https://github.com/aherne/mvc#application). Following extra sub-tags/attributes are defined:
+
+- **display_errors**: (optional) holds whether or not handled error/exception details will be exposed back to callers based on:
+    - **{ENVIRONMENT}**: name of development environment (to be replaced with "local", "dev", "live", etc). **{VALUE}** can be:
+        - *1*: indicates error/exception details will be displayed to caller
+        - *0*: indicates error/exception details won't be displayed to caller
+
+If no **display_errors** is defined or no **{ENVIRONMENT}** subtag is found matching current development environment, value 0 is assumed ([\Throwable](https://www.php.net/manual/en/class.throwable.php) details won't be exposed)!
+
+Tag example:
+
+```xml
+<display_errors>
+    <local>1</local>
+    <live>0</live>
+</display_errors>
 ```
 
 ### Reporters
