@@ -2,7 +2,9 @@
 namespace Lucinda\STDERR\Locators;
 
 use Lucinda\STDERR\Application;
-use Lucinda\STDERR\ConfigurationException;
+use Lucinda\MVC\ConfigurationException;
+use Lucinda\MVC\Locators\ClassFinder;
+use Lucinda\MVC\Locators\ServiceLocator;
 
 /**
  * Locates reporters on disk based on reporters path & <reporter> tags detected beforehand

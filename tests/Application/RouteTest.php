@@ -12,7 +12,7 @@ class RouteTest
     public function __construct()
     {
         $this->object = new Route(simplexml_load_string('
-        <exception class="Lucinda\MVC\STDOUT\PathNotFoundException" controller="PathNotFoundController" http_status="404" error_type="CLIENT" view="404"/>
+        <route id="Lucinda\MVC\STDOUT\PathNotFoundException" controller="PathNotFoundController" http_status="404" error_type="CLIENT" view="404"/>
         '));
     }
 

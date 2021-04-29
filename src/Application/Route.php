@@ -4,10 +4,8 @@ namespace Lucinda\STDERR\Application;
 /**
  * Encapsulates a route that matches a handled exception
  */
-class Route
+class Route extends \Lucinda\MVC\Application\Route
 {
-    private $controller;
-    private $view;
     private $httpStatus;
     private $errorType;
     
@@ -18,30 +16,9 @@ class Route
      */
     public function __construct(\SimpleXMLElement $info)
     {
-        $this->controller = (string) $info["controller"];
-        $this->view = (string) $info["view"];
+        parent::__construct($info);
         $this->httpStatus = (string) $info["http_status"];
         $this->errorType = (string) $info["error_type"];
-    }
-
-    /**
-     * Gets controller class name that handles exception handled.
-     *
-     * @return string
-     */
-    public function getController(): string
-    {
-        return $this->controller;
-    }
-
-    /**
-     * Gets file that holds what is displayed when error response is rendered.
-     *
-     * @return string
-     */
-    public function getView(): string
-    {
-        return $this->view;
     }
 
     /**

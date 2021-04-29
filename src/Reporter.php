@@ -1,6 +1,8 @@
 <?php
 namespace Lucinda\STDERR;
 
+use Lucinda\MVC\Runnable;
+
 /**
  * Defines blueprint for reporting an exception that fed STDERR flow to a storage medium (eg: log file)
  */
