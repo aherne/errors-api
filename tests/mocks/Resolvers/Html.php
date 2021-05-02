@@ -1,8 +1,10 @@
 <?php
+namespace Test\Lucinda\STDERR\mocks\Resolvers;
+
 use Lucinda\MVC\ViewResolver;
 use Lucinda\MVC\ConfigurationException;
 
-class HtmlRenderer extends ViewResolver
+class Html extends ViewResolver
 {
     public function run(): void
     {

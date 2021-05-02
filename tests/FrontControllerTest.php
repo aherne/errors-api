@@ -4,6 +4,8 @@ namespace Test\Lucinda\STDERR;
 use Lucinda\STDERR\FrontController;
 use Lucinda\UnitTest\Result;
 use Lucinda\MVC\ConfigurationException;
+use Test\Lucinda\STDERR\mocks\MockEmergencyHandler;
+use Test\Lucinda\STDERR\mocks\PathNotFoundException;
 
 class FrontControllerTest
 {
@@ -11,7 +13,7 @@ class FrontControllerTest
     
     public function __construct()
     {
-        $this->object = new FrontController(__DIR__."/configuration.xml", "local", dirname(__DIR__), new MockEmergencyHandler());
+        $this->object = new FrontController(__DIR__."/mocks/configuration.xml", "local", dirname(__DIR__), new MockEmergencyHandler());
     }
 
     public function setDisplayFormat()

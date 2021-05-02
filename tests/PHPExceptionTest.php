@@ -3,6 +3,7 @@ namespace Test\Lucinda\STDERR;
 
 use Lucinda\STDERR\PHPException;
 use Lucinda\UnitTest\Result;
+use Test\Lucinda\STDERR\mocks\MockEmergencyHandler;
 
 class PHPExceptionTest
 {

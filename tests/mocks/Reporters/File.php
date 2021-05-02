@@ -1,7 +1,9 @@
 <?php
+namespace Test\Lucinda\STDERR\mocks\Reporters;
+
 use Lucinda\STDERR\Reporter;
 
-class FileReporter extends Reporter
+class File extends Reporter
 {
     public function run(): void
     {

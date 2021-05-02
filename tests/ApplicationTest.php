@@ -10,33 +10,14 @@ class ApplicationTest
     
     public function __construct()
     {
-        $this->object = new Application(__DIR__."/configuration.xml", "local");
+        $this->object = new Application(__DIR__."/mocks/configuration.xml", "local");
     }
 
     public function getDefaultFormat()
     {
         return new Result($this->object->getDefaultFormat()=="html");
     }
-        
-
-    public function getControllersPath()
-    {
-        return new Result($this->object->getControllersPath()=="tests/mocks/controllers");
-    }
-        
-
-    public function getReportersPath()
-    {
-        return new Result($this->object->getReportersPath()=="tests/mocks/reporters");
-    }
-        
-
-    public function getViewResolversPath()
-    {
-        return new Result($this->object->getViewResolversPath()=="tests/mocks/resolvers");
-    }
-        
-
+    
     public function getViewsPath()
     {
         return new Result($this->object->getViewsPath()=="tests/mocks/views");
@@ -57,7 +38,7 @@ class ApplicationTest
 
     public function reporters()
     {
-        return new Result($this->object->reporters("FileReporter")!==null);
+        return new Result($this->object->reporters("Test\Lucinda\STDERR\mocks\Reporters\File")!==null);
     }
         
 
@@ -69,7 +50,7 @@ class ApplicationTest
 
     public function routes()
     {
-        return new Result($this->object->routes("Test\Lucinda\STDERR\PathNotFoundException")!==null);
+        return new Result($this->object->routes("Test\Lucinda\STDERR\mocks\PathNotFoundException")!==null);
     }
         
 

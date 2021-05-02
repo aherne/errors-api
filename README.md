@@ -16,6 +16,7 @@ Table of contents:
     - [How Is Route Detected](#how-is-route-detected)
     - [How Are Controllers Located](#how-are-controllers-located)
     - [How Are Reporters Located](#how-are-reporters-located)
+    - [How Are Views Located](#how-are-views-located)
 
 ## About
 
@@ -59,25 +60,7 @@ To configure this API you must have a XML with following tags inside:
 
 ### Application
 
-Maximal syntax of this tag is:
-
-```xml
-<application default_route="default" default_format="..." version="...">
-    <paths controllers="..." resolvers="..." views="..." reporters="..."/>
-</application>
-```
-
-Most of tag logic is already covered by Abstract MVC API [specification](https://github.com/aherne/mvc#application). Following extra attributes are defined:
-
-- *reporters*: (optional) holds folder in which user-defined reporters will be located. Each reporter will be a [Lucinda\STDERR\Reporter](#abstract-class-reporter) instance!
-
-Tag example:
-
-```xml
-<application default_route="default" default_format="html" version="1.0.1">
-    <paths controllers="application/controllers" resolvers="application/resolvers" views="application/views" reporters="application/reporters"/>
-</application>
-```
+Tag documentation is completely covered by inherited Abstract MVC API [specification](https://github.com/aherne/mvc#application)! Since STDIN for this API is made of HTTP(s) requests, *default_route* attribute must point to a uri inside your app. 
 
 ### Display_Errors
 
@@ -127,7 +110,7 @@ Where:
 - **reporters**: (mandatory) holds settings to configure your application for error reporting based on:
     - **{ENVIRONMENT}**: (mandatory) name of development environment (to be replaced with "local", "dev", "live", etc). Holds one or more reporters, each defined by a tag:
         - **reporter**: (mandatory) configures an error/exception reporter based on attributes:
-            - *class*: (mandatory) name of user-defined class that will report [\Throwable](https://www.php.net/manual/en/class.throwable.php) (including namespace or subfolder), found in folder defined by *reporters* attribute of **paths** tag @ **[application](#application)**. Must be a [Lucinda\STDERR\Reporter](#abstract-class-reporter) instance!
+            - *class*: (mandatory) name of user-defined PS-4 autoload compliant class (including namespace) that will report [\Throwable](https://www.php.net/manual/en/class.throwable.php).<br/>Class must be a [Lucinda\STDERR\Reporter](#abstract-class-reporter) instance!
             - {OPTIONS}: a list of extra attributes necessary to configure respective reporter identified by *class* above            
 
 Tag example:
@@ -160,8 +143,8 @@ Maximal syntax of this tag is:
 
 Most of tag logic is already covered by Abstract MVC API [specification](https://github.com/aherne/mvc#application). Following extra observations need to be made:
 
-- *id*: (mandatory) mapped error/exception class name or **default** (matching *default_route* @ [application](#application) tag). Class must be a [\Throwable](https://www.php.net/manual/en/class.throwable.php) instance!
-- *controller*: (optional) holds user-defined default controller (including namespace or subfolder) that will mitigate requests and responses based on models, found in folder defined by *controllers* attribute of **paths** tag @ **[application](#application)**. Class must be a [Lucinda\STDERR\Controller](#abstract-class-controller) instance!
+- *id*: (mandatory) mapped error/exception class name or **default** (matching *default_route* @ [application](#application) tag).<br/>Class must be a [\Throwable](https://www.php.net/manual/en/class.throwable.php) instance!
+- *controller*: (optional) name of user-defined PS-4 autoload compliant class (including namespace)  hat will mitigate requests and responses based on models.<br/>Class must be a [Lucinda\STDERR\Controller](#abstract-class-controller) instance!
 - *error_type*: (mandatory) defines default exception/error originator. Must match one of const values in [Lucinda\STDERR\ErrorType](https://github.com/aherne/errors-api/blob/master/src/ErrorType.php) enum! Example: "LOGICAL"
 - *http_status*: (mandatory) defines default response HTTP status. Example: "500"
 
@@ -170,7 +153,7 @@ Tag example:
 ```xml
 <routes>
     <route id="default" http_status="500" error_type="LOGICAL" view="500"/>
-    <route id="Lucinda\MVC\STDOUT\PathNotFoundException" http_status="404" error_type="CLIENT" view="404"/>
+    <route id="Lucinda\MVC\STDOUT\PathNotFoundException" controller="Lucinda\Project\Controllers\PathNotFound" http_status="404" error_type="CLIENT" view="404"/>
 </routes>
 ```
 
@@ -332,7 +315,9 @@ Developers need to implement *run* method for each reporter, where they are able
 Example of reporter:
 
 ```php
-class FileReporter extends \Lucinda\STDERR\Reporter
+namespace Lucinda\Project\Reporters;
+
+class File extends \Lucinda\STDERR\Reporter
 {
     public function run(): void
     {
@@ -354,7 +339,7 @@ class FileReporter extends \Lucinda\STDERR\Reporter
 Defined in XML as:
 
 ```xml
-<reporter class="FileReporter" path="errors" format="%d %m"/>
+<reporter class="Lucinda\Project\Reporters\File" path="errors" format="%d %m"/>
 ```
 
 For more info how reporters are detected, check [How Are Reporters Located](#how-are-reporters-located) section below!
@@ -384,7 +369,9 @@ $this->response->view()["hello"] = "world";
 Example of controller for *PathNotFoundException*:
 
 ```php
-class PathNotFoundController extends \Lucinda\STDERR\Controller
+namespace Lucinda\Project\Controllers;
+
+class PathNotFound extends \Lucinda\STDERR\Controller
 {
     public function run(): void
     {
@@ -396,7 +383,7 @@ class PathNotFoundController extends \Lucinda\STDERR\Controller
 Defined in XML as:
 
 ```xml
-<route id="PathNotFoundException" controller="PathNotFoundController" http_status="404" error_type="CLIENT" view="404"/>
+<route id="PathNotFoundException" controller="Lucinda\Project\Controllers\PathNotFound" http_status="404" error_type="CLIENT" view="404"/>
 ```
 
 For more info how controllers are detected, check [How Are Controllers Located](#how-are-controllers-located) section below!
@@ -410,6 +397,7 @@ Since this API works on top of [Abstract MVC API](https://github.com/aherne/mvc)
 - [How Is Route Detected](#how-is-route-detected)
 - [How Are Controllers Located](#how-are-controllers-located)
 - [How Are Reporters Located](#how-are-reporters-located)
+- [How Are Views Located](#how-are-views-located)
 
 ### How Is Response Format Detected
 
@@ -447,30 +435,30 @@ This follows parent API [specifications](https://github.com/aherne/mvc#how-are-c
 
 ### How Are Reporters Located
 
-To better understand how *reporters* attribute in [application](#application) XML tag plays together with *class* attributes @ [reporter](#reporters) tags matching *development environment*, let's take this XML for example:
+To better understand how *class* attributes @ [reporter](#reporters) tags matching *development environment*, let's take this XML for example:
 
 ```xml
-<application ...>
-    <paths reporters="FOLDER" .../>
-</application>
-...
 <reporters>
     <ENVIRONMENT1>
-        <reporter class="CLASS" .../>
-        <reporter class="CLASS" .../>
+        <reporter class="Lucinda\Project\Reporters\File" .../>
+        <reporter class="Lucinda\Project\Reporters\SysLog" .../>
     </ENVIRONMENT1>
     <ENVIRONMENT2>
-        <reporter class="CLASS" .../>
+        <reporter class="Lucinda\Project\Reporters\SysLog" .../>
     </ENVIRONMENT2>
     ...
 </reporters>
 ```
 
-| ENVIRONMENT | FOLDER | CLASSes | Files Loaded | Class Instanced |
+In that case if "psr-4" attribute in composer.json associates "Lucinda\\Project\\" with "src/" folder then:
+
+| ENVIRONMENT | Files Loaded | Classes Instanced |
 | --- | --- | --- | --- | --- |
-| ENVIRONMENT1 | application/reporters | FileLogger<br/>foo/FileLogger | application/reporters/FileLogger.php<br/>application/reporters/foo/FileLogger.php | FileLogger |
-| ENVIRONMENT2 | application/reporters | \Foo\FileLogger | application/reporters/FileLogger.php | \Foo\FileLogger |
-| ENVIRONMENT2 | application/reporters | foo/\Bar\FileLogger | application/reporters/foo/FileLogger.php | \Bar\FileLogger |
+| ENVIRONMENT1 | src/Reporters/File.php<br/>src/Reporters/SysLog.php | Lucinda\Project\Reporters\File<br/>Lucinda\Project\Reporters\SysLog |
+| ENVIRONMENT2 | src/Reporters/SysLog.php | Lucinda\Project\Reporters\SysLog |
 
+All classes referenced above must be instance of [Lucinda\STDERR\Reporter](#abstract-class-reporter)!
 
-All classes referenced above must be instance of [Lucinda\STDERR\Reporter](#abstract-class-reporter)! API doesn't bundle any.
+### How Are Views Located
+
+This follows parent API [specifications](https://github.com/aherne/mvc#how-are-views-located) in its entirety. Extension is yet to be decided, since it depends on type of view resolved!
