@@ -118,10 +118,10 @@ Tag example:
 ```xml
 <reporters>
     <local>
-        <reporter class="FileReporter" path="errors" format="%d %f %l %m"/>
+        <reporter class="Lucinda\Project\Reporters\File" path="errors" format="%d %f %l %m"/>
     </local>
     <live>
-        <reporter class="SysLogReporter" application="unittest" format="%v %f %l %m"/>
+        <reporter class="Lucinda\Project\Reporters\SysLog" application="unittest" format="%v %f %l %m"/>
     </live>
 </reporters>
 ```
@@ -453,7 +453,7 @@ To better understand how *class* attributes @ [reporter](#reporters) tags matchi
 In that case if "psr-4" attribute in composer.json associates "Lucinda\\Project\\" with "src/" folder then:
 
 | ENVIRONMENT | Files Loaded | Classes Instanced |
-| --- | --- | --- | --- | --- |
+| --- | --- | --- |
 | ENVIRONMENT1 | src/Reporters/File.php<br/>src/Reporters/SysLog.php | Lucinda\Project\Reporters\File<br/>Lucinda\Project\Reporters\SysLog |
 | ENVIRONMENT2 | src/Reporters/SysLog.php | Lucinda\Project\Reporters\SysLog |
 
