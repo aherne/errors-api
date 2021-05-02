@@ -60,7 +60,7 @@ To configure this API you must have a XML with following tags inside:
 
 ### Application
 
-Tag documentation is completely covered by inherited Abstract MVC API [specification](https://github.com/aherne/mvc#application)! Since STDIN for this API is made of HTTP(s) requests, *default_route* attribute must point to a uri inside your app. 
+Tag documentation is completely covered by inherited Abstract MVC API [specification](https://github.com/aherne/mvc#application)! Since STDIN for this API is made of handled throwables but there is no generic throwable value of *default_route* attribute must be **default**. 
 
 ### Display_Errors
 
@@ -144,7 +144,7 @@ Maximal syntax of this tag is:
 Most of tag logic is already covered by Abstract MVC API [specification](https://github.com/aherne/mvc#application). Following extra observations need to be made:
 
 - *id*: (mandatory) mapped error/exception class name or **default** (matching *default_route* @ [application](#application) tag).<br/>Class must be a [\Throwable](https://www.php.net/manual/en/class.throwable.php) instance!
-- *controller*: (optional) name of user-defined PS-4 autoload compliant class (including namespace)  hat will mitigate requests and responses based on models.<br/>Class must be a [Lucinda\STDERR\Controller](#abstract-class-controller) instance!
+- *controller*: (optional) name of user-defined PS-4 autoload compliant class (including namespace) that will mitigate requests and responses based on models.<br/>Class must be a [Lucinda\STDERR\Controller](#abstract-class-controller) instance!
 - *error_type*: (mandatory) defines default exception/error originator. Must match one of const values in [Lucinda\STDERR\ErrorType](https://github.com/aherne/errors-api/blob/master/src/ErrorType.php) enum! Example: "LOGICAL"
 - *http_status*: (mandatory) defines default response HTTP status. Example: "500"
 
@@ -258,17 +258,12 @@ These classes are fully implemented by API:
 
 - [Lucinda\STDERR\Application](#class-application): reads [configuration](#configuration) XML file and encapsulates information inside
     - [Lucinda\STDERR\Application\Route](#class-application-route): encapsulates [route](#routes) XML tag matching [\Throwable](https://www.php.net/manual/en/class.throwable.php) handled
-    - [Lucinda\MVC\Application\Format](https://github.com/aherne/mvc#class-application-format): encapsulates [resolver](#resolvers) XML tag matching *default_format* attribute @ [application](#application) XML tag or one set by *setFormat* method @ [Lucinda\STDERR\FrontController](https://github.com/aherne/errors-api/blob/master/src/FrontController.php)
 - [Lucinda\STDERR\Request](#class-request): encapsulates handled [\Throwable](https://www.php.net/manual/en/class.throwable.php) and [Lucinda\STDERR\Application\Route](#class-application-route)
-- [Lucinda\MVC\Response](https://github.com/aherne/mvc#class-response): encapsulates response to send back to caller
-    - [Lucinda\STDERR\Response\Status](#class-response-status): encapsulates response HTTP status
-    - [Lucinda\STDERR\Response\View](#class-response-view): encapsulates view template and data that will be bound into a response body
 
 These abstract classes require to be extended by developers in order to gain an ability:
 
 - [Lucinda\STDERR\Reporter](#abstract-class-reporter): encapsulates [\Throwable](https://www.php.net/manual/en/class.throwable.php) reporting
 - [Lucinda\STDERR\Controller](#abstract-class-controller): encapsulates binding [Lucinda\STDERR\Request](#class-request) to [Lucinda\MVC\Response](https://github.com/aherne/mvc#class-response) based on [\Throwable](https://www.php.net/manual/en/class.throwable.php)
-- [Lucinda\MVC\ViewResolver](https://github.com/aherne/mvc#Abstract-Class-ViewResolver): encapsulates conversion of [Lucinda\STDERR\Response\View](#class-response-view) into a [Lucinda\MVC\Response](https://github.com/aherne/mvc#class-response) body
 
 ### Class Application
 
