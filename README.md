@@ -21,7 +21,7 @@ Table of contents:
 
 ## About
 
-This API is a **skeleton** created to efficiently handle errors or uncaught exceptions in a web application using a dialect of MVC paradigm where:
+This API is a **skeleton** (requires [binding](#binding-points) by developers) created to efficiently handle errors or uncaught exceptions in a web application using a dialect of MVC paradigm where:
 
 - *models* are reusable logic to report [\Throwable](https://www.php.net/manual/en/class.throwable.php) instances handled or holders of data to be sent to views
 - *views* are the response to send back to caller after an error/exception was handled
@@ -183,7 +183,7 @@ It offers developers an ability to **bind programmatically** to its prototypes v
 
 | Class Prototype | Ability Gained |
 | --- | --- |
-| Interface [ErrorHandler](#interface-errorhandler) | (mandatory) Handler to use if a [\Throwable](https://www.php.net/manual/en/class.throwable.php) while API handles request into response |
+| [ErrorHandler](#interface-errorhandler) | (mandatory) Handler to use if a [\Throwable](https://www.php.net/manual/en/class.throwable.php) while API handles request into response |
 
 ## Execution
 
@@ -240,8 +240,6 @@ composer require lucinda/errors-api
 Then create a *configuration.xml* file holding configuration settings (see [configuration](#configuration) above) and a *index.php* file (see [initialization](#initialization) above) in project root with following code:
 
 ```php
-require(__DIR__."/vendor/autoload.php");
-
 // detects current development environment from ENVIRONMENT environment variable (eg: set in .htaccess via "SetEnv ENVIRONMENT local");
 define("ENVIRONMENT", getenv("ENVIRONMENT"));
 
