@@ -12,6 +12,8 @@ use Lucinda\MVC\ConfigurationException;
  */
 class FrontController implements ErrorHandler
 {
+    const DEFAULT_HTTP_STATUS = 500;
+    
     private $displayFormat;
     private $documentDescriptor;
     private $developmentEnvironment;
@@ -83,7 +85,7 @@ class FrontController implements ErrorHandler
         // compiles a response object from content type and http status
         $format = $this->getResponseFormat($application);
         $response = new Response($this->getContentType($format), $this->getTemplateFile($application, $request));
-        $response->setStatus($request->getRoute()->getHttpStatus());
+        $response->setStatus($this->getResponseStatus($request->getRoute()));
         
         // locates and runs controller
         $className = $request->getRoute()->getController();
@@ -101,6 +103,17 @@ class FrontController implements ErrorHandler
         
         // commits response to caller
         $response->commit();
+    }
+    
+    /**
+     * Gets response http status code
+     * 
+     * @param Route $route
+     * @return int
+     */
+    private function getResponseStatus(Route $route): int
+    {
+        return ($route->getHttpStatus()?$route->getHttpStatus():self::DEFAULT_HTTP_STATUS);
     }
     
     /**

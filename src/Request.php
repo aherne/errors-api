@@ -8,8 +8,6 @@ use Lucinda\STDERR\Application\Route;
  */
 class Request
 {
-    const DEFAULT_HTTP_STATUS = 500;
-
     private $exception;
     private $route;
 
@@ -33,10 +31,6 @@ class Request
     private function setRoute(Route $route): void
     {
         $this->route = $route;
-        // override non-existent properties with defaults
-        if (!$this->route->getHttpStatus()) {
-            $this->route->setHttpStatus(self::DEFAULT_HTTP_STATUS);
-        }
     }
 
     /**
