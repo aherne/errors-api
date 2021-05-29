@@ -15,7 +15,6 @@ use Lucinda\STDERR\Application\Route;
  */
 class Application extends \Lucinda\MVC\Application
 {
-    private $reportersPath;
     private $displayErrors=false;
     private $reporters=array();
     private $developmentEnvironment;
@@ -36,29 +35,6 @@ class Application extends \Lucinda\MVC\Application
         $this->setReporters();
         $this->setRoutes();
         $this->setResolvers();
-    }
-    
-    /**
-     * {@inheritDoc}
-     * @see \Lucinda\MVC\Application::setApplicationInfo()
-     */
-    protected function setApplicationInfo(): void
-    {
-        parent::setApplicationInfo();
-        
-        $xml = $this->getTag("application");
-        
-        $this->reportersPath = (string) $xml->paths["reporters"];
-    }
-    
-    /**
-     * Gets path to reporters folder.
-     *
-     * @return string
-     */
-    public function getReportersPath(): string
-    {
-        return $this->reportersPath;
     }
     
     /**
@@ -96,7 +72,7 @@ class Application extends \Lucinda\MVC\Application
         foreach ($list as $info) {
             $reporterClass = (string) $info['class'];
             if (!$reporterClass) {
-                throw new ConfigurationException("Reporter tag missing 'class' attribute");
+                throw new ConfigurationException("Attribute 'class' is mandatory for 'reporter' tag");
             }
             $this->reporters[$reporterClass] = $info;
         }
@@ -116,7 +92,7 @@ class Application extends \Lucinda\MVC\Application
         foreach ($list as $info) {
             $id = (string) $info['id'];
             if (!$id) {
-                throw new ConfigurationException("Route missing 'id' attribute!");
+                throw new ConfigurationException("Attribute 'id' is mandatory for 'route' tag");
             }
             $this->routes[$id] = new Route($info);
         }

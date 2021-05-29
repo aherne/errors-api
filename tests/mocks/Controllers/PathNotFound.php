@@ -1,7 +1,9 @@
 <?php
+namespace Test\Lucinda\STDERR\mocks\Controllers;
+
 use Lucinda\STDERR\Controller;
 
-class PathNotFoundController extends Controller
+class PathNotFound extends Controller
 {
     public function run(): void
     {

@@ -2,10 +2,9 @@
 namespace Lucinda\STDERR;
 
 use Lucinda\MVC\Application\Format;
-use Lucinda\STDERR\Locators\ReporterLocator;
-use Lucinda\STDERR\Locators\ControllerLocator;
-use Lucinda\MVC\Locators\ViewResolverLocator;
 use Lucinda\MVC\Response;
+use Lucinda\STDERR\Application\Route;
+use Lucinda\MVC\ConfigurationException;
 
 /**
  * Error handler that bootstraps all uncaught exceptions and PHP errors as a STDERR front controller that feeds on
@@ -13,6 +12,8 @@ use Lucinda\MVC\Response;
  */
 class FrontController implements ErrorHandler
 {
+    const DEFAULT_HTTP_STATUS = 500;
+    
     private $displayFormat;
     private $documentDescriptor;
     private $developmentEnvironment;
@@ -72,29 +73,22 @@ class FrontController implements ErrorHandler
         $application = new Application($this->documentDescriptor, $this->developmentEnvironment);
         
         // finds and instances routes based on XML and exception received
-        $routes = $application->routes();
-        $targetClass = get_class($exception);
-        $request = new Request((isset($routes[$targetClass])?$routes[$targetClass]:$routes["default"]), $exception);
+        $request = new Request($this->getRoute($application, $exception), $exception);
         
         // builds reporters list then reports exception
         $reporters = $application->reporters();
         foreach ($reporters as $className=>$xml) {
-            $locator = new ReporterLocator($application, $className);
-            $className = $locator->getClassName();
             $object = new $className($request, $xml);
             $object->run();
         }
         
-        // detects response format
-        $format = $application->resolvers($this->displayFormat?$this->displayFormat:$application->getDefaultFormat());
-        
         // compiles a response object from content type and http status
+        $format = $this->getResponseFormat($application);
         $response = new Response($this->getContentType($format), $this->getTemplateFile($application, $request));
-        $response->setStatus($request->getRoute()->getHttpStatus());
+        $response->setStatus($this->getResponseStatus($request->getRoute()));
         
         // locates and runs controller
-        $locator = new ControllerLocator($application, $request);
-        $className = $locator->getClassName();
+        $className = $request->getRoute()->getController();
         if ($className) {
             $object = new $className($application, $request, $response);
             $object->run();
@@ -102,14 +96,24 @@ class FrontController implements ErrorHandler
         
         // set up response based on view
         if ($response->getBody()===null) {
-            $locator = new ViewResolverLocator($application, $format);
-            $className = $locator->getClassName();
+            $className = $format->getViewResolver();
             $object = new $className($application, $response);
             $object->run();
         }
         
         // commits response to caller
         $response->commit();
+    }
+    
+    /**
+     * Gets response http status code
+     * 
+     * @param Route $route
+     * @return int
+     */
+    private function getResponseStatus(Route $route): int
+    {
+        return ($route->getHttpStatus()?$route->getHttpStatus():self::DEFAULT_HTTP_STATUS);
     }
     
     /**
@@ -133,5 +137,50 @@ class FrontController implements ErrorHandler
     private function getContentType(Format $format): string
     {
         return $format->getContentType().($format->getCharacterEncoding()?"; charset=".$format->getCharacterEncoding():"");
+    }
+    
+    /**
+     * Gets route to handle
+     * 
+     * @param Application $application
+     * @param \Throwable $exception
+     * @return Route
+     * @throws ConfigurationException
+     */
+    private function getRoute(Application $application, \Throwable $exception): Route
+    {
+        $routes = $application->routes();
+        $targetClass = get_class($exception);
+        if (isset($routes[$targetClass])) {
+            return $routes[$targetClass];
+        } else {
+            if (isset($routes[$application->getDefaultRoute()])) {
+                return $routes[$application->getDefaultRoute()];
+            } else {
+                throw new ConfigurationException("Default route matches no route!");
+            }
+        }
+    }
+    
+    /**
+     * Gets response format to use
+     * 
+     * @param Application $application
+     * @return Format
+     * @throws ConfigurationException
+     */
+    private function getResponseFormat(Application $application): Format
+    {
+        $format = $this->displayFormat?$this->displayFormat:$application->getDefaultFormat();
+        $resolvers = $application->resolvers();
+        if (isset($resolvers[$format])) {
+            return $resolvers[$format];
+        } else {
+            if (isset($resolvers[$application->getDefaultFormat()])) {
+                return $resolvers[$application->getDefaultFormat()];
+            } else {
+                throw new ConfigurationException("Default format matches no resolver!");
+            }
+        }
     }
 }
