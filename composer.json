@@ -15,7 +15,8 @@
     },
     "autoload": {
     	"psr-4": {
-        	"Lucinda\\STDERR\\": "src/"
+        	"Lucinda\\STDERR\\": "src/",
+                "Test\\Lucinda\\STDERR\\": "tests/"
     	}
     },
     "authors": [
