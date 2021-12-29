@@ -5,6 +5,7 @@ use Lucinda\MVC\Application\Format;
 use Lucinda\MVC\Response;
 use Lucinda\STDERR\Application\Route;
 use Lucinda\MVC\ConfigurationException;
+use Lucinda\MVC\Response\HttpStatus;
 
 /**
  * Error handler that bootstraps all uncaught exceptions and PHP errors as a STDERR front controller that feeds on
@@ -12,13 +13,11 @@ use Lucinda\MVC\ConfigurationException;
  */
 class FrontController implements ErrorHandler
 {
-    const DEFAULT_HTTP_STATUS = 500;
-    
-    private $displayFormat;
-    private $documentDescriptor;
-    private $developmentEnvironment;
-    private $includePath;
-    private $emergencyHandler;
+    private ?string $displayFormat = null;
+    private string $documentDescriptor;
+    private string $developmentEnvironment;
+    private string $includePath;
+    private ErrorHandler $emergencyHandler;
 
     /**
      * Redirects all uncaught exceptions and PHP errors in current application to itself.
@@ -54,11 +53,12 @@ class FrontController implements ErrorHandler
     {
         $this->displayFormat = $displayFormat;
     }
-    
+
     /**
      * Handles errors by delegating to registered storage mediums (if any) then output using display method (if any)
      *
      * @param \Throwable $exception Encapsulates error information.
+     * @throws ConfigurationException
      */
     public function handle(\Throwable $exception): void
     {
@@ -109,11 +109,11 @@ class FrontController implements ErrorHandler
      * Gets response http status code
      * 
      * @param Route $route
-     * @return int
+     * @return HttpStatus
      */
-    private function getResponseStatus(Route $route): int
+    private function getResponseStatus(Route $route): HttpStatus
     {
-        return ($route->getHttpStatus()?$route->getHttpStatus():self::DEFAULT_HTTP_STATUS);
+        return ($route->getHttpStatus()??HttpStatus::INTERNAL_SERVER_ERROR);
     }
     
     /**

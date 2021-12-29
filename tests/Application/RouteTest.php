@@ -30,12 +30,12 @@ class RouteTest
 
     public function getHttpStatus()
     {
-        return new Result($this->object->getHttpStatus()==404);
+        return new Result($this->object->getHttpStatus()->value == "404 Not Found");
     }
         
 
     public function getErrorType()
     {
-        return new Result($this->object->getErrorType()==ErrorType::CLIENT);
+        return new Result($this->object->getErrorType()->value == "CLIENT");
     }
 }

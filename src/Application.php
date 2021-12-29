@@ -15,9 +15,9 @@ use Lucinda\STDERR\Application\Route;
  */
 class Application extends \Lucinda\MVC\Application
 {
-    private $displayErrors=false;
-    private $reporters=array();
-    private $developmentEnvironment;
+    private bool $displayErrors=false;
+    private array $reporters=array();
+    private string $developmentEnvironment;
     
     /**
      * Performs detection process.
@@ -44,7 +44,7 @@ class Application extends \Lucinda\MVC\Application
     {
         $xml = $this->getTag("display_errors");
         $value = $xml->{$this->developmentEnvironment};
-        $this->displayErrors = (string) $value?true:false;
+        $this->displayErrors = (bool)((string)$value);
     }
     
     /**
@@ -104,12 +104,12 @@ class Application extends \Lucinda\MVC\Application
      * @param string $className
      * @return \SimpleXMLElement|array|null
      */
-    public function reporters(string $className="")
+    public function reporters(string $className=""): \SimpleXMLElement|array|null
     {
         if (!$className) {
             return $this->reporters;
         } else {
-            return (isset($this->reporters[$className])?$this->reporters[$className]:null);
+            return ($this->reporters[$className] ?? null);
         }
     }
 }

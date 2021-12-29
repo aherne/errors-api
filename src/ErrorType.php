@@ -9,11 +9,11 @@ namespace Lucinda\STDERR;
  * - SYNTAX: handled exception was thrown automatically after developer performed syntax errors in code (eg: PHP, SQL)
  * - LOGICAL: handled exception was thrown by developer to signal logical errors in application flow
  */
-class ErrorType
+enum ErrorType: string
 {
-    const NONE = "NONE";  // Exceptions that are not errors
-    const SERVER = "SERVER"; // Exceptions thrown when operations with server fail
-    const CLIENT = "CLIENT"; // Exceptions thrown when client is performing an illegal operation (eg: asking for a resource that doesn't exist)
-    const SYNTAX = "SYNTAX"; // Exceptions thrown automatically when a syntax error occurs
-    const LOGICAL = "LOGICAL"; // Exceptions thrown on logical errors in code
+    case NONE = "NONE";  // Exceptions that are not errors
+    case SERVER = "SERVER"; // Exceptions thrown when operations with server fail
+    case CLIENT = "CLIENT"; // Exceptions thrown when client is performing an illegal operation (eg: asking for a resource that doesn't exist)
+    case SYNTAX = "SYNTAX"; // Exceptions thrown automatically when a syntax error occurs
+    case LOGICAL = "LOGICAL"; // Exceptions thrown on logical errors in code
 }

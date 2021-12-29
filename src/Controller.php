@@ -12,9 +12,9 @@ use Lucinda\MVC\Runnable;
  */
 abstract class Controller implements Runnable
 {
-    protected $application;
-    protected $request;
-    protected $response;
+    protected Application $application;
+    protected Request $request;
+    protected Response $response;
 
     /**
      * Controller constructor.

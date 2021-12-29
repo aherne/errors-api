@@ -8,15 +8,8 @@ use Lucinda\MVC\Runnable;
  */
 abstract class Reporter implements Runnable
 {
-    /**
-     * @var Request
-     */
-    protected $request;
-    
-    /**
-     * @var \SimpleXMLElement
-     */
-    protected $xml;
+    protected Request $request;
+    protected \SimpleXMLElement $xml;
     
     /**
      * Reports error info to a storage medium.

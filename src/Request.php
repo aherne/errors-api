@@ -8,8 +8,8 @@ use Lucinda\STDERR\Application\Route;
  */
 class Request
 {
-    private $exception;
-    private $route;
+    private Route $route;
+    private \Throwable $exception;
 
     /**
      * Detects route based on exception handled.

@@ -1,42 +1,86 @@
 <?php
 namespace Lucinda\STDERR\Application;
 
+use Lucinda\MVC\ConfigurationException;
+use Lucinda\MVC\Response\HttpStatus;
+use Lucinda\STDERR\ErrorType;
+
 /**
  * Encapsulates a route that matches a handled exception
  */
 class Route extends \Lucinda\MVC\Application\Route
 {
-    private $httpStatus;
-    private $errorType;
-    
+    private ?HttpStatus $httpStatus = null;
+    private ?ErrorType $errorType = null;
+
     /**
      * Detects route info from <exception> tag
      *
      * @param \SimpleXMLElement $info
+     * @throws ConfigurationException
      */
     public function __construct(\SimpleXMLElement $info)
     {
         parent::__construct($info);
-        $this->httpStatus = (string) $info["http_status"];
-        $this->errorType = (string) $info["error_type"];
+        $this->setHttpStatus((string) $info["http_status"]);
+        $this->setErrorType((string) $info["error_type"]);
+    }
+
+    /**
+     * Sets http status associated to exception handled.
+     *
+     * @param string $httpStatus
+     * @throws ConfigurationException
+     */
+    private function setHttpStatus(string $httpStatus): void
+    {
+        if (!$httpStatus) {
+            return;
+        }
+        $cases = HttpStatus::cases();
+        foreach($cases as $case) {
+            if (str_starts_with($case->value, $httpStatus)) {
+                $this->httpStatus = $case;
+                return;
+            }
+        }
+        throw new ConfigurationException("Invalid http status: ".$httpStatus);
     }
 
     /**
      * Gets HTTP status associated to exception handled.
      *
-     * @return string
+     * @return ?HttpStatus
      */
-    public function getHttpStatus(): string
+    public function getHttpStatus(): ?HttpStatus
     {
         return $this->httpStatus;
+    }
+
+    /**
+     * Sets HTTP status associated to exception handled.
+     *
+     * @param string $errorType
+     * @throws ConfigurationException
+     */
+    private function setErrorType(string $errorType): void
+    {
+        if (!$errorType) {
+            return;
+        }
+        if ($case = ErrorType::tryFrom($errorType)) {
+            $this->errorType = $case;
+        } else {
+            throw new ConfigurationException("Invalid error type: ".$errorType);
+        }
     }
     
     /**
      * Gets error type associated to exception handled.
      *
-     * @return string One of possible values of ErrorType enum
+     * @return ?ErrorType
      */
-    public function getErrorType(): string
+    public function getErrorType(): ?ErrorType
     {
         return $this->errorType;
     }

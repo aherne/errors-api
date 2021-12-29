@@ -12,7 +12,7 @@ class PHPException extends \Exception
      *
      * @var ErrorHandler $errorHandler
      */
-    private static $errorHandler;
+    private static ErrorHandler $errorHandler;
     
 
     /**
@@ -43,7 +43,7 @@ class PHPException extends \Exception
      * @param string $file
      * @param integer $line
      */
-    public static function nonFatalError(int $errorNumber, string $message, string $file, int $line): void
+    public static function nonFatalError(int $errorNumber, string $message, string $file, int $line): never
     {
         $e = new self($message, $errorNumber);
         $e->line = $line;
