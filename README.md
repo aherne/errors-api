@@ -40,14 +40,14 @@ Furthermore, this whole process is done in a manner that is made flexible throug
 
 - **[configuration](#configuration)**: setting up an XML file where this API is configured
 - **[binding points](#binding-points)**: binding user-defined components defined in XML/code to API prototypes in order to gain necessary abilities
-- **[initialization](#initialization)**: instancing [FrontController](https://github.com/aherne/errors-api/blob/v3.0/src/FrontController.php) to register itself as sole [\Throwable](https://www.php.net/manual/en/class.throwable.php) handler
+- **[initialization](#initialization)**: instancing [FrontController](https://github.com/aherne/errors-api/blob/master/src/FrontController.php) to register itself as sole [\Throwable](https://www.php.net/manual/en/class.throwable.php) handler
 - **[handling](#handling)**: once any error or uncaught exception has occurred in STDOUT phase, method *handle* of above is called automatically kick-starting [\Throwable](https://www.php.net/manual/en/class.throwable.php)-response process
 
 API is fully PSR-4 compliant, only requiring [Abstract MVC API](https://github.com/aherne/mvc) for basic MVC logic, PHP7.1+ interpreter and SimpleXML extension. To quickly see how it works, check:
 
 - **[installation](#installation)**: describes how to install API on your computer, in light of steps above
 - **[unit tests](#unit-tests)**: API has 100% Unit Test coverage, using [UnitTest API](https://github.com/aherne/unit-testing) instead of PHPUnit for greater flexibility
-- **[example](https://github.com/aherne/errors-api/blob/v3.0/tests/FrontController.php)**: shows a deep example of API functionality based on [FrontController](https://github.com/aherne/errors-api/blob/v3.0/src/FrontController.php) unit test
+- **[example](https://github.com/aherne/errors-api/blob/master/tests/FrontController.php)**: shows a deep example of API functionality based on [FrontController](https://github.com/aherne/errors-api/blob/master/src/FrontController.php) unit test
 - **[reference guide](#reference-guide)**: describes all API classes, methods and fields relevant to developers
 
 All classes inside belong to **Lucinda\STDERR** namespace!
@@ -149,7 +149,7 @@ Most of tag logic is already covered by Abstract MVC API [specification](https:/
 
 - *id*: (mandatory) mapped error/exception class name or **default** (matching *default_route* @ [application](#application) tag).<br/>Class must be a [\Throwable](https://www.php.net/manual/en/class.throwable.php) instance!
 - *controller*: (optional) name of user-defined PS-4 autoload compliant class (including namespace) that will mitigate requests and responses based on models.<br/>Class must be a [Controller](#abstract-class-controller) instance!
-- *error_type*: (mandatory) defines default exception/error originator. Must match one of [ErrorType](https://github.com/aherne/errors-api/blob/v3.0/src/ErrorType.php) enum cases values! Example: "LOGICAL"
+- *error_type*: (mandatory) defines default exception/error originator. Must match one of [ErrorType](https://github.com/aherne/errors-api/blob/master/src/ErrorType.php) enum cases values! Example: "LOGICAL"
 - *http_status*: (mandatory) defines default response HTTP status. Must be a valid HTTP status code! Example: "500"
 
 Tag example:
@@ -189,9 +189,9 @@ It offers developers an ability to **bind programmatically** to its prototypes v
 
 ### Initialization
 
-Now that developers have finished setting up XML that configures the API, they are finally able to initialize it by instantiating [FrontController](https://github.com/aherne/errors-api/blob/v3.0/src/FrontController.php).
+Now that developers have finished setting up XML that configures the API, they are finally able to initialize it by instantiating [FrontController](https://github.com/aherne/errors-api/blob/master/src/FrontController.php).
 
-As a handler of [\Throwable](https://www.php.net/manual/en/class.throwable.php) instances, above needs to implement [ErrorHandler](#interface-errorhandler). Apart of method *run* required by interface above, [FrontController](https://github.com/aherne/errors-api/blob/v3.0/src/FrontController.php) comes with following public methods, all related to initialization process:
+As a handler of [\Throwable](https://www.php.net/manual/en/class.throwable.php) instances, above needs to implement [ErrorHandler](#interface-errorhandler). Apart of method *run* required by interface above, [FrontController](https://github.com/aherne/errors-api/blob/master/src/FrontController.php) comes with following public methods, all related to initialization process:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
@@ -203,14 +203,14 @@ Where:
 - *$documentDescriptor*: relative location of XML [configuration](#configuration) file. Example: "configuration.xml"
 - *$developmentEnvironment*: name of development environment (to be replaced with "local", "dev", "live", etc) to be used in deciding how to report or whether or not to expose handled [\Throwable](https://www.php.net/manual/en/class.throwable.php)
 - *$includePath*: absolute location of your project root (necessary because sometimes include paths are lost when errors are thrown). Example: __DIR__
-- *$emergencyHandler*: a [ErrorHandler](#interface-errorhandler) instance to be used in handling errors occurring during execution of [FrontController](https://github.com/aherne/errors-api/blob/v3.0/src/FrontController.php)'s *handle* method
+- *$emergencyHandler*: a [ErrorHandler](#interface-errorhandler) instance to be used in handling errors occurring during execution of [FrontController](https://github.com/aherne/errors-api/blob/master/src/FrontController.php)'s *handle* method
 - *$displayFormat*: value of display format, matching to a *format* attribute of a *resolver* @ [resolvers](#resolvers) XML tag
 
 Very important to notice that once handlers are registered, API employs Aspect Oriented Programming concepts to listen *asynchronously* for error events then triggering handler automatically. So once API is initialized, you can immediately start your preferred framework that handles http requests to responses!
 
 ### Handling
 
-Once a [\Throwable](https://www.php.net/manual/en/class.throwable.php) event has occurred inside STDOUT request-response phase, *handle* method of [FrontController](https://github.com/aherne/errors-api/blob/v3.0/src/FrontController.php) is called. This:
+Once a [\Throwable](https://www.php.net/manual/en/class.throwable.php) event has occurred inside STDOUT request-response phase, *handle* method of [FrontController](https://github.com/aherne/errors-api/blob/master/src/FrontController.php) is called. This:
 
 - registers handler presented as constructor argument to capture any error that might occur while handling
 - constructs a [Application](#class-application) object based on XML where API is configured and development environment
@@ -266,9 +266,9 @@ class EmergencyHandler implements \ErrorHandler
 
 For tests and examples, check following files/folders in API sources:
 
-- [test.php](https://github.com/aherne/errors-api/blob/v3.0/test.php): runs unit tests in console
-- [unit-tests.xml](https://github.com/aherne/errors-api/blob/v3.0/unit-tests.xml): sets up unit tests and mocks "loggers" tag
-- [tests](https://github.com/aherne/errors-api/blob/v3.0/tests): unit tests for classes from [src](https://github.com/aherne/errors-api/blob/v3.0/src) folder
+- [test.php](https://github.com/aherne/errors-api/blob/master/test.php): runs unit tests in console
+- [unit-tests.xml](https://github.com/aherne/errors-api/blob/master/unit-tests.xml): sets up unit tests and mocks "loggers" tag
+- [tests](https://github.com/aherne/errors-api/blob/master/tests): unit tests for classes from [src](https://github.com/aherne/errors-api/blob/master/src) folder
 
 ## Reference Guide
 
@@ -285,7 +285,7 @@ These abstract classes require to be extended by developers in order to gain an 
 
 ### Class Application
 
-Class [Application](https://github.com/aherne/errors-api/blob/v3.0/src/Application.php) extends [Lucinda\MVC\Application](https://github.com/aherne/mvc#Class-Application) and adds one method relevant to developers:
+Class [Application](https://github.com/aherne/errors-api/blob/master/src/Application.php) extends [Lucinda\MVC\Application](https://github.com/aherne/mvc#Class-Application) and adds one method relevant to developers:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
@@ -293,16 +293,16 @@ Class [Application](https://github.com/aherne/errors-api/blob/v3.0/src/Applicati
 
 ### Class Application Route
 
-Class [Application\Route](https://github.com/aherne/errors-api/blob/v3.0/src/Application/Route.php) extends [Lucinda\MVC\Application\Route](https://github.com/aherne/mvc#Class-Application-Route) and adds following public methods:
+Class [Application\Route](https://github.com/aherne/errors-api/blob/master/src/Application/Route.php) extends [Lucinda\MVC\Application\Route](https://github.com/aherne/mvc#Class-Application-Route) and adds following public methods:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
-| getErrorType | void | [ErrorType](https://github.com/aherne/errors-api/blob/v3.0/src/ErrorType.php) | Gets error type based on *error_type* attribute of matching [route](#routes) XML tag |
+| getErrorType | void | [ErrorType](https://github.com/aherne/errors-api/blob/master/src/ErrorType.php) | Gets error type based on *error_type* attribute of matching [route](#routes) XML tag |
 | getHttpStatus | void |  [\\Lucinda\\MVC\\Response\\HttpStatus](https://github.com/aherne/mvc/blob/v2.0/src/Response/HttpStatus.php) | Gets response http status code based on *http_status* attribute of matching [route](#routes) XML tag |
 
 ### Class Request
 
-Class [Request](https://github.com/aherne/errors-api/blob/v3.0/src/Request.php) encapsulates handled [\Throwable](https://www.php.net/manual/en/class.throwable.php) and matching [Application\Route](#class-application-route). It defines following public methods relevant to developers:
+Class [Request](https://github.com/aherne/errors-api/blob/master/src/Request.php) encapsulates handled [\Throwable](https://www.php.net/manual/en/class.throwable.php) and matching [Application\Route](#class-application-route). It defines following public methods relevant to developers:
 
 
 | Method | Arguments | Returns | Description |
@@ -312,7 +312,7 @@ Class [Request](https://github.com/aherne/errors-api/blob/v3.0/src/Request.php) 
 
 ## Interface ErrorHandler
 
-Interface [ErrorHandler](https://github.com/aherne/errors-api/blob/v3.0/src/ErrorHandler.php) contains blueprint for handling [\Throwable](https://www.php.net/manual/en/class.throwable.php) via method:
+Interface [ErrorHandler](https://github.com/aherne/errors-api/blob/master/src/ErrorHandler.php) contains blueprint for handling [\Throwable](https://www.php.net/manual/en/class.throwable.php) via method:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
@@ -324,7 +324,7 @@ https://github.com/aherne/lucinda-framework/blob/master/src/EmergencyHandler.php
 
 ### Abstract Class Reporter
 
-Abstract class [Reporter](https://github.com/aherne/errors-api/blob/v3.0/src/Reporter.php) implements [\Lucinda\MVC\Runnable](https://github.com/aherne/mvc#interface-runnable) and encapsulates a single [\Throwable](https://www.php.net/manual/en/class.throwable.php) reporter. It defines following public method relevant to developers:
+Abstract class [Reporter](https://github.com/aherne/errors-api/blob/master/src/Reporter.php) implements [\Lucinda\MVC\Runnable](https://github.com/aherne/mvc#interface-runnable) and encapsulates a single [\Throwable](https://www.php.net/manual/en/class.throwable.php) reporter. It defines following public method relevant to developers:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
@@ -346,7 +346,7 @@ For more info how reporters are detected, check [How Are Reporters Located](#how
 
 ### Abstract Class Controller
 
-Abstract class [Controller](https://github.com/aherne/errors-api/blob/v3.0/src/Controller.php) implements [\Lucinda\MVC\Runnable](https://github.com/aherne/mvc#interface-runnable)) to set up response (views in particular) based on information detected beforehand. It defines following public method relevant to developers:
+Abstract class [Controller](https://github.com/aherne/errors-api/blob/master/src/Controller.php) implements [\Lucinda\MVC\Runnable](https://github.com/aherne/mvc#interface-runnable)) to set up response (views in particular) based on information detected beforehand. It defines following public method relevant to developers:
 
 | Method | Arguments | Returns | Description |
 | --- | --- | --- | --- |
