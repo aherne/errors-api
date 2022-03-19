@@ -68,7 +68,7 @@ class Application extends \Lucinda\MVC\Application
         if ($xml===null) {
             return;
         }
-        $list = $xml->xpath("//reporter");
+        $list = $xml->xpath("reporter");
         foreach ($list as $info) {
             $reporterClass = (string) $info['class'];
             if (!$reporterClass) {
