@@ -68,7 +68,7 @@ class Application extends \Lucinda\MVC\Application
         if ($xml===null) {
             return;
         }
-        $list = $xml->xpath("//reporter");
+        $list = $xml->xpath("reporter");
         foreach ($list as $info) {
             $reporterClass = (string) $info['class'];
             if (!$reporterClass) {
@@ -88,7 +88,7 @@ class Application extends \Lucinda\MVC\Application
     protected function setRoutes(): void
     {
         $xml = $this->getTag("routes");
-        $list = $xml->xpath("//route");
+        $list = $xml->xpath("route");
         foreach ($list as $info) {
             $id = (string) $info['id'];
             if (!$id) {
