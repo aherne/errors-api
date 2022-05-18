@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\STDERR\mocks\Reporters;
 
 use Lucinda\STDERR\Reporter;

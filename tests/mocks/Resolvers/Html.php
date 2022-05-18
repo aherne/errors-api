@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\STDERR\mocks\Resolvers;
 
 use Lucinda\MVC\ViewResolver;

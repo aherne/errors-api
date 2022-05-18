@@ -1,4 +1,5 @@
 <?php
+
 namespace Test\Lucinda\STDERR;
 
 use Lucinda\STDERR\Request;
@@ -10,7 +11,7 @@ class RequestTest
     private $object;
     private $route;
     private $exception;
-    
+
     public function __construct()
     {
         $this->route = new Route(simplexml_load_string('
@@ -24,7 +25,7 @@ class RequestTest
     {
         return new Result($this->object->getRoute()==$this->route);
     }
-        
+
 
     public function getException()
     {

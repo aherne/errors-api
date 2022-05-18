@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\STDERR\Application;
 
 use Lucinda\MVC\ConfigurationException;
@@ -38,7 +39,7 @@ class Route extends \Lucinda\MVC\Application\Route
             return;
         }
         $cases = HttpStatus::cases();
-        foreach($cases as $case) {
+        foreach ($cases as $case) {
             if (str_starts_with($case->value, $httpStatus)) {
                 $this->httpStatus = $case;
                 return;
@@ -74,7 +75,7 @@ class Route extends \Lucinda\MVC\Application\Route
             throw new ConfigurationException("Invalid error type: ".$errorType);
         }
     }
-    
+
     /**
      * Gets error type associated to exception handled.
      *

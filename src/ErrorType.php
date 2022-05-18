@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\STDERR;
 
 /**
@@ -13,7 +14,7 @@ enum ErrorType: string
 {
     case NONE = "NONE";  // Exceptions that are not errors
     case SERVER = "SERVER"; // Exceptions thrown when operations with server fail
-    case CLIENT = "CLIENT"; // Exceptions thrown when client is performing an illegal operation (eg: asking for a resource that doesn't exist)
+    case CLIENT = "CLIENT"; // Exceptions thrown when client is at fault (eg: asking for a resource that doesn't exist)
     case SYNTAX = "SYNTAX"; // Exceptions thrown automatically when a syntax error occurs
     case LOGICAL = "LOGICAL"; // Exceptions thrown on logical errors in code
 }

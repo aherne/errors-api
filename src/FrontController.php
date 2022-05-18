@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\STDERR;
 
 use Lucinda\MVC\Application\Format;
@@ -27,8 +28,12 @@ class FrontController implements ErrorHandler
      * @param string $includePath Absolute root path where reporters / resolvers / controllers / views should be located
      * @param ErrorHandler $emergencyHandler Handler to use if an error occurs while FrontController handles an exception
      */
-    public function __construct(string $documentDescriptor, string $developmentEnvironment, string $includePath, ErrorHandler $emergencyHandler)
-    {
+    public function __construct(
+        string $documentDescriptor,
+        string $developmentEnvironment,
+        string $includePath,
+        ErrorHandler $emergencyHandler
+    ) {
         // sets up system to track errors
         error_reporting(E_ALL);
         set_error_handler('\\Lucinda\\STDERR\\PHPException::nonFatalError', E_ALL);
@@ -36,7 +41,7 @@ class FrontController implements ErrorHandler
         PHPException::setErrorHandler($this);
         set_exception_handler(array($this,"handle"));
         ini_set("display_errors", 0);
-        
+
         // registers args to be used on demand
         $this->documentDescriptor = $documentDescriptor;
         $this->developmentEnvironment = $developmentEnvironment;
@@ -64,50 +69,50 @@ class FrontController implements ErrorHandler
     {
         // sets include path
         set_include_path($this->includePath);
-        
+
         // redirects errors to emergency handler
         PHPException::setErrorHandler($this->emergencyHandler);
         set_exception_handler(array($this->emergencyHandler,"handle"));
-        
+
         // finds application settings based on XML and development environment
         $application = new Application($this->documentDescriptor, $this->developmentEnvironment);
-        
+
         // finds and instances routes based on XML and exception received
         $request = new Request($this->getRoute($application, $exception), $exception);
-        
+
         // builds reporters list then reports exception
         $reporters = $application->reporters();
         foreach ($reporters as $className=>$xml) {
             $object = new $className($request, $xml);
             $object->run();
         }
-        
+
         // compiles a response object from content type and http status
         $format = $this->getResponseFormat($application);
         $response = new Response($this->getContentType($format), $this->getTemplateFile($application, $request));
         $response->setStatus($this->getResponseStatus($request->getRoute()));
-        
+
         // locates and runs controller
         $className = $request->getRoute()->getController();
         if ($className) {
             $object = new $className($application, $request, $response);
             $object->run();
         }
-        
+
         // set up response based on view
         if ($response->getBody()===null) {
             $className = $format->getViewResolver();
             $object = new $className($application, $response);
             $object->run();
         }
-        
+
         // commits response to caller
         $response->commit();
     }
-    
+
     /**
      * Gets response http status code
-     * 
+     *
      * @param Route $route
      * @return HttpStatus
      */
@@ -115,7 +120,7 @@ class FrontController implements ErrorHandler
     {
         return ($route->getHttpStatus()??HttpStatus::INTERNAL_SERVER_ERROR);
     }
-    
+
     /**
      * Gets response template file
      *
@@ -125,9 +130,9 @@ class FrontController implements ErrorHandler
      */
     private function getTemplateFile(Application $application, Request $request): string
     {
-        return ($request->getRoute()->getView()?($application->getViewsPath()."/".$request->getRoute()->getView()):"");
+        return ($request->getRoute()->getView() ? ($application->getViewsPath()."/".$request->getRoute()->getView()) : "");
     }
-    
+
     /**
      * Gets response content type
      *
@@ -136,12 +141,13 @@ class FrontController implements ErrorHandler
      */
     private function getContentType(Format $format): string
     {
-        return $format->getContentType().($format->getCharacterEncoding()?"; charset=".$format->getCharacterEncoding():"");
+        $charset = ($format->getCharacterEncoding() ? "; charset=".$format->getCharacterEncoding() : "");
+        return $format->getContentType().$charset;
     }
-    
+
     /**
      * Gets route to handle
-     * 
+     *
      * @param Application $application
      * @param \Throwable $exception
      * @return Route
@@ -161,17 +167,17 @@ class FrontController implements ErrorHandler
             }
         }
     }
-    
+
     /**
      * Gets response format to use
-     * 
+     *
      * @param Application $application
      * @return Format
      * @throws ConfigurationException
      */
     private function getResponseFormat(Application $application): Format
     {
-        $format = $this->displayFormat?$this->displayFormat:$application->getDefaultFormat();
+        $format = $this->displayFormat ? $this->displayFormat : $application->getDefaultFormat();
         $resolvers = $application->resolvers();
         if (isset($resolvers[$format])) {
             return $resolvers[$format];

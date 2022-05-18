@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\STDERR;
 
 use Lucinda\MVC\Runnable;
@@ -10,7 +11,7 @@ abstract class Reporter implements Runnable
 {
     protected Request $request;
     protected \SimpleXMLElement $xml;
-    
+
     /**
      * Reports error info to a storage medium.
      *

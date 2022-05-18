@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\STDERR;
 
 /**
@@ -6,14 +7,13 @@ namespace Lucinda\STDERR;
  */
 class PHPException extends \Exception
 {
-    
     /**
      * Object to which error handling will be delegated to.
      *
      * @var ErrorHandler $errorHandler
      */
     private static ErrorHandler $errorHandler;
-    
+
 
     /**
      * Sets object to which error handling will be delegated to.
@@ -34,7 +34,7 @@ class PHPException extends \Exception
     {
         return self::$errorHandler;
     }
-    
+
     /**
      * Function called automatically when a non-fatal PHP error is encountered.
      *
@@ -48,13 +48,13 @@ class PHPException extends \Exception
         $e = new self($message, $errorNumber);
         $e->line = $line;
         $e->file = $file;
-        if (!self::$errorHandler) {
+        if (empty(self::$errorHandler)) {
             die($message);
         }
         self::$errorHandler->handle($e);
         die(); // prevents double-reporting if exception is caught
     }
-    
+
     /**
      * Function called automatically when a fatal PHP error is encountered.
      */
@@ -65,7 +65,7 @@ class PHPException extends \Exception
             $e = new self($error['message'], 0);
             $e->line = $error['line'];
             $e->file = $error['file'];
-            if (!self::$errorHandler) {
+            if (empty(self::$errorHandler)) {
                 die($error['message']);
             }
             self::$errorHandler->handle($e);

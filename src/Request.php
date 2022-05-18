@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\STDERR;
 
 use Lucinda\STDERR\Application\Route;

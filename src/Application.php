@@ -1,4 +1,5 @@
 <?php
+
 namespace Lucinda\STDERR;
 
 use Lucinda\MVC\ConfigurationException;
@@ -16,9 +17,12 @@ use Lucinda\STDERR\Application\Route;
 class Application extends \Lucinda\MVC\Application
 {
     private bool $displayErrors=false;
-    private array $reporters=array();
     private string $developmentEnvironment;
-    
+    /**
+     * @var array<string,\SimpleXMLElement>
+     */
+    private array $reporters=array();
+
     /**
      * Performs detection process.
      *
@@ -36,7 +40,7 @@ class Application extends \Lucinda\MVC\Application
         $this->setRoutes();
         $this->setResolvers();
     }
-    
+
     /**
      * Sets whether or not error details should be displayed based on contents of "display_errors" XML tag:
      */
@@ -46,7 +50,7 @@ class Application extends \Lucinda\MVC\Application
         $value = $xml->{$this->developmentEnvironment};
         $this->displayErrors = (bool)((string)$value);
     }
-    
+
     /**
      * Gets whether or not error details should be displayed.
      *
@@ -56,7 +60,7 @@ class Application extends \Lucinda\MVC\Application
     {
         return $this->displayErrors;
     }
-    
+
     /**
      * Reads content of tag reporters
      *
@@ -80,7 +84,7 @@ class Application extends \Lucinda\MVC\Application
             throw new ConfigurationException("Tag is empty: reporters");
         }
     }
-    
+
     /**
      * {@inheritDoc}
      * @see \Lucinda\MVC\Application::setRoutes()
@@ -97,12 +101,12 @@ class Application extends \Lucinda\MVC\Application
             $this->routes[$id] = new Route($info);
         }
     }
-    
+
     /**
      * Gets content of tag reporters
      *
      * @param string $className
-     * @return \SimpleXMLElement|array|null
+     * @return \SimpleXMLElement|array<string,\SimpleXMLElement>|null
      */
     public function reporters(string $className=""): \SimpleXMLElement|array|null
     {
