@@ -15,7 +15,7 @@ class Request
     /**
      * Detects route based on exception handled.
      *
-     * @param Route $route Matching route information detected from XML
+     * @param Route      $route     Matching route information detected from XML
      * @param \Throwable $exception Error "request" that fed STDERR stream
      */
     public function __construct(Route $route, \Throwable $exception)

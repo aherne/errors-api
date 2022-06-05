@@ -26,8 +26,8 @@ class Application extends \Lucinda\MVC\Application
     /**
      * Performs detection process.
      *
-     * @param string $xmlFilePath Relative location of XML file containing settings.
-     * @param string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
+     * @param  string $xmlFilePath            Relative location of XML file containing settings.
+     * @param  string $developmentEnvironment Development environment server is running into (eg: local, dev, live)
      * @throws ConfigurationException If XML is misconfigured.
      */
     public function __construct(string $xmlFilePath, string $developmentEnvironment)
@@ -87,6 +87,7 @@ class Application extends \Lucinda\MVC\Application
 
     /**
      * {@inheritDoc}
+     *
      * @see \Lucinda\MVC\Application::setRoutes()
      */
     protected function setRoutes(): void
@@ -105,7 +106,7 @@ class Application extends \Lucinda\MVC\Application
     /**
      * Gets content of tag reporters
      *
-     * @param string $className
+     * @param  string $className
      * @return \SimpleXMLElement|array<string,\SimpleXMLElement>|null
      */
     public function reporters(string $className=""): \SimpleXMLElement|array|null

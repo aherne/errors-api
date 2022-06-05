@@ -19,9 +19,10 @@ abstract class Controller implements Runnable
 
     /**
      * Controller constructor.
+     *
      * @param Application $application Encapsulates application settings detected from xml and development environment.
-     * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
-     * @param Response $response Encapsulates response.
+     * @param Request     $request     Encapsulates error request, including exception/error itself and route that maps it.
+     * @param Response    $response    Encapsulates response.
      */
     public function __construct(Application $application, Request $request, Response $response)
     {

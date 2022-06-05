@@ -17,7 +17,7 @@ class Route extends \Lucinda\MVC\Application\Route
     /**
      * Detects route info from <exception> tag
      *
-     * @param \SimpleXMLElement $info
+     * @param  \SimpleXMLElement $info
      * @throws ConfigurationException
      */
     public function __construct(\SimpleXMLElement $info)
@@ -30,7 +30,7 @@ class Route extends \Lucinda\MVC\Application\Route
     /**
      * Sets http status associated to exception handled.
      *
-     * @param string $httpStatus
+     * @param  string $httpStatus
      * @throws ConfigurationException
      */
     private function setHttpStatus(string $httpStatus): void
@@ -61,7 +61,7 @@ class Route extends \Lucinda\MVC\Application\Route
     /**
      * Sets HTTP status associated to exception handled.
      *
-     * @param string $errorType
+     * @param  string $errorType
      * @throws ConfigurationException
      */
     private function setErrorType(string $errorType): void

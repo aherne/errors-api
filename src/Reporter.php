@@ -15,8 +15,8 @@ abstract class Reporter implements Runnable
     /**
      * Reports error info to a storage medium.
      *
-     * @param Request $request Encapsulates error request, including exception/error itself and route that maps it.
-     * @param \SimpleXMLElement $xml XML that sets up individual reporter
+     * @param Request           $request Encapsulates error request, including exception/error itself and route that maps it.
+     * @param \SimpleXMLElement $xml     XML that sets up individual reporter
      */
     public function __construct(Request $request, \SimpleXMLElement $xml)
     {

@@ -23,10 +23,10 @@ class FrontController implements ErrorHandler
     /**
      * Redirects all uncaught exceptions and PHP errors in current application to itself.
      *
-     * @param string $documentDescriptor Path to XML file containing your application settings.
-     * @param string $developmentEnvironment Development environment application is running into (eg: local, dev, live)
-     * @param string $includePath Absolute root path where reporters / resolvers / controllers / views should be located
-     * @param ErrorHandler $emergencyHandler Handler to use if an error occurs while FrontController handles an exception
+     * @param string       $documentDescriptor     Path to XML file containing your application settings.
+     * @param string       $developmentEnvironment Development environment application is running into (eg: local, dev, live)
+     * @param string       $includePath            Absolute root path where reporters / resolvers / controllers / views should be located
+     * @param ErrorHandler $emergencyHandler       Handler to use if an error occurs while FrontController handles an exception
      */
     public function __construct(
         string $documentDescriptor,
@@ -62,7 +62,7 @@ class FrontController implements ErrorHandler
     /**
      * Handles errors by delegating to registered storage mediums (if any) then output using display method (if any)
      *
-     * @param \Throwable $exception Encapsulates error information.
+     * @param  \Throwable $exception Encapsulates error information.
      * @throws ConfigurationException
      */
     public function handle(\Throwable $exception): void
@@ -113,7 +113,7 @@ class FrontController implements ErrorHandler
     /**
      * Gets response http status code
      *
-     * @param Route $route
+     * @param  Route $route
      * @return HttpStatus
      */
     private function getResponseStatus(Route $route): HttpStatus
@@ -124,8 +124,8 @@ class FrontController implements ErrorHandler
     /**
      * Gets response template file
      *
-     * @param Application $application
-     * @param Request $request
+     * @param  Application $application
+     * @param  Request     $request
      * @return string
      */
     private function getTemplateFile(Application $application, Request $request): string
@@ -136,7 +136,7 @@ class FrontController implements ErrorHandler
     /**
      * Gets response content type
      *
-     * @param Format $format
+     * @param  Format $format
      * @return string
      */
     private function getContentType(Format $format): string
@@ -148,8 +148,8 @@ class FrontController implements ErrorHandler
     /**
      * Gets route to handle
      *
-     * @param Application $application
-     * @param \Throwable $exception
+     * @param  Application $application
+     * @param  \Throwable  $exception
      * @return Route
      * @throws ConfigurationException
      */
@@ -171,7 +171,7 @@ class FrontController implements ErrorHandler
     /**
      * Gets response format to use
      *
-     * @param Application $application
+     * @param  Application $application
      * @return Format
      * @throws ConfigurationException
      */

@@ -39,8 +39,8 @@ class PHPException extends \Exception
      * Function called automatically when a non-fatal PHP error is encountered.
      *
      * @param integer $errorNumber
-     * @param string $message
-     * @param string $file
+     * @param string  $message
+     * @param string  $file
      * @param integer $line
      */
     public static function nonFatalError(int $errorNumber, string $message, string $file, int $line): never
