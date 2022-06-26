@@ -112,17 +112,9 @@ class FrontController implements ErrorHandler
      * @param Route $route
      * @return int
      */
-    private function getResponseStatus(Route $route): string
+    private function getResponseStatus(Route $route): int
     {
-        $statusCode = ($route->getHttpStatus()?$route->getHttpStatus():self::DEFAULT_HTTP_STATUS);
-        $reflectionClass = new \ReflectionClass(HttpStatus::class);
-        $constants = $reflectionClass->getConstants();
-        foreach ($constants as $constant) {
-            if (strpos($constant, $statusCode." ")===0) {
-                return $constant;
-            }
-        }
-        throw new ConfigurationException("HTTP status not found: ".$statusCode);
+        return (int) ($route->getHttpStatus()?$route->getHttpStatus():self::DEFAULT_HTTP_STATUS);
     }
     
     /**
