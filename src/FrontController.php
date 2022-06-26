@@ -3,6 +3,7 @@ namespace Lucinda\STDERR;
 
 use Lucinda\MVC\Application\Format;
 use Lucinda\MVC\Response;
+use Lucinda\MVC\Response\HttpStatus;
 use Lucinda\STDERR\Application\Route;
 use Lucinda\MVC\ConfigurationException;
 
@@ -111,9 +112,17 @@ class FrontController implements ErrorHandler
      * @param Route $route
      * @return int
      */
-    private function getResponseStatus(Route $route): int
+    private function getResponseStatus(Route $route): string
     {
-        return ($route->getHttpStatus()?$route->getHttpStatus():self::DEFAULT_HTTP_STATUS);
+        $statusCode = ($route->getHttpStatus()?$route->getHttpStatus():self::DEFAULT_HTTP_STATUS);
+        $reflectionClass = new \ReflectionClass(HttpStatus::class);
+        $constants = $reflectionClass->getConstants();
+        foreach ($constants as $constant) {
+            if (strpos($constant, $statusCode." ")===0) {
+                return $constant;
+            }
+        }
+        throw new ConfigurationException("HTTP status not found: ".$statusCode);
     }
     
     /**
