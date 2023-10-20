@@ -155,15 +155,19 @@ class Response
      */
     public function commit()
     {
+        $headersSent = headers_sent();
+
         // do not display anything, if headers have already been sent
-        if (!headers_sent() && $this->status) {
+        if (!$headersSent && $this->status) {
             header("HTTP/1.1 ".$this->status->getId()." ".$this->status->getDescription());
         }
         
         if (!$this->isDisabled) {
             // sends headers
-            foreach ($this->headers as $name=>$value) {
-                header($name.": ".$value);
+            if (!$headersSent) {
+                foreach ($this->headers as $name=>$value) {
+                    header($name.": ".$value);
+                }
             }
             
             // show output
