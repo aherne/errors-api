@@ -14,11 +14,11 @@ use Lucinda\MVC\Response\HttpStatus;
  */
 class FrontController implements ErrorHandler
 {
-    private ?string $displayFormat = null;
-    private string $documentDescriptor;
-    private string $developmentEnvironment;
-    private string $includePath;
-    private ErrorHandler $emergencyHandler;
+    protected ?string $displayFormat = null;
+    protected string $documentDescriptor;
+    protected string $developmentEnvironment;
+    protected string $includePath;
+    protected ErrorHandler $emergencyHandler;
 
     /**
      * Redirects all uncaught exceptions and PHP errors in current application to itself.
@@ -184,7 +184,7 @@ class FrontController implements ErrorHandler
      * @return Route
      * @throws ConfigurationException
      */
-    private function getRoute(Application $application, \Throwable $exception): Route
+    protected function getRoute(Application $application, \Throwable $exception): Route
     {
         $routes = $application->routes();
         $targetClass = get_class($exception);
@@ -204,7 +204,7 @@ class FrontController implements ErrorHandler
      * @return Format
      * @throws ConfigurationException
      */
-    private function getResponseFormat(Application $application): Format
+    protected function getResponseFormat(Application $application): Format
     {
         $format = $this->displayFormat ? $this->displayFormat : $application->getDefaultFormat();
         $resolvers = $application->resolvers();
