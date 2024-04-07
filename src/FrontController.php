@@ -60,11 +60,12 @@ class FrontController implements ErrorHandler
     {
         $this->displayFormat = $displayFormat;
     }
-    
+
     /**
      * Handles errors by delegating to registered storage mediums (if any) then output using display method (if any)
      *
      * @param \Throwable $exception Encapsulates error information.
+     * @throws ConfigurationException
      */
     public function handle(\Throwable $exception): void
     {
@@ -191,12 +192,10 @@ class FrontController implements ErrorHandler
         $targetClass = get_class($exception);
         if (isset($routes[$targetClass])) {
             return $routes[$targetClass];
+        } elseif (isset($routes[$application->getDefaultRoute()])) {
+            return $routes[$application->getDefaultRoute()];
         } else {
-            if (isset($routes[$application->getDefaultRoute()])) {
-                return $routes[$application->getDefaultRoute()];
-            } else {
-                throw new ConfigurationException("Default route matches no route!");
-            }
+            throw new ConfigurationException("Default route matches no route!");
         }
     }
     
@@ -213,12 +212,10 @@ class FrontController implements ErrorHandler
         $resolvers = $application->resolvers();
         if (isset($resolvers[$format])) {
             return $resolvers[$format];
+        } elseif (isset($resolvers[$application->getDefaultFormat()])) {
+            return $resolvers[$application->getDefaultFormat()];
         } else {
-            if (isset($resolvers[$application->getDefaultFormat()])) {
-                return $resolvers[$application->getDefaultFormat()];
-            } else {
-                throw new ConfigurationException("Default format matches no resolver!");
-            }
+            throw new ConfigurationException("Default format matches no resolver!");
         }
     }
 }
