@@ -72,77 +72,108 @@ class FrontController implements ErrorHandler
 
         // redirects errors to emergency handler
         PHPException::setErrorHandler($this->emergencyHandler);
-        set_exception_handler(array($this->emergencyHandler,"handle"));
+        set_exception_handler([$this->emergencyHandler, "handle"]);
 
         // finds application settings based on XML and development environment
         $application = new Application($this->documentDescriptor, $this->developmentEnvironment);
 
+        // detects route to handle
+        $route = $this->getRoute($application, $exception);
+
         // finds and instances routes based on XML and exception received
-        $request = new Request($this->getRoute($application, $exception), $exception);
+        $request = new Request($route, $exception);
 
         // builds reporters list then reports exception
+        $this->runReporters($application, $request);
+
+        // determines response format
+        $format = $this->getResponseFormat($application);
+
+        // compiles a response object from content type and http status
+        $response = $this->generateResponse($application, $route, $format);
+
+        // locates and runs controller
+        $this->runController($application, $request, $response);
+
+        // set up response based on view
+        $this->runViewResolver($application, $response, $format);
+
+        // sets http status and commits response to caller
+        $response->commit();
+    }
+
+    /**
+     * Iterates over error reporters and runs them
+     *
+     * @param Application $application
+     * @param Request $request
+     * @return void
+     */
+    protected function runReporters(Application $application, Request $request): void
+    {
         $reporters = $application->reporters();
         foreach ($reporters as $className=>$xml) {
             $object = new $className($request, $xml);
             $object->run();
         }
+    }
 
-        // compiles a response object from content type and http status
-        $format = $this->getResponseFormat($application);
-        $response = new Response($this->getContentType($format), $this->getTemplateFile($application, $request));
-        $response->setStatus($this->getResponseStatus($request->getRoute()));
-
-        // locates and runs controller
-        $className = $request->getRoute()->getController();
-        if ($className) {
+    /**
+     * Detects and runs exception controller, if any
+     *
+     * @param Application $application
+     * @param Request $request
+     * @param Response $response
+     * @return void
+     */
+    protected function runController(Application $application, Request $request, Response $response): void
+    {
+        if ($className = $request->getRoute()->getController()) {
             $object = new $className($application, $request, $response);
             $object->run();
         }
+    }
 
-        // set up response based on view
+    /**
+     * Detects resolver to compile view into response body, if not already written
+     *
+     * @param Application $application
+     * @param Response $response
+     * @param Format $format
+     * @return void
+     */
+    protected function runViewResolver(Application $application, Response $response, Format $format): void
+    {
         if ($response->getBody()===null) {
             $className = $format->getViewResolver();
             $object = new $className($application, $response);
             $object->run();
         }
-
-        // commits response to caller
-        $response->commit();
     }
 
     /**
-     * Gets response http status code
+     * Generates preliminary body-less response based on information gathered from route and format
      *
-     * @param  Route $route
-     * @return HttpStatus
+     * @param Application $application
+     * @param Route $route
+     * @param Format $format
+     * @return Response
+     * @throws ConfigurationException
      */
-    private function getResponseStatus(Route $route): HttpStatus
+    protected function generateResponse(Application $application, Route $route, Format $format): Response
     {
-        return ($route->getHttpStatus()??HttpStatus::INTERNAL_SERVER_ERROR);
-    }
+        $charset = $format->getCharacterEncoding();
+        $contentType = $format->getContentType().($charset ? "; charset=".$charset : "");
 
-    /**
-     * Gets response template file
-     *
-     * @param  Application $application
-     * @param  Request     $request
-     * @return string
-     */
-    private function getTemplateFile(Application $application, Request $request): string
-    {
-        return ($request->getRoute()->getView() ? ($application->getViewsPath()."/".$request->getRoute()->getView()) : "");
-    }
+        $view = $route->getView();
+        $templateFile = $view ? ($application->getViewsPath()."/".$view) : "";
 
-    /**
-     * Gets response content type
-     *
-     * @param  Format $format
-     * @return string
-     */
-    private function getContentType(Format $format): string
-    {
-        $charset = ($format->getCharacterEncoding() ? "; charset=".$format->getCharacterEncoding() : "");
-        return $format->getContentType().$charset;
+        $status = $route->getHttpStatus();
+        $httpStatus = ($status ?: HttpStatus::INTERNAL_SERVER_ERROR);
+
+        $response = new Response($contentType, $templateFile);
+        $response->setStatus($httpStatus);
+        return $response;
     }
 
     /**
@@ -159,12 +190,10 @@ class FrontController implements ErrorHandler
         $targetClass = get_class($exception);
         if (isset($routes[$targetClass])) {
             return $routes[$targetClass];
+        } elseif (isset($routes[$application->getDefaultRoute()])) {
+            return $routes[$application->getDefaultRoute()];
         } else {
-            if (isset($routes[$application->getDefaultRoute()])) {
-                return $routes[$application->getDefaultRoute()];
-            } else {
-                throw new ConfigurationException("Default route matches no route!");
-            }
+            throw new ConfigurationException("Default route matches no route!");
         }
     }
 
@@ -181,12 +210,10 @@ class FrontController implements ErrorHandler
         $resolvers = $application->resolvers();
         if (isset($resolvers[$format])) {
             return $resolvers[$format];
+        } elseif (isset($resolvers[$application->getDefaultFormat()])) {
+            return $resolvers[$application->getDefaultFormat()];
         } else {
-            if (isset($resolvers[$application->getDefaultFormat()])) {
-                return $resolvers[$application->getDefaultFormat()];
-            } else {
-                throw new ConfigurationException("Default format matches no resolver!");
-            }
+            throw new ConfigurationException("Default format matches no resolver!");
         }
     }
 }
