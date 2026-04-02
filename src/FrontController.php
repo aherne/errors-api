@@ -2,51 +2,78 @@
 
 namespace Lucinda\STDERR;
 
-use Lucinda\MVC\Application\Format;
-use Lucinda\MVC\Response;
-use Lucinda\STDERR\Application\Route;
+use Lucinda\MVC\Response\Basic as Response;
 use Lucinda\MVC\ConfigurationException;
+use Lucinda\MVC\Controller\ViewAware;
+use Lucinda\MVC\FacetRegistry;
+use Lucinda\MVC\ReflectionInjector;
 use Lucinda\MVC\Response\HttpStatus;
+use Lucinda\MVC\Response\View;
+use Lucinda\MVC\Service\ViewDetector;
+use Lucinda\STDERR\Service\ContentTypeDetector;
+use Lucinda\STDERR\Validators\ValidatedRequest;
+use Lucinda\STDERR\XmlTags\ResolverInfo;
+use Lucinda\STDERR\XmlTags\RouteInfo;
+use Throwable;
 
 /**
  * Error handler that bootstraps all uncaught exceptions and PHP errors as a STDERR front controller that feeds on
  * exception instances instead of requests.
  */
-class FrontController implements ErrorHandler
+final class FrontController implements ErrorHandler
 {
-    protected ?string $displayFormat = null;
-    protected string $documentDescriptor;
-    protected string $developmentEnvironment;
-    protected string $includePath;
-    protected ErrorHandler $emergencyHandler;
+    const DEFAULT_EXIT_CODE = 1;
+
+    private ?string $displayFormat = null;
+    private string $documentDescriptor;
+    private string $includePath;
+    private ErrorReporter $reporter;
+    private FatalErrorResolver $emergencyResolver;
+    protected FacetRegistry $facetRegistry;
+    protected ReflectionInjector $reflectionInjector;
+    private bool $displayErrors;
+
+    private bool $handling = false;
+    private int $exitCode = self::DEFAULT_EXIT_CODE;
 
     /**
      * Redirects all uncaught exceptions and PHP errors in current application to itself.
      *
      * @param string       $documentDescriptor     Path to XML file containing your application settings.
-     * @param string       $developmentEnvironment Development environment application is running into (eg: local, dev, live)
      * @param string       $includePath            Absolute root path where reporters / resolvers / controllers / views should be located
-     * @param ErrorHandler $emergencyHandler       Handler to use if an error occurs while FrontController handles an exception
+     * @param ErrorReporter $errorReporter
+     * @param FatalErrorResolver $emergencyResolver       Handler to use if an error occurs while FrontController handles an exception
+     * @param bool $displayErrors 
      */
     public function __construct(
         string $documentDescriptor,
-        string $developmentEnvironment,
         string $includePath,
-        ErrorHandler $emergencyHandler
+        ErrorReporter $reporter,
+        FatalErrorResolver $emergencyResolver,
+        bool $displayErrors = false
     ) {
+        // registers args to be used on demand
+        $this->documentDescriptor = $documentDescriptor;
+        $this->includePath = $includePath;
+        $this->reporter = $reporter;
+        $this->emergencyResolver = $emergencyResolver;
+        $this->displayErrors = $displayErrors;
+        $this->facetRegistry = new FacetRegistry();
+        $this->reflectionInjector = new ReflectionInjector($this->facetRegistry);
+        
+        $this->startListening();
+    }
+
+    private function startListening(): void
+    {
         // sets up system to track errors
+        ini_set("display_errors", 0);
+        ini_set('log_errors', '1');              // ensure logging is on    
         error_reporting(E_ALL);
+        set_exception_handler([$this,"handle"]);
         set_error_handler('\\Lucinda\\STDERR\\PHPException::nonFatalError', E_ALL);
         register_shutdown_function('\\Lucinda\\STDERR\\PHPException::fatalError');
         PHPException::setErrorHandler($this);
-        set_exception_handler(array($this,"handle"));
-        ini_set("display_errors", 0);
-
-        // registers args to be used on demand
-        $this->documentDescriptor = $documentDescriptor;
-        $this->developmentEnvironment = $developmentEnvironment;
-        $this->includePath = $includePath;
-        $this->emergencyHandler = $emergencyHandler;
     }
 
     /**
@@ -67,71 +94,110 @@ class FrontController implements ErrorHandler
      */
     public function handle(\Throwable $exception): void
     {
-        // sets include path
-        set_include_path($this->includePath);
+        // avoid recursive reentry while already handling an exception
+        if (!$this->startHandling()) {
+            return;
+        }
 
-        // redirects errors to emergency handler
-        PHPException::setErrorHandler($this->emergencyHandler);
-        set_exception_handler([$this->emergencyHandler, "handle"]);
+        try {
+            // sets include path
+            set_include_path($this->includePath);
 
-        // finds application settings based on XML and development environment
-        $application = new Application($this->documentDescriptor, $this->developmentEnvironment);
+            // reports immediately
+            $this->reporter->report($exception);
 
-        // detects route to handle
-        $route = $this->getRoute($application, $exception);
+            // finds application settings based on XML and development environment
+            $application = new Application($this->documentDescriptor);
+            $this->facetRegistry->put($application->getApplicationInfo());
 
-        // finds and instances routes based on XML and exception received
-        $request = new Request($route, $exception);
+            // detects route to handle
+            $requestValidator = new ValidatedRequest($application, $exception, $this->displayFormat);
+            $routeInfo = $application->getRoutes($requestValidator->getRoute());
+            $resolverInfo = $application->getResolvers($requestValidator->getFormat());
 
-        // builds reporters list then reports exception
-        $this->runReporters($application, $request);
+            // finds and instances routes based on XML and exception received
+            $request = new Request($routeInfo, $exception);
+            $this->facetRegistry->put($request);
 
-        // determines response format
-        $format = $this->getResponseFormat($application);
+            // compiles a response object from content type and http status
+            $response = $this->generateResponse($application, $routeInfo, $resolverInfo);
 
-        // compiles a response object from content type and http status
-        $response = $this->generateResponse($application, $route, $format);
+            // locates and runs controller
+            $filledView = $this->runController($request);
+            $viewDetector = new ViewDetector($application, $requestValidator, $filledView);
+            if ($view = $viewDetector->getView()) {
+                $this->runViewResolver($resolverInfo, $response, $view);
+            }
 
-        // locates and runs controller
-        $this->runController($application, $request, $response);
+            // sets http status and commits response to caller
+            $response->run();
 
-        // set up response based on view
-        $this->runViewResolver($application, $response, $format);
-
-        // sets http status and commits response to caller
-        $response->commit();
+            if ($response instanceof ConsoleResponse) {
+                $this->exitCode = $response->getExitCode();
+            }
+        } catch (\Throwable $apiException) {
+            $this->handleFatal($apiException, $exception);    
+        } finally {
+            $this->handling = false;
+        }
     }
 
-    /**
-     * Iterates over error reporters and runs them
-     *
-     * @param Application $application
-     * @param Request $request
-     * @return void
-     */
-    protected function runReporters(Application $application, Request $request): void
+    public function handleFatal(Throwable $exception, ?Throwable $previous = null): void
     {
-        $reporters = $application->reporters();
-        foreach ($reporters as $className=>$xml) {
-            $object = new $className($request, $xml);
-            $object->run();
-        }
+        try {
+            $this->reporter->report($exception, $previous);
+
+            $body = $this->emergencyResolver->resolve($exception, $previous);
+
+            $response = null;
+            if (PHP_SAPI !== 'cli') {
+                $response = new HttpResponse(HttpStatus::INTERNAL_SERVER_ERROR);
+            } else {
+                $response = new ConsoleResponse(self::DEFAULT_EXIT_CODE);
+            }
+            $response->setBody($body);
+            $response->run();
+
+            if ($response instanceof ConsoleResponse) {
+                $this->exitCode = $response->getExitCode();
+            }
+        } catch (\Throwable $exception) {
+            // swallow: emergency path must never recurse
+        }    
     }
 
     /**
      * Detects and runs exception controller, if any
      *
-     * @param Application $application
      * @param Request $request
      * @param Response $response
-     * @return void
+     * @return ?View
      */
-    protected function runController(Application $application, Request $request, Response $response): void
+    protected function runController(Request $request): ?View
     {
         if ($className = $request->getRoute()->getController()) {
-            $object = new $className($application, $request, $response);
-            $object->run();
+            $object = $this->reflectionInjector->create($className);
+            if ($object instanceof ViewAware) {
+                return $object->run();
+            } else {
+                $object->run();
+            }
         }
+        return null;
+    }
+
+    /**
+     * Signals that handling is active. Returns false if handling already started
+     * 
+     * @return bool
+     */
+    private function startHandling(): bool
+    {
+        if ($this->handling) {
+            return false;
+        }
+        $this->handling = true;
+        return true;
     }
 
     /**
@@ -139,81 +205,46 @@ class FrontController implements ErrorHandler
      *
      * @param Application $application
      * @param Response $response
-     * @param Format $format
+     * @param ResolverInfo $resolverInfo
      * @return void
      */
-    protected function runViewResolver(Application $application, Response $response, Format $format): void
-    {
-        if ($response->getBody()===null) {
-            $className = $format->getViewResolver();
-            $object = new $className($application, $response);
-            $object->run();
-        }
+    protected function runViewResolver(
+        ResolverInfo $resolverInfo,
+        Response $response,
+        View $view
+    ): void {
+        $resolver = $this->reflectionInjector->create($resolverInfo->getViewResolver());
+        $response->resolve($view, $resolver);
     }
 
     /**
      * Generates preliminary body-less response based on information gathered from route and format
      *
      * @param Application $application
-     * @param Route $route
-     * @param Format $format
+     * @param RouteInfo $route
+     * @param ResolverInfo $resolverInfo
      * @return Response
      * @throws ConfigurationException
      */
-    protected function generateResponse(Application $application, Route $route, Format $format): Response
+    protected function generateResponse(Application $application, RouteInfo $route, ResolverInfo $resolverInfo): Response
     {
-        $charset = $format->getCharacterEncoding();
-        $contentType = $format->getContentType().($charset ? "; charset=".$charset : "");
+        if (PHP_SAPI !== 'cli') {
+            $detector = new ContentTypeDetector($resolverInfo);
+            $contentType = $detector->getContentType();
 
-        $view = $route->getView();
-        $templateFile = $view ? ($application->getViewsPath()."/".$view) : "";
+            $status = $route->getHttpStatus();
+            $httpStatus = ($status ?: HttpStatus::INTERNAL_SERVER_ERROR);
 
-        $status = $route->getHttpStatus();
-        $httpStatus = ($status ?: HttpStatus::INTERNAL_SERVER_ERROR);
-
-        $response = new Response($contentType, $templateFile);
-        $response->setStatus($httpStatus);
-        return $response;
-    }
-
-    /**
-     * Gets route to handle
-     *
-     * @param  Application $application
-     * @param  \Throwable  $exception
-     * @return Route
-     * @throws ConfigurationException
-     */
-    protected function getRoute(Application $application, \Throwable $exception): Route
-    {
-        $routes = $application->routes();
-        $targetClass = get_class($exception);
-        if (isset($routes[$targetClass])) {
-            return $routes[$targetClass];
-        } elseif (isset($routes[$application->getDefaultRoute()])) {
-            return $routes[$application->getDefaultRoute()];
+            $response = new HttpResponse($httpStatus);
+            $response->setHeader("Content-Type", $contentType);
+            return $response;
         } else {
-            throw new ConfigurationException("Default route matches no route!");
+            return new ConsoleResponse($route->getExitCode()?:self::DEFAULT_EXIT_CODE);
         }
     }
 
-    /**
-     * Gets response format to use
-     *
-     * @param  Application $application
-     * @return Format
-     * @throws ConfigurationException
-     */
-    protected function getResponseFormat(Application $application): Format
+    public function getExitCode(): int
     {
-        $format = $this->displayFormat ? $this->displayFormat : $application->getDefaultFormat();
-        $resolvers = $application->resolvers();
-        if (isset($resolvers[$format])) {
-            return $resolvers[$format];
-        } elseif (isset($resolvers[$application->getDefaultFormat()])) {
-            return $resolvers[$application->getDefaultFormat()];
-        } else {
-            throw new ConfigurationException("Default format matches no resolver!");
-        }
+        return $this->exitCode;
     }
 }

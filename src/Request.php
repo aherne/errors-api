@@ -2,23 +2,24 @@
 
 namespace Lucinda\STDERR;
 
-use Lucinda\STDERR\Application\Route;
+use Lucinda\MVC\Facet;
+use Lucinda\STDERR\XmlTags\RouteInfo;
 
 /**
  * Encapsulates a STDERR request by matching routes @ XML with exception handled
  */
-class Request
+class Request implements Facet
 {
-    private Route $route;
+    private RouteInfo $route;
     private \Throwable $exception;
 
     /**
      * Detects route based on exception handled.
      *
-     * @param Route      $route     Matching route information detected from XML
+     * @param RouteInfo      $route     Matching route information detected from XML
      * @param \Throwable $exception Error "request" that fed STDERR stream
      */
-    public function __construct(Route $route, \Throwable $exception)
+    public function __construct(RouteInfo $route, \Throwable $exception)
     {
         $this->setRoute($route);
         $this->setException($exception);
@@ -27,9 +28,9 @@ class Request
     /**
      * Detects route based on exception handled.
      *
-     * @param Route $route
+     * @param RouteInfo $route
      */
-    private function setRoute(Route $route): void
+    private function setRoute(RouteInfo $route): void
     {
         $this->route = $route;
     }
@@ -37,9 +38,9 @@ class Request
     /**
      * Gets route that matches exception received.
      *
-     * @return Route
+     * @return RouteInfo
      */
-    public function getRoute(): Route
+    public function getRoute(): RouteInfo
     {
         return $this->route;
     }

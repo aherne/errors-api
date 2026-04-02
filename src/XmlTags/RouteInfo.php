@@ -1,43 +1,49 @@
 <?php
 
-namespace Lucinda\STDERR\Application;
+namespace Lucinda\STDERR\XmlTags;
 
 use Lucinda\MVC\ConfigurationException;
 use Lucinda\MVC\Response\HttpStatus;
+use Lucinda\MVC\XmlReader\Element;
 use Lucinda\STDERR\ErrorType;
 
 /**
  * Encapsulates a route that matches a handled exception
  */
-class Route extends \Lucinda\MVC\Application\Route
+class RouteInfo extends \Lucinda\MVC\XmlTags\RouteInfo
 {
     private ?HttpStatus $httpStatus = null;
     private ?ErrorType $errorType = null;
+    private ?int $exitCode = null;
 
     /**
      * Detects route info from <exception> tag
      *
-     * @param  \SimpleXMLElement $info
+     * @param  Element $element
      * @throws ConfigurationException
      */
-    public function __construct(\SimpleXMLElement $info)
+    public function __construct(Element $element)
     {
-        parent::__construct($info);
-        $this->setHttpStatus((string) $info["http_status"]);
-        $this->setErrorType((string) $info["error_type"]);
+        parent::__construct($element);
+        $attributes = $element->getAttributes();
+        $this->setHttpStatus($attributes);
+        $this->setErrorType($attributes);
+        $this->setExitCode($attributes);
     }
 
     /**
      * Sets http status associated to exception handled.
      *
-     * @param  string $httpStatus
+     * @param  array $attributes
      * @throws ConfigurationException
      */
-    private function setHttpStatus(string $httpStatus): void
+    private function setHttpStatus(array $attributes): void
     {
-        if (!$httpStatus) {
+        if (empty($attributes["http_status"])) {
             return;
         }
+
+        $httpStatus = $attributes["http_status"];
         $cases = HttpStatus::cases();
         foreach ($cases as $case) {
             if (str_starts_with($case->value, $httpStatus)) {
@@ -61,14 +67,16 @@ class Route extends \Lucinda\MVC\Application\Route
     /**
      * Sets HTTP status associated to exception handled.
      *
-     * @param  string $errorType
+     * @param  array $attributes
      * @throws ConfigurationException
      */
-    private function setErrorType(string $errorType): void
+    private function setErrorType(array $attributes): void
     {
-        if (!$errorType) {
+        if (empty($attributes["error_type"])) {
             return;
         }
+
+        $errorType = $attributes["error_type"];
         if ($case = ErrorType::tryFrom($errorType)) {
             $this->errorType = $case;
         } else {
@@ -84,5 +92,15 @@ class Route extends \Lucinda\MVC\Application\Route
     public function getErrorType(): ?ErrorType
     {
         return $this->errorType;
+    }
+
+    private function setExitCode(array $attributes): void
+    {
+        $this->exitCode = (int) ($attributes["exit_code"]??1);
+    }
+
+    public function getExitCode(): int
+    {
+        return $this->exitCode;
     }
 }
