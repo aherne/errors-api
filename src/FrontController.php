@@ -9,6 +9,8 @@ use Lucinda\MVC\FacetRegistry;
 use Lucinda\MVC\ReflectionInjector;
 use Lucinda\MVC\Response\HttpStatus;
 use Lucinda\MVC\Response\View;
+use Lucinda\MVC\Response\Http;
+use Lucinda\MVC\Response\Console;
 use Lucinda\MVC\Service\ViewDetector;
 use Lucinda\STDERR\Service\ContentTypeDetector;
 use Lucinda\STDERR\Validators\ValidatedRequest;
@@ -132,7 +134,7 @@ final class FrontController implements ErrorHandler
             // sets http status and commits response to caller
             $response->run();
 
-            if ($response instanceof ConsoleResponse) {
+            if ($response instanceof Console) {
                 $this->exitCode = $response->getExitCode();
             }
         } catch (\Throwable $apiException) {
@@ -151,14 +153,15 @@ final class FrontController implements ErrorHandler
 
             $response = null;
             if (PHP_SAPI !== 'cli') {
-                $response = new HttpResponse(HttpStatus::INTERNAL_SERVER_ERROR);
+                $response = new Http();
+                $response->setStatus(HttpStatus::INTERNAL_SERVER_ERROR);
             } else {
-                $response = new ConsoleResponse(self::DEFAULT_EXIT_CODE);
+                $response = new Console(self::DEFAULT_EXIT_CODE, STDERR);
             }
             $response->setBody($body);
             $response->run();
 
-            if ($response instanceof ConsoleResponse) {
+            if ($response instanceof Console) {
                 $this->exitCode = $response->getExitCode();
             }
         } catch (\Throwable $exception) {
@@ -235,11 +238,12 @@ final class FrontController implements ErrorHandler
             $status = $route->getHttpStatus();
             $httpStatus = ($status ?: HttpStatus::INTERNAL_SERVER_ERROR);
 
-            $response = new HttpResponse($httpStatus);
+            $response = new Http();
+            $response->setStatus($status);
             $response->setHeader("Content-Type", $contentType);
             return $response;
         } else {
-            return new ConsoleResponse($route->getExitCode()?:self::DEFAULT_EXIT_CODE);
+            return new Console($route->getExitCode()?:self::DEFAULT_EXIT_CODE, STDERR);
         }
     }
 
