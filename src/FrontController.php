@@ -33,7 +33,7 @@ final class FrontController implements ErrorHandler
     private FatalErrorResolver $emergencyResolver;
     protected FacetRegistry $facetRegistry;
     protected ReflectionInjector $reflectionInjector;
-    private bool $displayErrors;
+    private DisplayErrors $displayErrors;
 
     private bool $handling = false;
     private int $exitCode = self::DEFAULT_EXIT_CODE;
@@ -43,16 +43,16 @@ final class FrontController implements ErrorHandler
      *
      * @param string       $documentDescriptor     Path to XML file containing your application settings.
      * @param string       $includePath            Absolute root path where reporters / resolvers / controllers / views should be located
-     * @param ErrorReporter $errorReporter
+     * @param ErrorReporter $reporter
      * @param FatalErrorResolver $emergencyResolver       Handler to use if an error occurs while FrontController handles an exception
-     * @param bool $displayErrors 
+     * @param DisplayErrors $displayErrors 
      */
     public function __construct(
         string $documentDescriptor,
         string $includePath,
         ErrorReporter $reporter,
         FatalErrorResolver $emergencyResolver,
-        bool $displayErrors = false
+        DisplayErrors $displayErrors
     ) {
         // registers args to be used on demand
         $this->documentDescriptor = $documentDescriptor;
@@ -107,6 +107,9 @@ final class FrontController implements ErrorHandler
 
             // reports immediately
             $this->reporter->report($exception);
+
+            // adds display errors
+            $this->facetRegistry->put($this->displayErrors);
 
             // finds application settings based on XML and development environment
             $application = new Application($this->documentDescriptor);

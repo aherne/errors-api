@@ -6,6 +6,7 @@ use Lucinda\STDERR\FrontController;
 use Lucinda\UnitTest\Validator\Integers;
 use Lucinda\UnitTest\Validator\Objects;
 use Lucinda\UnitTest\Validator\Strings;
+use Test\Lucinda\STDERR\Support\RecordingDisplayErrors;
 use Test\Lucinda\STDERR\Support\RecordingFatalErrorResolver;
 use Test\Lucinda\STDERR\Support\RecordingReporter;
 
@@ -14,16 +15,19 @@ class FrontControllerTest
     private FrontController $object;
     private RecordingReporter $reporter;
     private RecordingFatalErrorResolver $emergencyResolver;
+    private RecordingDisplayErrors $displayErrors;
 
     public function __construct()
     {
         $this->reporter = new RecordingReporter();
         $this->emergencyResolver = new RecordingFatalErrorResolver();
+        $this->displayErrors = new RecordingDisplayErrors();
         $this->object = new FrontController(
             __DIR__."/fixtures/root.xml",
             getcwd(),
             $this->reporter,
-            $this->emergencyResolver
+            $this->emergencyResolver,
+            $this->displayErrors
         );
     }
 
@@ -35,6 +39,16 @@ class FrontControllerTest
         return (new Strings((string) $property->getValue($this->object)))->assertEquals("json");
     }
 
+    public function displayErrorsDependency()
+    {
+        $property = new \ReflectionProperty($this->object, "displayErrors");
+
+        return [
+            (new Objects($property->getValue($this->object)))->assertInstanceOf(RecordingDisplayErrors::class),
+            (new Integers(spl_object_id($property->getValue($this->object))))->assertEquals(spl_object_id($this->displayErrors))
+        ];
+    }
+
     public function handle()
     {
         $outputFile = sys_get_temp_dir()."/front-controller-handle-".uniqid("", true).".json";
@@ -43,11 +57,13 @@ require getcwd()."/vendor/autoload.php";
 
 $reporter = new \Test\Lucinda\STDERR\Support\RecordingReporter();
 $resolver = new \Test\Lucinda\STDERR\Support\RecordingFatalErrorResolver();
+$displayErrors = new \Test\Lucinda\STDERR\Support\RecordingDisplayErrors();
 $controller = new \Lucinda\STDERR\FrontController(
     getcwd()."/tests/fixtures/root.xml",
     getcwd(),
     $reporter,
-    $resolver
+    $resolver,
+    $displayErrors
 );
 $controller->handle(new \Test\Lucinda\STDERR\Support\NotFoundException("missing"));
 file_put_contents(
