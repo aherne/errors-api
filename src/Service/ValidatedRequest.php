@@ -1,11 +1,9 @@
 <?php
 
-namespace Lucinda\STDERR\Validators;
+namespace Lucinda\STDERR\Service;
 
 use Lucinda\MVC\RequestValidator;
 use Lucinda\STDERR\Application;
-use Lucinda\STDERR\Request;
-use Lucinda\STDOUT\Validators\ValidationFailedException;
 
 /**
  * Binds information in Request and Application objects in order to detect final route info

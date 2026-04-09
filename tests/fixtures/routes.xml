@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<xml>
+  <routes>
+    <route id="default" view="default" http_status="500" error_type="LOGICAL" exit_code="7"/>
+    <route
+      id="Test\Lucinda\STDERR\Support\NotFoundException"
+      view="not-found"
+      http_status="404"
+      error_type="CLIENT"
+      exit_code="4"
+    />
+  </routes>
+</xml>

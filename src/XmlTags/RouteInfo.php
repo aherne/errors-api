@@ -24,6 +24,9 @@ class RouteInfo extends \Lucinda\MVC\XmlTags\RouteInfo
      */
     public function __construct(Element $element)
     {
+        $this->controller = "";
+        $this->view = "";
+        $this->format = "";
         parent::__construct($element);
         $attributes = $element->getAttributes();
         $this->setHttpStatus($attributes);

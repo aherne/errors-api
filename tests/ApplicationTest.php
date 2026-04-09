@@ -2,66 +2,39 @@
 
 namespace Test\Lucinda\STDERR;
 
+use Lucinda\UnitTest\Validator\Objects;
+use Lucinda\UnitTest\Validator\Strings;
 use Lucinda\STDERR\Application;
-use Lucinda\UnitTest\Result;
+use Lucinda\STDERR\XmlTags\ResolverInfo;
+use Lucinda\STDERR\XmlTags\RouteInfo;
 
 class ApplicationTest
 {
-    private $object;
+    private Application $object;
 
     public function __construct()
     {
-        $this->object = new Application(__DIR__."/mocks/configuration.xml", "local");
+        $this->object = new Application(__DIR__."/fixtures/root.xml");
     }
 
-    public function getDefaultFormat()
+    public function getApplicationInfo()
     {
-        return new Result($this->object->getDefaultFormat()=="html");
+        $applicationInfo = $this->object->getApplicationInfo();
+
+        return [
+            (new Strings($applicationInfo->getDefaultRoute()))->assertEquals("default"),
+            (new Strings($applicationInfo->getDefaultFormat()))->assertEquals("txt"),
+            (new Strings($applicationInfo->getViewsFolder()))->assertEquals("tests/fixtures/views")
+        ];
     }
 
-    public function getViewsPath()
+    public function getResolvers()
     {
-        return new Result($this->object->getViewsPath()=="tests/mocks/views");
+        return (new Objects($this->object->getResolvers("txt")))->assertInstanceOf(ResolverInfo::class);
     }
 
-
-    public function getDisplayErrors()
+    public function getRoutes()
     {
-        return new Result($this->object->getDisplayErrors());
-    }
-
-
-    public function getVersion()
-    {
-        return new Result($this->object->getVersion()=="1.0.0");
-    }
-
-
-    public function reporters()
-    {
-        return new Result($this->object->reporters("Test\Lucinda\STDERR\mocks\Reporters\File")!==null);
-    }
-
-
-    public function resolvers()
-    {
-        return new Result($this->object->resolvers("html")!==null);
-    }
-
-
-    public function routes()
-    {
-        return new Result($this->object->routes("Test\Lucinda\STDERR\mocks\PathNotFoundException")!==null);
-    }
-
-
-    public function getTag()
-    {
-        return new Result($this->object->getTag("reporters")!==null);
-    }
-
-    public function getXML()
-    {
-        return new Result($this->object->getXML() instanceof \SimpleXMLElement);
+        return (new Objects($this->object->getRoutes("default")))->assertInstanceOf(RouteInfo::class);
     }
 }

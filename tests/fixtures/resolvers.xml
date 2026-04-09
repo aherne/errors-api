@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE xml>
+<xml>
+  <resolvers>
+    <resolver
+      format="txt"
+      content_type="text/plain"
+      charset="UTF-8"
+      class="Test\Lucinda\STDERR\Support\PlainTextViewResolver"
+    />
+    <resolver
+      format="json"
+      content_type="application/json"
+      charset="UTF-8"
+      class="Test\Lucinda\STDERR\Support\PlainTextViewResolver"
+    />
+  </resolvers>
+</xml>

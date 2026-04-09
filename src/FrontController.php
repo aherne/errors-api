@@ -13,7 +13,7 @@ use Lucinda\MVC\Response\Http;
 use Lucinda\MVC\Response\Console;
 use Lucinda\MVC\Service\ViewDetector;
 use Lucinda\STDERR\Service\ContentTypeDetector;
-use Lucinda\STDERR\Validators\ValidatedRequest;
+use Lucinda\STDERR\Service\ValidatedRequest;
 use Lucinda\STDERR\XmlTags\ResolverInfo;
 use Lucinda\STDERR\XmlTags\RouteInfo;
 use Throwable;
@@ -113,7 +113,7 @@ final class FrontController implements ErrorHandler
             $this->facetRegistry->put($application->getApplicationInfo());
 
             // detects route to handle
-            $requestValidator = new ValidatedRequest($application, $exception, $this->displayFormat);
+            $requestValidator = new ValidatedRequest($application, $exception, $this->displayFormat ?? "");
             $routeInfo = $application->getRoutes($requestValidator->getRoute());
             $resolverInfo = $application->getResolvers($requestValidator->getFormat());
 

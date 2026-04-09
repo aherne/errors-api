@@ -24,10 +24,8 @@ final class ResolverInfo extends AbstractResolverInfo
         parent::__construct($element);
 
         $attributes = $element->getAttributes();
-        if (PHP_SAPI !== 'cli') {
-            $this->setContentType($attributes);
-            $this->setCharacterEncoding($attributes);
-        }
+        $this->setContentType($attributes);
+        $this->setCharacterEncoding($attributes);
     }
     
     /**
@@ -63,7 +61,7 @@ final class ResolverInfo extends AbstractResolverInfo
      */
     private function setCharacterEncoding(array $attributes): void
     {
-        $this->contentType = $attributes["charset"]??"";
+        $this->characterEncoding = $attributes["charset"]??"";
     }
 
     /**

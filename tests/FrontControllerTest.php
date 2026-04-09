@@ -3,48 +3,96 @@
 namespace Test\Lucinda\STDERR;
 
 use Lucinda\STDERR\FrontController;
-use Lucinda\UnitTest\Result;
-use Lucinda\MVC\ConfigurationException;
-use Test\Lucinda\STDERR\mocks\MockEmergencyHandler;
-use Test\Lucinda\STDERR\mocks\PathNotFoundException;
+use Lucinda\UnitTest\Validator\Integers;
+use Lucinda\UnitTest\Validator\Objects;
+use Lucinda\UnitTest\Validator\Strings;
+use Test\Lucinda\STDERR\Support\RecordingFatalErrorResolver;
+use Test\Lucinda\STDERR\Support\RecordingReporter;
 
 class FrontControllerTest
 {
-    private $object;
+    private FrontController $object;
+    private RecordingReporter $reporter;
+    private RecordingFatalErrorResolver $emergencyResolver;
 
     public function __construct()
     {
-        $this->object = new FrontController(__DIR__."/mocks/configuration.xml", "local", dirname(__DIR__), new MockEmergencyHandler());
+        $this->reporter = new RecordingReporter();
+        $this->emergencyResolver = new RecordingFatalErrorResolver();
+        $this->object = new FrontController(
+            __DIR__."/fixtures/root.xml",
+            getcwd(),
+            $this->reporter,
+            $this->emergencyResolver
+        );
     }
 
     public function setDisplayFormat()
     {
-        $this->object->setDisplayFormat("html");
-        return new Result(true);
-    }
+        $this->object->setDisplayFormat("json");
+        $property = new \ReflectionProperty($this->object, "displayFormat");
 
+        return (new Strings((string) $property->getValue($this->object)))->assertEquals("json");
+    }
 
     public function handle()
     {
-        $results = [];
+        $outputFile = sys_get_temp_dir()."/front-controller-handle-".uniqid("", true).".json";
+        $bootstrap = <<<'PHP'
+require getcwd()."/vendor/autoload.php";
 
-        ob_start();
-        $this->object->handle(new ConfigurationException("asdf"));
-        $contents = ob_get_contents();
-        ob_end_clean();
+$reporter = new \Test\Lucinda\STDERR\Support\RecordingReporter();
+$resolver = new \Test\Lucinda\STDERR\Support\RecordingFatalErrorResolver();
+$controller = new \Lucinda\STDERR\FrontController(
+    getcwd()."/tests/fixtures/root.xml",
+    getcwd(),
+    $reporter,
+    $resolver
+);
+$controller->handle(new \Test\Lucinda\STDERR\Support\NotFoundException("missing"));
+file_put_contents(
+    $argv[1],
+    json_encode([
+        "report_count" => $reporter->getCount(),
+        "error_class" => $reporter->getLastError()::class,
+        "exit_code" => $controller->getExitCode()
+    ], JSON_THROW_ON_ERROR)
+);
+PHP;
+        shell_exec(
+            escapeshellarg(PHP_BINARY)
+            ." -r "
+            .escapeshellarg($bootstrap)
+            ." "
+            .escapeshellarg($outputFile)
+            ." 2>/dev/null"
+        );
+        $payload = json_decode((string) file_get_contents($outputFile), true);
+        @unlink($outputFile);
 
-        $results[] = new Result($contents==file_get_contents(__DIR__."/mocks/views/500.html"), "tested main route");
+        return [
+            (new Integers((int) ($payload["report_count"] ?? 0)))->assertEquals(1),
+            (new Strings($payload["error_class"] ?? ""))->assertEquals(\Test\Lucinda\STDERR\Support\NotFoundException::class),
+            (new Integers((int) ($payload["exit_code"] ?? 0)))->assertEquals(4)
+        ];
+    }
 
-        ob_start();
-        $_SERVER["REQUEST_URI"] = "/test";
-        $this->object->handle(new PathNotFoundException("asdf"));
-        $contents = ob_get_contents();
-        ob_end_clean();
+    public function handleFatal()
+    {
+        $exception = new \RuntimeException("fatal");
+        $previous = new \Test\Lucinda\STDERR\Support\FixtureException("root cause");
+        $this->object->handleFatal($exception, $previous);
 
-        $results[] = new Result($contents==str_replace('<?php echo $_VIEW["page"]; ?>', "/test", file_get_contents(__DIR__."/mocks/views/404.html")), "tested exception route");
+        return [
+            (new Integers($this->reporter->getCount()))->assertEquals(1),
+            (new Objects($this->reporter->getLastError()))->assertInstanceOf(\RuntimeException::class),
+            (new Strings($this->reporter->getLastPrevious()?->getMessage() ?? ""))->assertEquals("root cause"),
+            (new Integers($this->emergencyResolver->getCount()))->assertEquals(1)
+        ];
+    }
 
-        $results[] = new Result(strpos(file_get_contents(dirname(__DIR__)."/errors.log"), date("Y-m-d H:i:s")." asdf")!==false, "tested reporting");
-
-        return $results;
+    public function getExitCode()
+    {
+        return (new Integers($this->object->getExitCode()))->assertEquals(1);
     }
 }
