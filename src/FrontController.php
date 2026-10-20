@@ -242,7 +242,7 @@ final class FrontController implements ErrorHandler
             $httpStatus = ($status ?: HttpStatus::INTERNAL_SERVER_ERROR);
 
             $response = new Http();
-            $response->setStatus($status);
+            $response->setStatus($httpStatus);
             $response->setHeader("Content-Type", $contentType);
             return $response;
         } else {

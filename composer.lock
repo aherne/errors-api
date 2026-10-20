@@ -1,0 +1,122 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "183dbdce6ba6405252aae2080ef6c5f2",
+    "packages": [
+        {
+            "name": "lucinda/abstract_mvc",
+            "version": "v3.0.18",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aherne/mvc.git",
+                "reference": "faf98911cee8f78b3745b078a603df21e80586d6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aherne/mvc/zipball/faf98911cee8f78b3745b078a603df21e80586d6",
+                "reference": "faf98911cee8f78b3745b078a603df21e80586d6",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "lucinda/unit-testing": "^2.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Lucinda\\MVC\\": "src/",
+                    "Test\\Lucinda\\MVC\\": "tests/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lucian Popescu",
+                    "email": "lucian.gabriel.popescu@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Abstract MVC API to be extended based on STDIN type (url requests, exceptions)",
+            "keywords": [
+                "abstract",
+                "api",
+                "mvc"
+            ],
+            "support": {
+                "issues": "https://github.com/aherne/mvc/issues",
+                "source": "https://github.com/aherne/mvc/tree/v3.0.18"
+            },
+            "time": "2026-10-20T15:16:59+00:00"
+        }
+    ],
+    "packages-dev": [
+        {
+            "name": "lucinda/unit-testing",
+            "version": "v2.0.7",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/aherne/unit-testing.git",
+                "reference": "c7194bdaf76f84695026afc7571d5a193092808f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/aherne/unit-testing/zipball/c7194bdaf76f84695026afc7571d5a193092808f",
+                "reference": "c7194bdaf76f84695026afc7571d5a193092808f",
+                "shasum": ""
+            },
+            "require": {
+                "ext-curl": "*",
+                "ext-pdo": "*",
+                "ext-simplexml": "*",
+                "ext-tokenizer": "*",
+                "php": "^8.1"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Lucinda\\UnitTest\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Lucian Popescu",
+                    "email": "lucian.gabriel.popescu@gmail.com",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Lightweight PHP8.1 library for unit testing with zero dependencies",
+            "homepage": "https://github.com/aherne/unit-testing",
+            "keywords": [
+                "unit testing"
+            ],
+            "support": {
+                "issues": "https://github.com/aherne/unit-testing/issues",
+                "source": "https://github.com/aherne/unit-testing/tree/v2.0.7"
+            },
+            "time": "2026-06-19T07:03:19+00:00"
+        }
+    ],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": {},
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": {
+        "php": "^8.1",
+        "ext-simplexml": "*"
+    },
+    "platform-dev": {},
+    "plugin-api-version": "2.9.0"
+}
