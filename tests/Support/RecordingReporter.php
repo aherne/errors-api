@@ -11,7 +11,7 @@ class RecordingReporter implements ErrorReporter
      */
     private array $entries = [];
 
-    public function report(\Throwable $error, ?\Throwable $previous = null)
+    public function report(\Throwable $error, ?\Throwable $previous = null): void
     {
         $this->entries[] = [
             "error" => $error,

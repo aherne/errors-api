@@ -4,5 +4,5 @@ namespace Lucinda\STDERR;
 
 interface ErrorReporter
 {
-    public function report(\Throwable $error, ?\Throwable $previous = null);
+    public function report(\Throwable $error, ?\Throwable $previous = null): void;
 }
