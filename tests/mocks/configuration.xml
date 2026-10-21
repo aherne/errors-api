@@ -4,9 +4,6 @@
   <application default_route="default" default_format="html" version="1.0.0">
     <paths views="tests/mocks/views"/>
   </application>
-  <display_errors>
-    <local>1</local>
-  </display_errors>
   <resolvers>
     <resolver format="html" content_type="text/html" class="Test\Lucinda\STDERR\mocks\Resolvers\Html" charset="UTF-8"/>
   </resolvers>
