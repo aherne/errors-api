@@ -17,4 +17,5 @@ enum ErrorType: string
     case CLIENT = "CLIENT"; // Exceptions thrown when client is at fault (eg: asking for a resource that doesn't exist)
     case SYNTAX = "SYNTAX"; // Exceptions thrown automatically when a syntax error occurs
     case LOGICAL = "LOGICAL"; // Exceptions thrown on logical errors in code
+    case INTERNAL = "INTERNAL"; // Exceptions thrown when this API fails while handling
 }

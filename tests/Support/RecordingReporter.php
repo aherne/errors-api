@@ -3,6 +3,7 @@
 namespace Test\Lucinda\STDERR\Support;
 
 use Lucinda\STDERR\ErrorReporter;
+use Lucinda\STDERR\ErrorType;
 
 class RecordingReporter implements ErrorReporter
 {
@@ -11,7 +12,7 @@ class RecordingReporter implements ErrorReporter
      */
     private array $entries = [];
 
-    public function report(\Throwable $error, ?\Throwable $previous = null): void
+    public function report(ErrorType $errorType, \Throwable $error, ?\Throwable $previous = null): void
     {
         $this->entries[] = [
             "error" => $error,

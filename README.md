@@ -192,7 +192,7 @@ Current route behavior:
 - `controller` is optional
 - `view` is the MVC view name used by Lucinda MVC view detection
 - `http_status` is optional but validated against `Lucinda\MVC\Response\HttpStatus`
-- `error_type` is optional but validated against [`ErrorType`](src/ErrorType.php)
+- `error_type` is mandatory and validated against [`ErrorType`](src/ErrorType.php)
 - `exit_code` defaults to `1` and is used for CLI responses
 
 Route matching is exact by exception class name. If no direct route exists, the configured default route is used.
@@ -206,7 +206,7 @@ Route matching is exact by exception class name. If no direct route exists, the 
 ```php
 interface ErrorReporter
 {
-    public function report(\Throwable $error, ?\Throwable $previous = null);
+    public function report(ErrorType $errorType, \Throwable $error, ?\Throwable $previous = null);
 }
 ```
 

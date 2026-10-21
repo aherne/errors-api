@@ -105,9 +105,6 @@ final class FrontController implements ErrorHandler
             // sets include path
             set_include_path($this->includePath);
 
-            // reports immediately
-            $this->reporter->report($exception);
-
             // adds display errors
             $this->facetRegistry->put($this->displayErrors);
 
@@ -119,6 +116,9 @@ final class FrontController implements ErrorHandler
             $requestValidator = new ValidatedRequest($application, $exception, $this->displayFormat ?? "");
             $routeInfo = $application->getRoutes($requestValidator->getRoute());
             $resolverInfo = $application->getResolvers($requestValidator->getFormat());
+
+            // reports immediately
+            $this->reporter->report($routeInfo->getErrorType(), $exception);
 
             // finds and instances routes based on XML and exception received
             $request = new Request($routeInfo, $exception);
@@ -150,7 +150,7 @@ final class FrontController implements ErrorHandler
     public function handleFatal(Throwable $exception, ?Throwable $previous = null): void
     {
         try {
-            $this->reporter->report($exception, $previous);
+            $this->reporter->report(ErrorType::INTERNAL, $exception, $previous);
 
             $body = $this->emergencyResolver->resolve($exception, $previous);
 

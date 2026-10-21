@@ -13,7 +13,7 @@ use Lucinda\STDERR\ErrorType;
 class RouteInfo extends \Lucinda\MVC\XmlTags\RouteInfo
 {
     private ?HttpStatus $httpStatus = null;
-    private ?ErrorType $errorType = null;
+    private ErrorType $errorType;
     private ?int $exitCode = null;
 
     /**
@@ -76,7 +76,7 @@ class RouteInfo extends \Lucinda\MVC\XmlTags\RouteInfo
     private function setErrorType(array $attributes): void
     {
         if (empty($attributes["error_type"])) {
-            return;
+            throw new ConfigurationException("STDERR attribute 'error_type' is mandatory for 'route' tag");
         }
 
         $errorType = $attributes["error_type"];
@@ -90,9 +90,9 @@ class RouteInfo extends \Lucinda\MVC\XmlTags\RouteInfo
     /**
      * Gets error type associated to exception handled.
      *
-     * @return ?ErrorType
+     * @return ErrorType
      */
-    public function getErrorType(): ?ErrorType
+    public function getErrorType(): ErrorType
     {
         return $this->errorType;
     }
