@@ -116,6 +116,7 @@ final class FrontController implements ErrorHandler
             $requestValidator = new ValidatedRequest($application, $exception, $this->displayFormat ?? "");
             $routeInfo = $application->getRoutes($requestValidator->getRoute());
             $resolverInfo = $application->getResolvers($requestValidator->getFormat());
+            $this->facetRegistry->put($requestValidator);
 
             // reports immediately
             $this->reporter->report($routeInfo->getErrorType(), $exception);

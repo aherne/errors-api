@@ -2,13 +2,14 @@
 
 namespace Lucinda\STDERR\Service;
 
+use Lucinda\MVC\Facet;
 use Lucinda\MVC\RequestValidator;
 use Lucinda\STDERR\Application;
 
 /**
  * Binds information in Request and Application objects in order to detect final route info
  */
-final class ValidatedRequest implements RequestValidator
+final class ValidatedRequest implements RequestValidator, Facet
 {
     private string $page;
     private string $format;
